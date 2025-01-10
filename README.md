@@ -8,3 +8,10 @@ Create graph based on EBIOS RM method
 
 Use it here : 
 [carto.html](https://seb1k.github.io/EBIOS-RM-Graph/carto.html)
+
+
+
+# Info : 
+
+Single HTML page, no image or library used.
+Based on EBIOS RM V1.5
