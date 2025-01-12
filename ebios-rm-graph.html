@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Atelier 3 - Cartographie</title>
+<style>
+
+html {
+font-family: Helvetica, Sans-Serif;
+}
+
+body{
+margin:0;
+}
+
+svg{
+border-radius:8px;
+}
+.at1bg{
+background-color:#FB3199
+}
+.at2bg{
+background-color:#6D2163
+}
+.at3bg{
+background-color:#00A7A2
+}
+.at4bg{
+background-color:#BFA100
+}
+.at5bg{
+background-color:#E3394A
+}
+
+
+#layout-sidebar{
+min-width:220px;
+height: 100vh;
+position: relative;
+user-select: none;
+background-color:#eee;
+white-space: nowrap;
+}
+
+
+#layout-sidebar .mini{
+width:18px;
+height:18px;
+display:inline-block;
+font-weight:bold;
+color:#fff;
+line-height:18px;
+text-align:center;
+border-radius:4px;
+margin-left:6px;
+margin-right:6px;
+}
+
+.submenu .mini{
+margin-left:26px !important;
+display:block;
+}
+.submenu_activ{
+background-color: #ddd;
+}
+
+div:hover .disabled{
+text-decoration: none !important;
+cursor:default !important;
+}
+
+.disabled .mini{
+background-color: #ddd !important;
+
+}
+
+#layout-sidebar div{
+width:100%;
+height:24px;
+line-height:24px;
+cursor:pointer;
+}
+
+#layout-sidebar div:hover{
+text-decoration: underline;
+}
+
+#headeratelier .inactiv{
+filter: brightness(.7);
+}
+
+
+.at3_pp{
+border : 1px solid grey;
+border-radius:8px;
+display:block;
+max-width:400px;
+margin:8px;
+padding:4px;
+position:relative;
+}
+
+.overcircle{
+background-color:#F4B7BD;
+border-color:#000;
+}
+
+.close{
+display:inline-block;
+position:absolute;
+top:0px;
+right:0px;
+padding: 4px 6px;
+
+cursor:pointer;
+}
+
+
+#divgrey{
+position:absolute;
+width:100%;
+height:100%;
+top:0;
+left:0;
+background-color:#333;
+z-index:100;
+display:none;
+opacity:.7;
+}
+
+
+#divover{
+position:absolute;
+background-color:#fff;
+z-index:100;
+display:none;
+box-shadow: 0 4px 16px 0 #aaa;
+border-radius:4px;
+padding:4px 8px;
+}
+
+#divmenuover{
+position:absolute;
+background-color:#fff;
+z-index:100;
+display:none;
+box-shadow: 0 4px 16px 0 #aaa;
+border-radius:4px;
+
+}
+
+#divmenuover div{
+height:40px;
+line-height:40px;
+cursor:pointer;
+padding-right:8px;
+}
+
+#divmenuover div:hover{
+background-color:#eee;
+}
+
+.menacelvl{
+cursor:pointer;
+}
+
+#div_menace, #divcenter{
+display:none;
+position:absolute;
+top:20px;
+background-color:#fff;
+min-width:550px;
+z-index:150;
+
+left: 0; 
+  right: 0; 
+ margin-inline: auto; 
+  width: fit-content;
+  
+  
+padding:4px;
+border-radius:8px;
+}
+
+.at3_cat
+{
+position: relative;
+display:block;
+padding:4px;
+border: 1px solid black;
+border-radius:8px;
+width:300px;
+margin-bottom:8px;
+}
+
+.svgaddedclick{
+cursor:pointer;
+}
+
+
+.listblock{
+margin-left:8px;
+}
+
+#at2a_tablesrovexemple{
+cursor:pointer;
+background-color:#E2D3E0;
+border-collapse:collapse;
+}
+
+#at2a_tablesrovexemple tr:hover{
+background-color:#d2b3d0;
+}
+
+.td_reducetext{
+height:90px;
+width:300px;
+overflow:auto;
+}
+
+.at2b_mra{
+height:90px;
+}
+.at2b_mra div{
+height:50%;
+line-height:45px;
+cursor:pointer;
+user-select: none;
+}
+
+
+.at2b_mra_a{
+display:none;
+}
+
+.at2b_mra_m div, .at2b_mra_r div, .at2b_mra_a div{
+height:100%;
+width:100%;
+text-indent:6px;
+}
+
+.optioncolumn
+{
+width:24px;
+text-align:center;
+}
+
+</style>
+
+
+
+<script>
+var ipp = 0;
+var icat = 0;
+
+
+log = function() {    return Function.prototype.bind.call(console.log, console);}();
+warn = function() {    return Function.prototype.bind.call(console.warn, console);}();
+error = function() {    return Function.prototype.bind.call(console.error, console);}();
+ 
+
+function newpp(elem)
+{
+if(!elem)	var inblock = document.querySelector('.at3_cat').querySelector('.listpp');
+else		var inblock= elem.closest('.at3_cat').querySelector('.listpp');
+
+ipp++
+
+var HTML ="<div class='at3_pp' data-expo='9' data-fiab='4' data-menace='2.25' data-dep='3' data-pen='3' data-mat='2' data-conf='2' >"
+
+
+HTML+="<input type=text value='Partie p. "+ipp+"'></input><br/>"
+
+HTML+="<div class='close' onclick=deletepp(this)>X</div>"
+
+HTML+="<span class='menacelvl' onclick='chmenace(this)'>Menace : <span class='menace'>2.25</span> <div style='transform: scale(-1, 1);display: inline-block;font-size: 20px;'>&#x270E;</div></span><br/>"
+
+
+
+HTML+="</div>"
+inblock.innerHTML=inblock.innerHTML+HTML
+
+at3a_redraw_graph()
+}
+
+
+
+var clickmenace = false
+function chmenace(elem)
+{
+
+var pp=elem.closest('.at3_pp')
+dep.value = pp.dataset.dep
+pen.value = pp.dataset.pen
+mat.value = pp.dataset.mat
+conf.value =  pp.dataset.conf
+
+
+clickmenace=elem;
+
+show_divgrey()
+div_menace.style.display='block'
+
+calcexpo()
+calcfiab()
+}
+
+function show_divcenter()
+{
+show_divgrey()
+divcenter.style.display='block'
+
+divcenter.querySelectorAll(":scope > div").forEach(e => e.style.display="none");
+}
+
+function hide_divcenter()
+{
+divcenter.style.display='none'
+}
+
+function show_divgrey()
+{
+divgrey.style.display="block"
+}
+
+function hide_divgrey()
+{
+divgrey.style.display='none'
+div_menace.style.display='none'
+divcenter.style.display='none'
+}
+
+function menaceok()
+{
+
+var newexpo = (dep.value*pen.value)
+var newfiab = (mat.value*conf.value)
+var newmenace=Math.round(newexpo/newfiab * 100) / 100
+
+clickmenace.querySelector('.menace').innerHTML=newmenace
+
+
+menace_set(clickmenace.closest('.at3_pp'),newexpo,newfiab,newmenace)
+
+
+div_menace.style.display='none'
+divgrey.style.display='none'
+
+at3a_redraw_graph()
+}
+
+function menace_set(clickmenacediv,e,f,m)
+{
+clickmenacediv.dataset.dep = dep.value
+clickmenacediv.dataset.pen = pen.value
+clickmenacediv.dataset.mat = mat.value
+clickmenacediv.dataset.conf = conf.value
+
+clickmenacediv.dataset.expo = e
+clickmenacediv.dataset.fiab = f
+clickmenacediv.dataset.menace = m
+}
+
+
+
+function new_cat()
+{
+
+var listblock = document.querySelector('.listblock')
+icat++
+var HTML ="<div class='at3_cat'>"
+
+var txt = "Clients"
+if(icat==2)txt = "Partenaires"
+if(icat==3)txt = "Prestataires"
+if(icat==4)txt = "Interne"
+if(icat>4) txt = "Cat. "+icat
+HTML+="<input type=text value='"+txt+"'></input> "
+HTML+='<button onclick="newpp(this)" style="height:24px;cursor:pointer"> + Partie prenante </button><br/>'
+
+HTML+="<div class='close' onclick=deletecat(this)>X</div>"
+
+
+
+
+HTML+='<div class="listpp"></div>'
+
+
+
+HTML+="</div>"
+listblock.innerHTML=listblock.innerHTML+HTML
+
+at3a_redraw_graph()
+}
+
+
+function at3a_redraw_graph()
+{
+
+document.querySelectorAll('.svgadded, .svgaddedclick').forEach(e => e.remove());
+
+redraw_block()
+redraw_pp()
+}
+
+
+
+function over_pp(event,elem)
+{
+document.querySelectorAll('.overcircle').forEach(e => e.classList.remove('overcircle'));
+
+
+var icat=parseInt(elem.dataset.icat)
+var ipp=parseInt(elem.dataset.ipp)
+
+var ppover = document.querySelectorAll('.at3_cat')[icat].querySelectorAll('.at3_pp')[ipp]
+
+ppover.classList.add('overcircle');
+
+
+divover.style.display="inline-block";
+
+divover.style.left=elem.getBoundingClientRect().right+15+"px"//40+event.clientX+"px"
+divover.style.top=elem.getBoundingClientRect().bottom-50+"px"//-30+event.clientY+"px"
+
+var HTML=""
+
+HTML += "<b>"+ppover.querySelector('input').value+"</b><br/>"
+HTML += "<table>"
+HTML += "<tr><td>Menace</td><td>:</td><td>"+ppover.dataset.menace+"<td/></tr>"
+HTML += "<tr><td>Expo.</td><td>:</td><td>"+ppover.dataset.expo+"<td/></tr>"
+HTML += "<tr><td>Fiabilité</td><td>:</td><td>"+ppover.dataset.fiab+"<td/></tr>"
+HTML += "</table>"
+divover.innerHTML = HTML
+}
+
+function out_pp(elem)
+{
+document.querySelectorAll('.overcircle').forEach(e => e.classList.remove('overcircle'));
+divover.style.display="none";
+}
+
+
+function click_pp(elem)
+{
+var icat=parseInt(elem.dataset.icat)
+var ipp=parseInt(elem.dataset.ipp)
+
+document.querySelectorAll('.at3_cat')[icat].querySelectorAll('.at3_pp')[ipp].querySelector('.menace').click()
+}
+
+function redraw_pp()
+{
+
+var cats=document.querySelectorAll('.at3_cat')
+
+
+for(var icat=0;icat<cats.length;icat++)
+	{
+	var anglestart = cats[icat].dataset.anglestart
+	var anglestop = cats[icat].dataset.anglestop
+	var pps_in_block=cats[icat].querySelectorAll('.at3_pp')
+	
+	for(var i=0;i<pps_in_block.length;i++)
+		{
+		
+		var pp = pps_in_block[i]
+		
+		var expo 	= pp.dataset.expo
+		var fiab 	= pp.dataset.fiab
+		var menace 	= pp.dataset.menace
+		
+		if(menace>5.9)menace=5.9;
+		var distance = 300 - 50 * menace
+
+		var space_between_pp=(-anglestop-anglestart)/(pps_in_block.length+1)
+		
+		var angler = (-space_between_pp-anglestart-space_between_pp*i) / 180 * Math.PI;
+		var posx=Math.cos(angler) * distance
+		var posy=Math.sin(angler) * distance
+
+
+		var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		newLine.setAttribute('class',"svgaddedclick");
+		newLine.setAttribute('data-icat',icat);
+		newLine.setAttribute('data-ipp',i);
+		newLine.setAttribute('onmouseover',"over_pp(event,this)");
+		newLine.setAttribute('onmouseout',"out_pp(this)");
+		newLine.setAttribute('onclick',"click_pp(this)");
+		newLine.setAttribute('cx',posx);
+		newLine.setAttribute('cy',posy);
+		
+		var fiabcolor = "#9B9C9F"
+		if(fiab<7)fiabcolor = "#B1D4E9"
+		if(fiab<5)fiabcolor = "#D97E8F"
+		if(fiab<4)fiabcolor = "#E3394A"
+		newLine.setAttribute('fill',fiabcolor);
+
+		var rsize = "20"
+		if(expo<9)rsize = "16"
+		if(expo<6)rsize = "13"
+		if(expo<3)rsize = "10"
+		newLine.setAttribute('r',rsize);
+		
+		newLine.setAttribute('stroke',"#aaa");
+		newLine.setAttribute('stroke-width',1);	
+
+		document.getElementById("at3a_svg").append(newLine);
+		}
+	
+	}
+}
+
+
+
+function redraw_block()
+{
+
+var cats=document.querySelectorAll('.at3_cat')
+var nbcats=cats.length
+
+
+// SEUIL1
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('fill',"none");
+newLine.setAttribute('stroke',"#00A7A2");
+newLine.setAttribute("stroke-width", "3")
+newLine.setAttribute("stroke-opacity", "80%")
+newLine.setAttribute('r',300-seuil1.value*50);
+at3a_svg.insertBefore(newLine,bluecircle);
+
+// SEUIL2
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('fill',"none");
+newLine.setAttribute('stroke',"#F6E742");
+newLine.setAttribute("stroke-width", "3")
+newLine.setAttribute("stroke-opacity", "80%")
+newLine.setAttribute('r',300-seuil2.value*50);
+at3a_svg.insertBefore(newLine,bluecircle);
+
+// SEUIL3
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('fill',"none");
+newLine.setAttribute('stroke',"#E3394A");
+newLine.setAttribute("stroke-width", "3")
+newLine.setAttribute("stroke-opacity", "80%")
+newLine.setAttribute('r',300-seuil3.value*50);
+at3a_svg.insertBefore(newLine,bluecircle);
+
+
+svg_seuil1.innerHTML="Seuil "+seuil1.value
+svg_seuil2.innerHTML="Seuil "+seuil2.value
+svg_seuil3.innerHTML="Seuil "+seuil3.value
+
+
+for(var icat=0;icat<nbcats;icat++)
+{
+
+var tcolor=["mediumslateblue","darkorange","forestgreen","firebrick","chocolate"]
+var color = tcolor[icat%tcolor.length]
+
+var angle_p_cat = 270 / nbcats
+blockstart=icat*angle_p_cat
+
+cats[icat].dataset.anglestart=blockstart
+cats[icat].dataset.anglestop=-blockstart-angle_p_cat
+
+var textblock = cats[icat].querySelector('input').value
+
+var distance = 340 
+var angler = (-blockstart-2) / 180 * Math.PI;
+
+var posx1=Math.cos(angler) * distance
+var posy1=Math.sin(angler) * distance
+
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+newLine.setAttribute('class',"svgadded");
+
+newLine.setAttribute('x2',posx1);
+newLine.setAttribute('y2',posy1);
+newLine.setAttribute("stroke", color)
+newLine.setAttribute("stroke-dasharray", "6")
+newLine.setAttribute("stroke-width", "2")
+document.getElementById("at3a_svg").insertBefore(newLine,bluecircle);
+
+
+var angler = (-blockstart-angle_p_cat+2) / 180 * Math.PI;
+var posx2=Math.cos(angler) * distance
+var posy2=Math.sin(angler) * distance
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+newLine.setAttribute('class',"svgadded");
+
+newLine.setAttribute('x2',posx2);
+newLine.setAttribute('y2',posy2);
+newLine.setAttribute("stroke", color)
+newLine.setAttribute("stroke-dasharray", "6")
+newLine.setAttribute("stroke-width", "2")
+document.getElementById("at3a_svg").insertBefore(newLine,bluecircle);
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','path');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('id',"curvepp"+icat);
+//newLine.setAttribute('d','M '+posx1+' '+posy1+' A 150 150 20 0 0 '+posx2+' '+posy2);
+if(angle_p_cat<180)
+	newLine.setAttribute('d','M '+posx1+' '+posy1+' A '+distance+' '+distance+' 0 0 0 '+posx2+' '+posy2);
+else
+	newLine.setAttribute('d','M '+posx1+' '+posy1+' A '+distance+' '+distance+' 1 1 0 '+posx2+' '+posy2);
+
+var center_block_side = 2 * distance * Math.PI /360 * (angle_p_cat-5) /2
+
+newLine.setAttribute("stroke", color)
+
+newLine.setAttribute("stroke-width", "2.5")
+newLine.setAttribute("stroke-dasharray", "6")
+newLine.setAttribute("fill", "none")
+document.getElementById("at3a_svg").insertBefore(newLine,bluecircle);
+
+
+var text1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+text1.setAttribute('class',"svgadded");
+text1.setAttributeNS(null, "fill", color);
+text1.setAttributeNS(null,"font-size","24px");
+text1.setAttributeNS(null,"x", center_block_side);
+text1.setAttributeNS(null,"dy", "-5");
+
+text1.setAttributeNS(null, "text-anchor", "middle");
+
+
+var textpath = document.createElementNS("http://www.w3.org/2000/svg","textPath");
+textpath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#curvepp"+icat);   
+var ringdatenode = document.createTextNode(textblock);
+textpath.appendChild(ringdatenode);
+text1.appendChild(textpath);
+document.getElementById("at3a_svg").appendChild(text1);  
+}
+}
+
+
+
+
+function deletecat(elem)
+{
+elem.closest('.at3_cat').remove()
+at3a_redraw_graph()
+}
+
+function deletepp(elem)
+{
+elem.closest('.at3_pp').remove()
+at3a_redraw_graph()
+}
+
+
+function go()
+{
+new_cat()
+new_cat()
+new_cat()
+
+
+showatt('at2a',document.querySelector('.startscript'))
+}
+
+
+function seuil()
+{
+if(divseuil.style.display=="block")
+	{
+	document.querySelector('.listblock').style.display="block"
+	butnewcat.style.display="inline-block"
+	divseuil.style.display="none"
+	
+	
+	return;
+	}
+document.querySelector('.listblock').style.display="none"
+butnewcat.style.display="none"
+divseuil.style.display="block"
+
+}
+
+function calcexpo()
+{
+calcexpotext.innerHTML=" ( "+parseInt(dep.value)*parseInt(pen.value)+" )"
+}
+
+function calcfiab()
+{
+calcfiabtext.innerHTML=" ( "+parseInt(mat.value)*parseInt(conf.value)+" )"
+}
+
+
+function clickmenu(elem)
+{
+var id=elem.id;
+var isclose=(document.querySelector("."+id+"open").style.display=="none")
+
+var todo = "none"
+if(isclose)
+	todo = "block"
+document.querySelectorAll("."+id+"open").forEach(e => e.style.display=todo);
+}
+
+function at2a_newsrov()
+{
+show_divcenter()
+at2a_newsrovdiv.style.display="block"
+at2a_text_sr.value=""
+at2a_text_ov.value=""
+}
+
+function at2a_newsrovok()
+{
+hide_divgrey()
+if(at2a_text_ov.value=="")
+	{
+	return;
+	}
+	
+var nbline = at2a_srovlist.rows.length
+var sr="SR"+(nbline+1)
+for(var i=0;i<nbline;i++)
+	{
+	if(at2a_srovlist.rows[i].cells[2].innerText==at2a_text_sr.value)
+		{
+		sr=at2a_srovlist.rows[i].dataset.sr
+		break;
+		}
+	}
+var ovlist=[]
+var idsrovlist=[]
+for(var i=0;i<nbline;i++)
+	{
+	ovlist.push(at2a_srovlist.rows[i].dataset.ov);
+	idsrovlist.push(at2a_srovlist.rows[i].dataset.idsrov);
+	}
+	
+for(var ovi=1;ovi<9999;ovi++)
+	{
+	if(!ovlist.includes("OV"+ovi)) 
+		break;
+	}
+
+
+for(var idsrov=1;idsrov<9999;idsrov++)
+	{
+	if(!idsrovlist.includes("idsrov"+idsrov)) 
+		{
+		idsrov="idsrov"+idsrov
+		break;
+		}
+	}
+	
+
+var row = at2a_srovlist.insertRow();
+row.dataset.idsrov=idsrov
+row.dataset.sr=sr
+row.dataset.ov="OV"+ovi
+var cell0 = row.insertCell(0);
+var cell1 = row.insertCell(1);
+var cell2 = row.insertCell(2);
+var cell3 = row.insertCell(3);
+var cell4 = row.insertCell(4);
+cell0.innerHTML = "<input type='checkbox' />";cell0.className = "optioncolumn";
+cell1.innerHTML = sr;
+cell2.innerHTML = at2a_text_sr.value;
+cell3.innerHTML = "OV"+ovi;
+cell4.innerHTML = at2a_text_ov.value;
+
+var row = at2b_srovlist.insertRow();
+row.dataset.idsrov=idsrov
+var cell1 = row.insertCell(0);
+var cell2 = row.insertCell(1);
+var cell3 = row.insertCell(2);
+var cell4 = row.insertCell(3);
+var cell5 = row.insertCell(4);
+var cell6 = row.insertCell(5);
+var cell7 = row.insertCell(6);
+var cell8 = row.insertCell(7);
+var cell9 = row.insertCell(8);
+
+cell1.innerHTML = sr;
+cell2.innerHTML = at2a_text_sr.value;
+cell3.innerHTML = "OV"+ovi;
+cell4.innerHTML = "<div class='td_reducetext'>"+at2a_text_ov.value+"</div>"
+cell5.innerHTML = "<div class='mra2do'></div>";
+cell6.className = "at2b_pertinence";
+cell7.innerHTML = "<select><option value='1'>1 - Faible</option><option value='2'>2 - Moyen</option><option value='3'>3 - Elevé</option></select>"
+cell8.innerHTML = "<input class='checkboxsrov' type='checkbox' onchange='at2b_redraw_graph()'/>"
+cell9.innerHTML = "<textarea style='width:200px;height:90px'></textarea>"
+
+
+
+var row = at2c_srovlist.insertRow();
+row.dataset.idsrov=idsrov
+var cell1 = row.insertCell(0);
+var cell2 = row.insertCell(1);
+
+cell1.innerHTML = at2a_text_sr.value;
+cell2.innerHTML = "<div class='td_reducetext'>"+at2a_text_ov.value+"</div>"
+
+
+
+
+
+
+create_mra2do()
+}
+
+function create_mra2do()
+{
+document.querySelectorAll(".mra2do").forEach(e => createmradiv(e));
+at2b_redraw_graph()
+}
+
+function createmradiv(elem)
+{
+elem.innerHTML="<div class='at2b_mra_m' onclick='at2b_chmra(this)'><div>Motivation</div></div><div class='at2b_mra_r' onclick='at2b_chmra(this)'><div>Ressources</div></div><div class='at2b_mra_a' onclick='at2b_chmra(this)'><div>Activité</div></div>"
+elem.className="at2b_mra"
+elem.dataset.m = "1"
+elem.dataset.r = "2"
+elem.dataset.a = "3"
+at2b_chmra_draw(elem)
+}
+
+function at2a_choosesrov(elem)
+{
+/*
+if(at2a_text_ov.value.length>20)
+	if(!confirm('Effacer le texte "Objectifs Visés"'))
+		return;
+*/
+at2a_text_sr.value=elem.querySelectorAll("td")[0].innerText
+at2a_text_ov.value=elem.querySelectorAll("td")[1].innerText
+}
+
+function showatt(att,elem)
+{
+if(elem.classList.contains('disabled'))	return;
+
+layout_content.querySelectorAll(":scope > div").forEach(e => e.style.display="none");
+document.querySelectorAll("#"+att).forEach(e => e.style.display="block");
+
+document.querySelectorAll('.submenu_activ').forEach(e => e.classList.remove('submenu_activ'));
+elem.classList.add('submenu_activ')
+
+load_att(att)
+}
+
+function load_att(att)
+{
+if(att=="at2b") at2b_redraw_graph()
+if(att=="at2c") at2c_redraw()
+if(att=="at3a") at3a_redraw_graph()
+}
+
+function at2c_redraw()
+{
+at2c_srovlist.querySelectorAll('tr').forEach(e => e.style.display="none");
+
+var toshow=[]
+at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
+
+for(var i=0;i<toshow.length;i++)
+	{
+	document.querySelectorAll("[data-idsrov='"+toshow[i]+"']").forEach(e => e.style.display="table-row");
+	}
+}
+
+
+function at2b_chmra(elem)
+{
+var eleminfo=elem.closest(".at2b_mra")
+
+if(elem.className=="at2b_mra_m")	var v=eleminfo.dataset.m
+if(elem.className=="at2b_mra_r")	var v=eleminfo.dataset.r
+if(elem.className=="at2b_mra_a")	var v=eleminfo.dataset.a
+
+v=parseInt(v)
+
+v++
+if(v>3)v=1
+
+if(elem.className=="at2b_mra_m") eleminfo.dataset.m=v
+if(elem.className=="at2b_mra_r") eleminfo.dataset.r=v
+if(elem.className=="at2b_mra_a") eleminfo.dataset.a=v
+
+at2b_chmra_draw(eleminfo)
+at2b_redraw_graph()
+}
+
+function at2b_chmra_draw(elem)
+{
+var m=parseInt(elem.dataset.m)
+var r=parseInt(elem.dataset.r)
+var a=parseInt(elem.dataset.a)
+
+var c=["#afa","#ffa","#faa"]
+var size=["33%","66%","100%"]
+var pert_text=["Faible","Moyen","Elevé"]
+
+var divm = elem.querySelector(".at2b_mra_m").querySelector("div").style
+var divr = elem.querySelector(".at2b_mra_r").querySelector("div").style
+var diva = elem.querySelector(".at2b_mra_a").querySelector("div").style
+
+
+divm.backgroundColor=c[m-1]
+divm.width=size[m-1]
+divr.backgroundColor=c[r-1]
+divr.width=size[r-1]
+diva.backgroundColor=c[a-1]
+diva.width=size[a-1]
+
+var pertinencecalc=m*r
+var pertinence=1
+if(pertinencecalc>2)pertinence=2
+if(pertinencecalc>4)pertinence=3
+
+var tr = elem.closest("tr")
+var perttd=tr.querySelector(".at2b_pertinence")
+
+tr.dataset.pertinence=pertinence
+perttd.style.backgroundColor=c[pertinence-1]
+perttd.innerText=pert_text[pertinence-1]
+}
+
+function at2b_redraw_graph()
+{
+document.querySelectorAll('.svgadded, .svgaddedclick').forEach(e => e.remove());
+at2b_redraw_svg1()
+at2b_redraw_svg2()
+}
+
+
+
+
+function at2b_redraw_svg1()
+{
+
+var tab = document.querySelector('#at2b_srovlist')
+var nbline = tab.rows.length 
+
+var tabSR=[]
+var infoangleblock = {};
+
+for(var i=0;i<nbline;i++)
+	{
+	var txt = tab.rows[i].cells[0].innerText.trim()
+	if(txt)tabSR.push(txt)
+	}
+tabSR = [...new Set(tabSR)]; // filter unique
+
+
+var nbcats=tabSR.length
+
+
+for(var icat=0;icat<nbcats;icat++)
+{
+var tcolor=["mediumslateblue","darkorange","forestgreen","firebrick","chocolate"]
+var color = tcolor[icat%tcolor.length]
+
+var angle_p_cat = 270 / nbcats
+blockstart=icat*angle_p_cat
+
+infoangleblock[icat]={}
+infoangleblock[icat].anglestart=blockstart
+infoangleblock[icat].anglestop=-blockstart-angle_p_cat
+
+
+//var textblock = tabSR[icat].querySelector('input').value
+
+var distance = 240 
+var angler = (-blockstart-2) / 180 * Math.PI;
+
+var posx1=Math.cos(angler) * distance
+var posy1=Math.sin(angler) * distance
+
+var angler = (-blockstart-angle_p_cat+2) / 180 * Math.PI;
+var posx2=Math.cos(angler) * distance
+var posy2=Math.sin(angler) * distance
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','path');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('id',"curvepp"+icat);
+
+if(angle_p_cat<180)
+	newLine.setAttribute('d','M '+posx1+' '+posy1+' A '+distance+' '+distance+' 0 0 0 '+posx2+' '+posy2+" L 0 0  L "+posx1+' '+posy1);
+else
+	newLine.setAttribute('d','M '+posx1+' '+posy1+' A '+distance+' '+distance+' 1 1 0 '+posx2+' '+posy2+" L 0 0  L "+posx1+' '+posy1);
+
+newLine.setAttribute("stroke", color)
+
+newLine.setAttribute("stroke-width", "3")
+newLine.setAttribute("stroke-dasharray", "6")
+newLine.setAttribute("fill", "white")
+document.getElementById("at2b_svg1").insertBefore(newLine,at2b_svg1_bluecircle);
+
+
+
+var middle4circle = -blockstart -angle_p_cat/2
+
+var angler = middle4circle / 180 * Math.PI;
+var posx=Math.cos(angler) * 220
+var posy=Math.sin(angler) * 220
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','text');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('x',posx);
+newLine.setAttribute('y',posy+6);
+newLine.setAttribute('text-anchor',"middle");
+newLine.setAttribute('style',"fill:"+color);
+newLine.setAttribute('font-size',"20");
+newLine.setAttribute('font-weight',"bold");
+
+newLine.appendChild(document.createTextNode(tabSR[icat]))
+
+document.getElementById("at2b_svg1").append(newLine);
+}
+
+
+/// circle
+for(var icat=0;icat<nbcats;icat++)
+	{
+	var anglestart = infoangleblock[icat].anglestart
+	var anglestop = infoangleblock[icat].anglestop
+	
+	var txtcat=tabSR[icat]
+
+	var nbline = tab.rows.length
+	var OVelem=[];
+	for(var i=0;i<nbline;i++)
+		{
+		if(tab.rows[i].cells[0].innerText.trim()==txtcat)
+			OVelem.push(tab.rows[i])
+		}
+	
+	for(var i=0;i<OVelem.length;i++)
+		{
+		var color = "#89C06D"
+		if(OVelem[i].querySelector('.checkboxsrov').checked)
+			color = "#FF3824"
+		
+		var OVtxt = OVelem[i].cells[2].innerText
+		
+		var distance = 250 - 50 * OVelem[i].dataset.pertinence*1.333
+
+		var space_between_pp=(-anglestop-anglestart)/(OVelem.length+1)
+		
+		var angler = (-space_between_pp-anglestart-space_between_pp*i) / 180 * Math.PI;
+		var posx=Math.cos(angler) * distance
+		var posy=Math.sin(angler) * distance
+
+		var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
+		newLine.setAttribute('class',"svgaddedclick");
+		newLine.setAttribute('onclick',"at2b_clickcircle(this)");
+		newLine.dataset.idsrov=OVelem[i].dataset.idsrov
+		newLine.setAttribute('cx',posx);
+		newLine.setAttribute('cy',posy);
+		newLine.setAttribute('fill',color);
+		newLine.setAttribute('r',24);
+		document.getElementById("at2b_svg1").append(newLine);
+		
+		var newLine = document.createElementNS('http://www.w3.org/2000/svg','text');
+		newLine.setAttribute('class',"svgaddedclick");
+		newLine.setAttribute('onclick',"at2b_clickcircle(this)");
+		newLine.dataset.idsrov=OVelem[i].dataset.idsrov
+		newLine.setAttribute('x',posx);
+		newLine.setAttribute('y',posy+8);
+		newLine.setAttribute('text-anchor',"middle");
+		newLine.setAttribute('style',"fill:#fff");
+		newLine.setAttribute('font-size',"18");
+		newLine.setAttribute('font-weight',"bold");
+		
+		var textNode = document.createTextNode(OVtxt);
+		newLine.appendChild(textNode)
+		
+		document.getElementById("at2b_svg1").append(newLine);
+		}
+	
+	}
+
+}
+
+
+
+function at2b_clickcircle(elem)
+{
+var idsrov=elem.dataset.idsrov
+var input = document.querySelector('#at2b_srovlist').querySelector("[data-idsrov='"+idsrov+"']").querySelector('input')
+
+if(input.checked)
+	input.checked=false
+else
+	input.checked=true
+at2b_redraw_graph()
+}
+
+
+
+
+function at2b_redraw_svg2()
+{
+
+var tab = document.querySelector('#at2b_srovlist')
+
+
+var nbcats=tab.rows.length-1
+
+
+for(var icat=0;icat<nbcats;icat++)
+{
+var tcolor=["mediumslateblue","darkorange","forestgreen","firebrick","chocolate"]
+var color = tcolor[icat%tcolor.length]
+
+var angle_p_cat = 270 / nbcats
+blockstart=icat*angle_p_cat
+
+
+var middle4circle = -blockstart -angle_p_cat/2
+
+var distance = 240 
+var angler = (-blockstart-2) / 180 * Math.PI;
+
+var posx1=Math.cos(angler) * distance
+var posy1=Math.sin(angler) * distance
+
+var angler = (-blockstart-angle_p_cat+2) / 180 * Math.PI;
+var posx2=Math.cos(angler) * distance
+var posy2=Math.sin(angler) * distance
+
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','path');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('id',"curvepp"+icat);
+
+if(angle_p_cat<180)
+	newLine.setAttribute('d','M '+posx1+' '+posy1+' A '+distance+' '+distance+' 0 0 0 '+posx2+' '+posy2+" L 0 0  L "+posx1+' '+posy1);
+else
+	newLine.setAttribute('d','M '+posx1+' '+posy1+' A '+distance+' '+distance+' 1 1 0 '+posx2+' '+posy2+" L 0 0  L "+posx1+' '+posy1);
+
+
+newLine.setAttribute("fill", "white")
+
+newLine.setAttribute("stroke", color)
+
+newLine.setAttribute("stroke-width", "3")
+newLine.setAttribute("stroke-dasharray", "6")
+
+document.getElementById("at2b_svg2").insertBefore(newLine,at2b_svg2_bluecircle);
+
+
+
+//circle
+
+var colortxt = "#89C06D"
+if(tab.rows[icat+1].querySelector('.checkboxsrov').checked)
+	colortxt = "#FF3824"
+
+var SRtxt = tab.rows[icat+1].cells[0].innerText
+var OVtxt = tab.rows[icat+1].cells[2].innerText
+
+var distance = 250 - 50 * tab.rows[icat+1].dataset.pertinence*1.333
+
+var angler = middle4circle / 180 * Math.PI;
+var posx=Math.cos(angler) * distance
+var posy=Math.sin(angler) * distance
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
+newLine.setAttribute('class',"svgaddedclick");
+newLine.setAttribute('onclick',"at2b_clickcircle(this)");
+newLine.dataset.idsrov=tab.rows[icat+1].dataset.idsrov
+newLine.setAttribute('cx',posx);
+newLine.setAttribute('cy',posy);
+newLine.setAttribute('fill',colortxt);
+newLine.setAttribute('r',24);
+document.getElementById("at2b_svg2").append(newLine);
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','text');
+newLine.setAttribute('class',"svgaddedclick");
+newLine.setAttribute('onclick',"at2b_clickcircle(this)");
+newLine.dataset.idsrov=tab.rows[icat+1].dataset.idsrov
+newLine.setAttribute('x',posx);
+newLine.setAttribute('y',posy+8);
+newLine.setAttribute('text-anchor',"middle");
+newLine.setAttribute('style',"fill:#fff");
+newLine.setAttribute('font-size',"18");
+newLine.setAttribute('font-weight',"bold");
+
+newLine.appendChild(document.createTextNode(SRtxt))
+
+document.getElementById("at2b_svg2").append(newLine);
+
+
+
+
+var angler = middle4circle / 180 * Math.PI;
+var posx=Math.cos(angler) * 220
+var posy=Math.sin(angler) * 220
+
+var newLine = document.createElementNS('http://www.w3.org/2000/svg','text');
+newLine.setAttribute('class',"svgadded");
+newLine.setAttribute('x',posx);
+newLine.setAttribute('y',posy+6);
+newLine.setAttribute('text-anchor',"middle");
+newLine.setAttribute('style',"fill:"+color);
+newLine.setAttribute('font-size',"20");
+newLine.setAttribute('font-weight',"bold");
+
+newLine.appendChild(document.createTextNode(OVtxt))
+
+document.getElementById("at2b_svg2").append(newLine);
+}
+
+
+
+
+}
+
+function at2a_option(elem)
+{
+document.addEventListener("click", divmenuover_clickev);
+
+divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"//40+event.clientX+"px"
+divmenuover.style.top=elem.getBoundingClientRect().bottom+"px"//-30+event.clientY+"px"
+divmenuover.style.display="block"
+
+divmenuover.innerHTML ="<div onclick='at2a_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
+divmenuover.innerHTML+="<div  onclick='at2a_chsr()'><div style='padding:0 0 0 4px;display: inline-block;font-size: 20px;'>&#x270E;</div> Changer SR</div>"
+}
+
+function divmenuover_clickev(e)
+{
+if(e!=false)
+	if(e.target.closest('#divmenuover')||e.target.closest('.optioncolumn'))return;
+
+divmenuover.style.display="none"
+document.removeEventListener("click", divmenuover_clickev); // Fails
+}
+
+
+function at2a_delete()
+{
+var ds = at2a_srovlist.querySelectorAll('input[type="checkbox"]:checked');
+
+var todelete=[]
+for(var i=0;i<ds.length;i++)
+	{
+	todelete.push(ds[i].closest('tr').dataset.idsrov)
+	}
+	
+for(var i=0;i<todelete.length;i++)
+	{
+	document.querySelectorAll("[data-idsrov='"+todelete[i]+"']").forEach(e => e.remove());
+	}
+
+divmenuover_clickev(false)
+}
+
+function at2a_chsr()
+{
+divmenuover_clickev(false)
+
+var ds = at2a_srovlist.querySelectorAll('input[type="checkbox"]:checked');
+
+var oldsr = ds[0].closest('tr').dataset.sr
+
+var newsr = prompt("Nouveau SR", oldsr)
+
+if(!newsr)return;
+
+for(var i=0;i<ds.length;i++)
+	{
+
+	ds[i].closest('tr').dataset.sr=newsr
+	ds[i].closest('tr').cells[1].innerText=newsr
+
+	var idsrov = ds[i].closest('tr').dataset.idsrov	
+	at2b_srovlist.querySelector("[data-idsrov='"+idsrov+"']").cells[0].innerText=newsr;
+	}
+}
+</script>
+</head>
+<body onload="go()">
+
+<div id="divgrey" onclick="hide_divgrey()"></div>
+<div id="divover">TEST TEST<br>test</div>
+<div id="divmenuover"></div>
+
+<div id="layout" style="display: flex;  width: 100%;">
+
+<div id="layout-sidebar" style="">
+<div id="atelier1" onmousedown="clickmenu(this)"><div class="mini at1bg disabled">1</div>Cadrage</div>
+<div class="atelier1open submenu disabled" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
+<div class="atelier1open submenu disabled" onmousedown="showatt('at1b',this)"><div class="mini at1bg">B</div>Périmètre</div>
+<div class="atelier1open submenu disabled" onmousedown="showatt('at1c',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
+<div class="atelier1open submenu disabled" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
+
+<div id="atelier2" onmousedown="clickmenu(this)"><div class="mini at2bg">2</div>SR/OV</div>
+<div class="atelier2open submenu startscript" onmousedown="showatt('at2a',this)"><div class="mini at2bg">A</div>Identification</div>
+<div class="atelier2open submenu" onmousedown="showatt('at2b',this)"><div class="mini at2bg">B</div>Pertinence</div>
+<div class="atelier2open submenu" onmousedown="showatt('at2c',this)"><div class="mini at2bg">C</div>Rétention</div>
+
+<div id="atelier3" onmousedown="clickmenu(this)"><div class="mini at3bg">3</div>Scénarios stratégiques</div>
+<div class="atelier3open submenu" onmousedown="showatt('at3a',this)"><div class="mini at3bg">A</div>Cartographie</div>
+<div class="atelier3open submenu disabled" onmousedown="showatt('at3b',this)"><div class="mini at3bg">B</div>Scénario</div>
+<div class="atelier3open submenu disabled" onmousedown="showatt('at3c',this)"><div class="mini at3bg">C</div>Mesures de sécurité</div>
+
+
+<div id="atelier4" onmousedown="clickmenu(this)"><div class="mini at4bg">4</div>Scénarios opérationnels</div>
+<div class="atelier4open submenu disabled" onmousedown="showatt('at4a',this)"><div class="mini at4bg">A</div>Scénarios</div>
+<div class="atelier4open submenu disabled" onmousedown="showatt('at4b',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
+
+<div id="atelier5" onmousedown="clickmenu(this)"><div class="mini at5bg">5</div>Traitement du risque</div>
+<div class="atelier5open submenu disabled" onmousedown="showatt('at5a',this)"><div class="mini at5bg">A</div>Synthèse</div>
+<div class="atelier5open submenu disabled" onmousedown="showatt('at5b',this)"><div class="mini at5bg">B</div>Stratégie</div>
+<div class="atelier5open submenu disabled" onmousedown="showatt('at5c',this)"><div class="mini at5bg">C</div>Mesures de sécurité</div>
+<div class="atelier5open submenu disabled" onmousedown="showatt('at5d',this)"><div class="mini at5bg">D</div>Risques résiduels</div>
+<div class="atelier5open submenu disabled" onmousedown="showatt('at5e',this)"><div class="mini at5bg">E</div>Suivi</div>
+<div class="atelier5open submenu disabled" onmousedown="showatt('at5f',this)"><div class="mini at5bg">F</div>Surveillance</div>
+</div>
+
+<div id="layout_content">
+
+
+
+
+
+<div id="at2a">
+
+<button onclick="at2a_newsrov()" style="padding:8px 16px">Ajouter SR/OV</button><br/>
+
+<table id="at2a_srovlist" style="width:600px">
+<tr><td class='optioncolumn' style="transform: rotate(270deg);cursor:pointer;font-size:18px;" onmousedown="at2a_option(this)"><b>...</b></td><td></td><td width="130px">Source de Risque</td><td width="40px"></td><td>Objectif Visés</td></tr>
+</table>
+
+</div>
+
+
+<div id="at2b">
+
+<table id="at2b_srovlist" style="width:1200px">
+<tr><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td>Cotation</td><td>Pertinence</td><td>Pertinence retenue</td><td>Retenue</td><td>Justification</td></tr>
+</table>
+
+
+<br/>
+<br/>
+<div style="text-align:center;">
+<svg id="at2b_svg1" width="350" height="350" viewBox="-250 -250 500 500" xmlns="http://www.w3.org/2000/svg" style="background-color:#CFD6D5">
+  
+  <circle id="at2b_svg1_bluecircle" cx="0" cy="0" r="15" fill="#443EA0" />
+  <!-- Cercle de fond -->
+  <circle cx="0" cy="0" r="50" fill="none" stroke="#999" />
+  <circle cx="0" cy="0" r="100" fill="none" stroke="#999" /> 
+  <circle cx="0" cy="0" r="150" fill="none" stroke="#999" />
+  <circle cx="0" cy="0" r="200" fill="none" stroke="#999" />
+  
+
+	
+  <!-- fleche -->
+  <line x1="25" y1="25" x2="170" y2="170" stroke="#333" stroke-width="1.5"/>
+  <polygon points="18,18 35,25 25,35" fill="black" />
+  
+  
+  
+  <!-- 1,2,3,4,5 -->
+  <text x="55" y="40" text-anchor="middle" font-size="16">4</text>
+  <text x="90" y="75" text-anchor="middle" font-size="16">3</text>
+  <text x="127" y="110" text-anchor="middle" font-size="16">2</text>
+  <text x="162" y="145" text-anchor="middle" font-size="16">1</text>
+  
+  <text x="-235" y="-230" font-size="22" style="fill:#002742">Vision par sources de risques</text>
+  <circle cx="220" cy="225" r="18" fill="#FF3824" />
+  <text x="195" y="233" text-anchor="end" font-size="18" style="fill:#002742">Couple SR/OV retenu</text>
+</svg>
+
+<svg id="at2b_svg2" width="350" height="350" viewBox="-250 -250 500 500" xmlns="http://www.w3.org/2000/svg" style="background-color:#CFF1F3">
+  
+  <circle id="at2b_svg2_bluecircle" cx="0" cy="0" r="15" fill="#443EA0" />
+  <!-- Cercle de fond -->
+  <circle cx="0" cy="0" r="50" fill="none" stroke="#999" />
+  <circle cx="0" cy="0" r="100" fill="none" stroke="#999" /> 
+  <circle cx="0" cy="0" r="150" fill="none" stroke="#999" />
+  <circle cx="0" cy="0" r="200" fill="none" stroke="#999" />
+  
+
+	
+  <!-- fleche -->
+  <line x1="25" y1="25" x2="170" y2="170" stroke="#333" stroke-width="1.5"/>
+  <polygon points="18,18 35,25 25,35" fill="black" />
+  
+  
+  
+  <!-- 1,2,3,4,5 -->
+  <text x="55" y="40" text-anchor="middle" font-size="16">4</text>
+  <text x="90" y="75" text-anchor="middle" font-size="16">3</text>
+  <text x="127" y="110" text-anchor="middle" font-size="16">2</text>
+  <text x="162" y="145" text-anchor="middle" font-size="16">1</text>
+
+  <text x="-235" y="-230" font-size="22" style="fill:#002742">Vision par objectifs visés</text>
+  <circle cx="-220" cy="225" r="18" fill="#89C06D" />
+  <text x="-190" y="233" font-size="18" style="fill:#002742">Couple SR/OV non retenu</text>
+
+</svg>
+</div>
+</div>
+
+
+
+<div id="at2c">
+
+<br/><br/>
+Couple SR/OV retenue :
+<br/>
+<br/>
+<table id="at2c_srovlist" style="width:800px">
+<tr><td width="130px">Source de Risque</td><td>Objectif Visés</td></tr>
+</table>
+
+
+<br/>
+<br/>
+
+</div>
+
+
+
+
+<div id="at3a">
+
+<div id="div_menace">
+
+<div style="width:100%;font-size:larger;color:#fff;background-color:#251B36;padding: 6px 0;border-radius:6px;text-align:center;">Exposition <span id='calcexpotext'>AAA</span></div>
+<table style="width:100%;border-collapse: collapse;">
+<tr><td style="width:200px">
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 2px;">
+<center>Dépendance</center>
+<p>La relation avec cette partie prenante est-elle vitale pour mon activité ?</p>
+</div>
+</td>
+<td style="text-align: center;">
+<select name="dep" id="dep" style="max-width:300px" onchange="calcexpo()">
+<option value="1">1 - Relation non nécessaire aux fonctions stratégiques.</option>
+<option value="2">2 - Relation utile aux fonctions stratégiques</option>
+<option value="3">3 - Relation indispensable mais non exclusive.</option>
+<option value="4">4 - Relation indispensable et unique (pas de substitution possible à court terme)</option>
+</select>
+</td>
+</tr>
+<tr><td>
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px">
+<center>Pénétration</center>
+<p>Dans quelle mesure la partie prenante accede-t-elle a mes ressouces internes ?</p>
+</div>
+</td>
+<td style="text-align: center;">
+<select name="pen" id="pen" style="max-width:300px" onchange="calcexpo()">
+<option value="1">1 - Pas d’accès ou accès avec privilèges de type utilisateur à des
+terminaux utilisateurs (poste de travail, téléphone mobile, etc.).</option>
+<option value="2">2 - Accès avec privilèges de type administrateur à des terminaux
+utilisateurs (parc informatique, flotte de terminaux mobiles, etc.)
+ou accès physique aux sites de l’organisation.</option>
+<option value="3">3 - Accès avec privilèges de type administrateur à des serveurs « métier » (serveur de fichiers, bases
+de données, serveur web, serveur d’application, etc.).</option>
+<option value="4">4 - Accès avec privilèges de type administrateur à des équipements
+d’infrastructure (annuaires, DNS, DHCP, commutateurs, pare-feu, hyperviseurs, baies de stockage,
+etc.) ou accès physique aux salles serveurs de l’organisation.</option>
+</select></td>
+</tr>
+</table>
+
+
+<br/>
+<div style="width:100%;font-size:larger;color:#fff;background-color:#251B36;padding: 6px 0;border-radius:6px;text-align:center;">Fiabilité cyber<span id='calcfiabtext'>BBB</span></div>
+<table style="width:100%;border-collapse: collapse;">
+<tr><td style="width:200px">
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 2px;">
+<center>Maturité cyber</center>
+<p>Quelles sont les capacités de la partie prenante en matiere de sécurité ?</p>
+</div>
+</td>
+<td style="text-align: center;">
+<select name="mat" id="mat" style="max-width:300px" onchange="calcfiab()">
+<option value="1">1 - Des règles d’hygiène informatique sont appliquées ponctuellement et non formalisées. La capacité de réaction sur incident est incertaine.</option>
+<option value="2">2 - Les règles d’hygiène et la réglementation sont prises en compte, sans intégration dans une politique globale. La sécurité numérique est conduite selon un mode réactif.</option>
+<option value="3">3 - Une politique globale est appliquée en matière de sécurité numérique. Celle-ci est assurée selon un mode réactif, avec une recherche de centralisation et d’anticipation sur certains risques.</option>
+<option value="4">4 - La partie prenante met en œuvre une politique de management du risque. La politique est intégrée et se réalise de manière proactive.</option>
+</select>
+</td>
+</tr>
+<tr><td>
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;">
+<center>Confiance</center>
+<p>Est-ce que les intentions ou les intérets de la partie prenante peuvent m'etre contraires ?</p>
+</div>
+</td>
+<td style="text-align: center;">
+<select name="conf" id="conf" style="max-width:300px" onchange="calcfiab()">
+<option value="1">1 - Pas d’accès ou accès avec privilèges de type utilisateur à des terminaux utilisateurs (poste de travail, téléphone mobile, etc.).</option>
+<option value="2">2 - Accès avec privilèges de type administrateur à des terminaux utilisateurs (parc informatique, flotte de terminaux mobiles, etc.)
+ou accès physique aux sites de l’organisation.</option>
+<option value="3">3 - Accès avec privilèges de type administrateur à des serveurs « métier » (serveur de fichiers, bases de données, serveur web, serveur d’application, etc.).</option>
+<option value="4">4 - Accès avec privilèges de type administrateur à des équipements d’infrastructure (annuaires, DNS, DHCP, commutateurs, pare-feu, hyperviseurs, baies de stockage,
+etc.) ou accès physique aux salles serveurs de l’organisation.</option>
+</select></td>
+</tr>
+</table>
+
+<br/><center><button onclick="menaceok()" style="padding:8px 16px">OK</button></center><br/><br/>
+
+
+<center>
+<div style="text-align:center;width: 280px;  padding: 16px;  border-radius: 8px;background-color:#9FA9ED;line-height: 20px;  font-size: larger;">
+<bold>Niveau de menace</bold><br/>
+=<br/>
+<u>Dépendance x Pénétration</u><br/>
+Maturité cyber x Confiance
+</div>
+</center>
+<br/>
+</div>
+
+
+<div id="cont_at3a" style="float:left;margin-right:8px;">
+<button onclick="seuil()" style="height:24px;cursor:pointer;margin:8px;"> Seuil </button><button id="butnewcat" onclick="new_cat()" style="height:24px;cursor:pointer;margin:8px;"> + Catégorie </button><br/>
+
+
+
+<div id="divseuil" style="display:none;width:310px;margin-left:8px;">
+
+<table>
+<tr><td><div style="width:22px;height:22px;border:4px solid #00A7A2;border-radius:18px;"></div></td><td>Zone de veille</td><td>		<input id="seuil1" type="number" value="0.2" min=0 max=6 step=".1"onchange="at3a_redraw_graph()"></td></tr>
+<tr><td><div style="width:19px;height:19px;border:4px solid #F6E742;border-radius:18px;margin-left:1px;"></div><div></div></td><td>Zone de controle</td><td>	<input id="seuil2" type="number" value="0.9" min=0 max=6 step=".1"onchange="at3a_redraw_graph()"></td></tr>
+<tr><td><div style="width:16px;height:16px;border:4px solid #E3394A;border-radius:18px;margin-left:3px;"></div><div></div></td><td>Zone de danger</td><td>		<input id="seuil3" type="number" value="2.5" min=0 max=6 step=".1" onchange="at3a_redraw_graph()"></td></tr>
+</table>
+</div>
+
+
+
+
+
+<div class="listblock"></div><br/>
+</div>
+<div  style='float:right'>
+<svg id="at3a_svg" width="680" height="900" viewBox="-340 -340 680 900" xmlns="http://www.w3.org/2000/svg">
+  
+  
+  <!-- Axes -->
+  <line x1="0" y1="300" x2="0" y2="-300" stroke="#ccc"/>
+  <line x1="-300" y1="0" x2="300" y2="0" stroke="#ccc"/>
+  
+  <!-- Cercle de fond -->
+  <circle cx="0" cy="0" r="50" fill="none" stroke="#ccc" />
+  <circle cx="0" cy="0" r="100" fill="none" stroke="#ccc" /> 
+  <circle cx="0" cy="0" r="150" fill="none" stroke="#ccc" />
+  <circle cx="0" cy="0" r="200" fill="none" stroke="#ccc" />
+  <circle cx="0" cy="0" r="250" fill="none" stroke="#ccc" />
+  <circle cx="0" cy="0" r="300" fill="none" stroke="#ccc" />
+  
+  <circle id="bluecircle" cx="0" cy="0" r="20" fill="#39B0F0" />
+	
+	
+	  
+  <!-- fleche -->
+  <line x1="25" y1="25" x2="240" y2="240" stroke="#333" stroke-width="1.5"/>
+  <polygon points="18,18 35,25 25,35" fill="black" />
+  
+  
+  
+  <!-- 1,2,3,4,5 -->
+  <text x="55" y="40" text-anchor="middle" font-size="16">5</text>
+  <text x="90" y="75" text-anchor="middle" font-size="16">4</text>
+  <text x="127" y="110" text-anchor="middle" font-size="16">3</text>
+  <text x="162" y="145" text-anchor="middle" font-size="16">2</text>
+  <text x="200" y="182" text-anchor="middle" font-size="16">1</text>
+  <text x="235" y="220" text-anchor="middle" font-size="16">0</text>
+  
+  
+  
+  
+  
+  <line x1="-280" y1="350" x2="280" y2="350" stroke="#4A6679" stroke-width="1"/>
+  
+  <text x="-205" y="375" font-size="14">Zone de veille</text>
+  <text x="-40" y="375" font-size="14">Zone de controle</text>
+  <text x="140" y="375" font-size="14">Zone de danger</text>
+  
+  <text id="svg_seuil1" x="-205" y="391" font-size="12">Seuil X</text>
+  <text id="svg_seuil2" x="-40" y="391" font-size="12">Seuil Y</text>
+  <text id="svg_seuil3" x="140" y="391" font-size="12">Seuil Z</text>
+  
+  <circle cx="-230" cy="378" r="16" fill="none" stroke="#2CB1AD" stroke-width="3"/>
+  <circle cx="-65" cy="378" r="16" fill="none" stroke="#F6E742" stroke-width="3"/>
+  <circle cx="115" cy="378" r="16" fill="none" stroke="#E8606E" stroke-width="3"/>
+  
+  
+  
+  <line x1="-280" y1="406" x2="280" y2="406" stroke="#4A6679" stroke-width="1"/>
+  <text x="-30" y="450" text-anchor="end" font-size="14">Exposition</text>
+  
+  <circle cx="0" cy="442" r="10" fill="none" stroke="#aaa" stroke-width="2"/>
+  <circle cx="40" cy="440" r="13" fill="none" stroke="#aaa" stroke-width="2"/> 
+  <circle cx="80" cy="438" r="16" fill="none" stroke="#aaa" stroke-width="2"/>
+  <circle cx="120" cy="435" r="20" fill="none" stroke="#aaa" stroke-width="2"/>
+  
+  <text x="0" y="467" text-anchor="middle" font-size="14"><3</text>
+  <text x="40" y="467" text-anchor="middle" font-size="14">3-6</text>
+  <text x="80" y="467" text-anchor="middle" font-size="14">7-9</text>
+  <text x="120" y="467" text-anchor="middle" font-size="14">>9</text>
+  
+  <text x="-30" y="496" text-anchor="end" font-size="14">Fiabilité</text>
+  
+  <circle cx="0" cy="490" r="12" fill="#E3394A" stroke="none" />
+  <circle cx="40" cy="490" r="12" fill="#D97E8F" stroke="none" /> 
+  <circle cx="80" cy="490" r="12" fill="#B1D4E9" stroke="none" />
+  <circle cx="120" cy="490" r="12" fill="#9B9C9F" stroke="none" />
+  
+  <text x="0" y="517" text-anchor="middle" font-size="14"><4</text>
+  <text x="40" y="517" text-anchor="middle" font-size="14">4-5</text>
+  <text x="80" y="517" text-anchor="middle" font-size="14">6-7</text>
+  <text x="120" y="517" text-anchor="middle" font-size="14">>7</text>
+  
+  <!-- Données -->
+</svg>
+</div>
+</div>
+
+</div>
+</div>
+<div id="divcenter">
+
+<div id="at2a_newsrovdiv" style="width:700px">
+Ajouter une Source de Risque / Objectif Visé<br/>
+<br/>
+Predefini :
+<br/>
+<table>
+<tr  style="color:#6D2163"><td width="120px">Src. de Risque</td><td style="text-indent:20px">Objectif Visés</td></tr>
+</table>
+
+<div style="height:200px;overflow: auto;">
+<table id="at2a_tablesrovexemple">
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td  width="120px">Activiste</td><td>Saboter la prochaine campagne nationale de
+vaccination en perturbant la production ou la
+distribution des vaccins, pour générer un choc
+psychologique sur la population et discréditer les
+pouvoirs publics.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Concurrent</td><td>Voler des informations en espionnant les travaux de
+R&D en vue d’obtenir un avantage concurrentiel.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Cybercriminel</td><td>Divulguer au grand public des informations sur la
+façon dont les vaccins sont conçus en collectant des
+photos et vidéos des tests animaliers afin de rallier
+l’opinion publique à sa cause.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition de vaccins
+distribués lors d’une campagne nationale de
+vaccination sous couvert de bioterrorisme à des fins
+d’extorsion d’une rançon.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Etatique</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Crime organisé</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Terroriste</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Officine spécialisée</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Amateur</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Vengeur</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Espionnage</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Influence</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Lucratif</td><td></td></tr>
+</table>
+</div>
+<br/>
+
+<br/>
+Source de Risque : <input type="text" id="at2a_text_sr"><br/>
+Objectifs Visés<br/>
+<div style="width:100%;height:120px;display: contents;">
+<textarea id="at2a_text_ov" style="width: 100%;    height: 140px;     box-sizing: border-box;"></textarea>
+</div>
+<br/>
+<br/>
+
+<center><button onclick="at2a_newsrovok()" style="padding:8px 16px">Ajouter</button></center>
+
+<br/>
+</div>
+</div>
+
+</body>
+</html>
