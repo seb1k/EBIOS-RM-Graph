@@ -3,7 +3,7 @@ Help to create graph for EBIOS RM
 
 
 Use it here : 
-[carto.html](https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html)
+[ebios-rm-graph](https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html)
 
 
 Screenshot :
