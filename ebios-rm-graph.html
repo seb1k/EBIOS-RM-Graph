@@ -31,7 +31,9 @@ background-color:#BFA100
 background-color:#E3394A
 }
 
-
+#div_menace p{
+margin:4px 0;
+}
 #layout-sidebar{
 min-width:220px;
 height: 100vh;
@@ -145,7 +147,7 @@ z-index:100;
 display:none;
 box-shadow: 0 4px 16px 0 #aaa;
 border-radius:4px;
-
+z-index:500;
 }
 
 #divmenuover div{
@@ -242,8 +244,92 @@ text-indent:6px;
 {
 width:24px;
 text-align:center;
+z-index:10;
 }
 
+#at21c_table td{
+background-color:#FED6EB;
+position:relative;
+border-radius: 2px;
+}
+
+.at21c_tableheader{
+border:3px solid #FB45A3;
+background-color:#fff !important;
+text-align:center;
+}
+
+.iconplus{
+padding: 8px;
+position:relative;
+cursor:pointer;
+right:0;
+bottom:0px;
+position: absolute;
+}
+
+.iconedit{
+padding: 8px;
+position:relative;
+cursor:pointer;
+right:0;
+top:0px;
+position: absolute;
+display:none;
+}
+
+#at21c_table td:hover .iconedit{
+display:inline-block;
+}
+.tdmetier{
+position: relative;
+text-align:center;
+}
+
+.tdgravite{
+text-align:center;
+font-weight:bold;
+user-select: none;
+cursor:pointer;
+}
+
+.at3b_sc{
+height:400px;
+width:100%;
+display:inline-block;
+}
+
+.at3b_sc_left{
+height:100%;
+display:inline-block;
+width:200px;
+margin-right:10px;
+position: relative;
+}
+
+.at3b_sc_center{
+background-color:#CCEDEC;
+height:100%;
+display:inline-block;
+width:400px;
+margin-right:20px;
+position: relative;
+}
+
+.at3b_sc_right{
+background-color:#99DCDA;
+height:100%;
+display:inline-block;
+width:300px;
+position: relative;
+}
+
+.at3b_sc .autohide{
+display:none;
+}
+.at3b_sc:hover .autohide{
+display:block;
+}
 </style>
 
 
@@ -312,10 +398,8 @@ divcenter.style.display='block'
 divcenter.querySelectorAll(":scope > div").forEach(e => e.style.display="none");
 }
 
-function hide_divcenter()
-{
-divcenter.style.display='none'
-}
+
+
 
 function show_divgrey()
 {
@@ -661,7 +745,9 @@ new_cat()
 new_cat()
 
 
-showatt('at2a',document.querySelector('.startscript'))
+showatt('at3b',document.querySelector('.startscript'))
+
+at3b_add()
 }
 
 
@@ -855,6 +941,8 @@ function load_att(att)
 if(att=="at2b") at2b_redraw_graph()
 if(att=="at2c") at2c_redraw()
 if(att=="at3a") at3a_redraw_graph()
+if(att=="at3b") at3b_redraw_graph()
+
 }
 
 function at2c_redraw()
@@ -866,8 +954,13 @@ at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => to
 
 for(var i=0;i<toshow.length;i++)
 	{
-	document.querySelectorAll("[data-idsrov='"+toshow[i]+"']").forEach(e => e.style.display="table-row");
+	at2c_srovlist.querySelectorAll("[data-idsrov='"+toshow[i]+"']").forEach(e => e.style.display="table-row");
 	}
+	
+
+at2c_nosrov.style.display="none"
+if(!toshow.length)
+	at2c_nosrov.style.display="block"
 }
 
 
@@ -930,6 +1023,12 @@ perttd.innerText=pert_text[pertinence-1]
 function at2b_redraw_graph()
 {
 document.querySelectorAll('.svgadded, .svgaddedclick').forEach(e => e.remove());
+
+at2b_nosrov.style.display="block"
+if(at2b_srovlist.querySelector("[data-idsrov]")!=null)
+	at2b_nosrov.style.display="none"
+
+
 at2b_redraw_svg1()
 at2b_redraw_svg2()
 }
@@ -962,8 +1061,8 @@ for(var icat=0;icat<nbcats;icat++)
 var tcolor=["mediumslateblue","darkorange","forestgreen","firebrick","chocolate"]
 var color = tcolor[icat%tcolor.length]
 
-var angle_p_cat = 270 / nbcats
-blockstart=icat*angle_p_cat
+var angle_p_cat = 340 / nbcats
+blockstart=-35+icat*angle_p_cat
 
 infoangleblock[icat]={}
 infoangleblock[icat].anglestart=blockstart
@@ -1115,19 +1214,21 @@ for(var icat=0;icat<nbcats;icat++)
 var tcolor=["mediumslateblue","darkorange","forestgreen","firebrick","chocolate"]
 var color = tcolor[icat%tcolor.length]
 
-var angle_p_cat = 270 / nbcats
-blockstart=icat*angle_p_cat
+var angle_p_cat = 340 / nbcats
+blockstart=-35+icat*angle_p_cat
 
-
+var dist_b_2bloc = 2
+if(nbcats<6)dist_b_2bloc=20;
+if(nbcats<3)dist_b_2bloc=40;
 var middle4circle = -blockstart -angle_p_cat/2
 
 var distance = 240 
-var angler = (-blockstart-2) / 180 * Math.PI;
+var angler = (-blockstart-dist_b_2bloc) / 180 * Math.PI;
 
 var posx1=Math.cos(angler) * distance
 var posy1=Math.sin(angler) * distance
 
-var angler = (-blockstart-angle_p_cat+2) / 180 * Math.PI;
+var angler = (-blockstart-angle_p_cat+dist_b_2bloc) / 180 * Math.PI;
 var posx2=Math.cos(angler) * distance
 var posy2=Math.sin(angler) * distance
 
@@ -1213,22 +1314,47 @@ newLine.appendChild(document.createTextNode(OVtxt))
 
 document.getElementById("at2b_svg2").append(newLine);
 }
-
-
-
-
 }
 
 function at2a_option(elem)
 {
 document.addEventListener("click", divmenuover_clickev);
 
-divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"//40+event.clientX+"px"
-divmenuover.style.top=elem.getBoundingClientRect().bottom+"px"//-30+event.clientY+"px"
+divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
+divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
 divmenuover.style.display="block"
 
 divmenuover.innerHTML ="<div onclick='at2a_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
 divmenuover.innerHTML+="<div  onclick='at2a_chsr()'><div style='padding:0 0 0 4px;display: inline-block;font-size: 20px;'>&#x270E;</div> Changer SR</div>"
+}
+
+function at3b_option(elem)
+{
+document.addEventListener("click", divmenuover_clickev);
+
+
+divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
+divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
+divmenuover.style.display="block"
+
+document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
+elem.closest('.at3b_sc').classList.add('scenarselected')
+
+
+divmenuover.innerHTML ="<div onclick='at3b_add_attackpath(1)'><span style='padding:0 10px'> </span>Ajouter chemin d'attaque</div>"
+divmenuover.innerHTML +="<div onclick='at3b_add_attackpath(2)'><span style='padding:0 10px'> </span>Ajouter chemin écosystème</div>"
+divmenuover.innerHTML +="<div onclick='at3b_deletesc()'><span style='padding:0 10px'> </span>Supprimer scénario</div>"
+}
+
+
+
+
+function at3b_deletesc()
+{
+document.querySelector('.scenarselected').remove();
+
+at3b_redraw_graph()
+divmenuover_clickev(false)
 }
 
 function divmenuover_clickev(e)
@@ -1281,12 +1407,404 @@ for(var i=0;i<ds.length;i++)
 	at2b_srovlist.querySelector("[data-idsrov='"+idsrov+"']").cells[0].innerText=newsr;
 	}
 }
+
+function at1c_newsmetier()
+{
+var row = at21c_table.insertRow();
+var cell0 = row.insertCell(0);
+var cell1 = row.insertCell(1);
+var cell2 = row.insertCell(2);
+var cell3 = row.insertCell(3);
+
+
+
+cell0.innerHTML = "<p contenteditable='true'>R&D</p><div onclick='at1c_newsevent(this)' class='iconplus'>+</div>"; cell0.rowSpan=1; cell0.className="tdmetier";
+at21c_cell_1_2_3(cell1,cell2,cell3)
+}
+
+function at21c_cell_1_2_3(cell1,cell2,cell3)
+{
+cell1.innerHTML = "Perte ou destruction des informations d’études et recherches conduisant à un fort impact, notamment sur les futures autorisations de mises sur le marché de l’entreprise";cell1.contentEditable=true
+cell2.innerHTML = "- Missions et services de l’organisme<br/>- Coûts de développement<br/>- Gouvernance de l’organisme";cell2.contentEditable=true
+cell3.innerHTML = "<div class='iconedit' style='font-size:xx-large;'>+</div><span class='at21c_table_gravite'>4</span>";cell3.className="tdgravite";cell3.onclick= function() {chtdgravite(this)};
+chtdgravite(cell3)
+}
+
+function chtdgravite(elem)
+{
+var elemtd = elem.closest('td')
+var v = parseInt(elemtd.querySelector('.at21c_table_gravite').innerText)
+
+v++;
+if(v>4)v=1
+
+var c=""
+if(v==1)c="#4DC2BE"
+if(v==2)c="#F9EF7B"
+if(v==3)c="#FFBF7E"
+if(v==4)c="#EC7581"
+elemtd.querySelector('.at21c_table_gravite').innerText=v
+elemtd.style.backgroundColor=c
+
+}
+
+function at1c_newsevent(elem)
+{
+var td = elem.closest('tr').querySelector('td')
+var rowIndex = elem.closest('tr').rowIndex
+
+var row = at21c_table.insertRow(rowIndex+td.rowSpan);
+
+td.rowSpan++
+var cell1 = row.insertCell(0);
+var cell2 = row.insertCell(1);
+var cell3 = row.insertCell(2);
+
+at21c_cell_1_2_3(cell1,cell2,cell3)
+}
+
+
+function at3b_new()
+{
+
+show_divcenter()
+at3b_newsscnear.style.display="block"
+
+var toshow=[]
+at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
+
+var HTML="<table>"
+HTML+="<tr><td>Source de Risque</td><td>Objectif Visés</td></tr>"
+for(var i=0;i<toshow.length;i++)
+	{
+	var rowscenar = document.querySelector('#at2b_srovlist').querySelector("[data-idsrov='"+toshow[i]+"']")
+
+	HTML+="<tr onclick='at3b_clickscenar(this)' style='cursor:pointer'><td>"+rowscenar.cells[1].innerText+"</td><td>"+rowscenar.cells[3].innerText+"</td></tr>"
+	}
+HTML+="</table>"
+
+at3b_nosrov.style.display="none"
+at3b_addbutton.innerText="Ajouter"
+if(!toshow.length)
+	{
+	at3b_nosrov.style.display="block"
+	at3b_addbutton.innerText="Ajouter scénario sans SR/OV"
+	HTML="" // empty
+	}
+
+
+at3b_1.innerHTML=HTML
+
+
+
+at3b_2.innerHTML=""
+
+}
+
+function at3b_clickscenar(elem)
+{
+var d = elem.closest('table').querySelectorAll('.selected')
+d.forEach(e => e.style.backgroundColor="")
+d.forEach(e => e.classList.remove('selected'))
+
+
+elem.classList.add('selected')
+elem.style.backgroundColor="#ccc"
+}
+
+function at3b_add()
+{
+var txt1 ="Attaquant"
+var txt2 ="Production des vaccins"
+
+var row = at3b_1.querySelector('.selected')
+if(row)
+	{
+	txt1 = row.cells[0].innerText
+	txt2 = row.cells[1].innerText
+	}
+
+var HTML = "<div class='at3b_sc' style='position:relative' data-attackinfo='"+JSON.stringify({icon1:"testSR",txt1:txt1,txt2:txt2, icon2:"OVOV", attackpath:[]})+"'>"
+HTML+="<div class='optioncolumn' style='transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:18px;position:absolute;left:20px;top:10px' onmousedown='at3b_option(this)'><b>...</b></div>"
+HTML+="<div class='at3b_sc_left'> </div>"
+HTML+="<div class='at3b_sc_center'> </div>"
+HTML+="<div class='at3b_sc_right'> </div>"
+HTML+="</div>"
+
+at3b_list.innerHTML+=HTML
+hide_divgrey()
+at3b_redraw_graph()
+}
+
+function at3b_add_attackpath(x)
+{
+var divsc = document.querySelector('.scenarselected')
+
+var scenarobj=JSON.parse(divsc.dataset.attackinfo)
+
+if(scenarobj.attackpath.length>4) return; // max : 5
+
+var text = "Chemin d’attaque"
+if(x==1)scenarobj.attackpath.push({type:"direct",text:text})
+if(x==2)scenarobj.attackpath.push({type:"50%",text:text,pp1:"Partie prenante"})
+
+
+divsc.dataset.attackinfo = JSON.stringify(scenarobj)
+at3b_redraw_graph()
+divmenuover_clickev(false)
+}
+
+
+function at3b_redraw_graph()
+{
+document.querySelectorAll('.scadded').forEach(e => e.remove());
+
+var scenars = document.querySelectorAll('.at3b_sc')
+
+for(var i=0;i<scenars.length;i++)
+{
+var divsc = scenars[i]
+
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+
+
+
+//text center
+divsc.querySelector('.at3b_sc_center').innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>ÉCOSYSTÈME</div>"
+
+//text right
+divsc.querySelector('.at3b_sc_right').innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>SOCIÉTÉ</div>"
+
+//SOURCE
+divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;border-radius:100px;width:76px;height:76px;left:59px;top:161px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 80px;'>SR</div>"
+divsc.innerHTML +="<div class='scadded' style='width:105px;height:140px;left:57px;top:140px;position: absolute;z-index:40;background-color:#fff'></div>"
+//SOURCE txt
+divsc.innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;left:20px;top:250px;width:160px;position: absolute;z-index:60;text-align:center;'>"+scenarobj.txt1+"</div>"
+
+
+//Objectif
+divsc.innerHTML +="<div class='scadded' style='border:4px solid #E3394A;border-radius:100px;width:100px;height:100px;left:725px;top:148px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 100px;'>OV</div>"
+divsc.innerHTML +="<div class='scadded' style='width:120px;height:170px;left:695px;top:118px;position: absolute;z-index:40;background-color:#99DCDA'></div>"
+//Objectif txt
+divsc.innerHTML +="<div class='scadded' style='font-weight:bold;color:#E3394A;left:792px;bottom:260px;width:134px;position: absolute;z-index:60;text-align:center;font-size:12px'>"+scenarobj.txt2+"</div>"
+
+// 4 blocs cible
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:0;height:25px;left:777px;top:136px;position: absolute;z-index:60;'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:0;height:25px;left:777px;top:240px;position: absolute;z-index:60;'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:25px;left:711px;top:200px;position: absolute;z-index:60;'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:25px;left:817px;top:200px;position: absolute;z-index:60;'></div>"
+
+// pathpos
+var nbattackpath = scenarobj.attackpath.length
+
+if(nbattackpath>5)nbattackpath=5;
+
+var postop=[]
+if(nbattackpath==1)postop.push(200)
+if(nbattackpath==2)postop.push(70,330)
+if(nbattackpath==3)postop.push(70,200,330)
+if(nbattackpath==4)postop.push(50,100,300,360)
+if(nbattackpath==5)postop.push(50,100,200,300,370)
+
+divsc.dataset.postop=postop
+
+
+// Fleche haut,bas
+if(nbattackpath>=2)
+	{
+	divsc.innerHTML +="<div class='scadded' style='left:91px;top:135px;display : inline-block; height : 0; width : 0; border-top : 19px solid #E3394A; border-right : 11px solid transparent; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
+	divsc.innerHTML +="<div class='scadded' style='left:91px;top:274px;display : inline-block; height : 0; width : 0; border-right : 11px solid transparent; border-bottom : 19px solid #E3394A; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
+	}
+	
+// Fleche SR centre
+if(nbattackpath==1||nbattackpath==3||nbattackpath==5)
+	divsc.innerHTML +="<div class='scadded' style='left:150px;top:191px;display : inline-block; height : 0; width : 0;  border-top : 11px solid transparent; border-right : 19px solid #E3394A; border-bottom : 11px solid transparent;position: absolute;z-index:80'></div>"
+
+
+
+
+
+// PATH
+for(var iatt=0;iatt<nbattackpath;iatt++)
+	{
+	var sc = scenarobj.attackpath[iatt]
+
+	var h= (200-postop[iatt])
+	
+	
+	var fleche=false
+	
+
+	var top = postop[iatt]
+	var toptext = top;
+	if(top>=200)
+		{
+		top=200
+		h=postop[iatt]-200
+		var b = "border-top:0px;"
+		toptext=200+h
+		fleche="bas"
+		}
+	else
+		{
+		var b = "border-bottom:0px;"
+		fleche="haut"
+		}
+
+	if(top==200&&h==0)fleche="centre"
+
+	if(sc.type=="direct" && fleche=="haut") divsc.innerHTML +="<div class='scadded' style='left:768px;top:110px;display : inline-block; height : 0; width : 0; border-top : 19px solid #E3394A; border-right : 11px solid transparent; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
+	if(sc.type=="direct" && fleche=="centre") divsc.innerHTML +="<div class='scadded' style='left:686px;top:191px;display : inline-block; height : 0; width : 0;border-top : 11px solid transparent; border-bottom : 11px solid transparent; border-left : 19px solid #E3394A;position: absolute;z-index:80'></div>"
+	if(sc.type=="direct" && fleche=="bas") divsc.innerHTML +="<div class='scadded' style='left:768px;top:274px;display : inline-block; height : 0; width : 0; border-right : 11px solid transparent; border-bottom : 19px solid #E3394A; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
+	
+	if(sc.type=="direct")
+		divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;"+b+";height:"+h+"px;border-radius:10px;width:673px;left:100px;top:"+top+"px;position: absolute;z-index:"+(20-iatt)+"'></div>"// Fleche SR centre
+
+	if(sc.type=="50%")
+		divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;"+b+";height:"+h+"px;border-radius:10px;border-right:0;width:320px;left:100px;top:"+top+"px;position: absolute;z-index:"+(20-iatt)+"'></div>"
+	
+
+	
+	if(sc.pp1)
+		{
+		var HTMLpp = "<div class='scadded' style='left:"+145+"px;top:"+(toptext-20)+"px;width:120px;height:40px;z-index:60;position:absolute;background-color:#CCEDEC;line-height: 100px;text-align: center;white-space: nowrap;'>"
+		HTMLpp +="<div class='scadded' style='left:25px;top:0px;width:70px;height:40px;position:absolute;background-color:#fff'>"
+
+		
+		HTMLpp +="<div class='scadded' style='left:-30px;top:10px;display : inline-block; height : 0; width : 0;border-top : 11px solid transparent; border-bottom : 11px solid transparent; border-left : 19px solid #E3394A;position: absolute;z-index:80'></div>"
+		if(sc.type=="direct")
+			HTMLpp +="<div class='scadded' style='right:-28px;top:10px;display : inline-block; height : 0; width : 0;  border-top : 11px solid transparent; border-right : 19px solid #E3394A; border-bottom : 11px solid transparent;position: absolute;z-index:80'></div>"
+		HTMLpp +="</div>"+sc.pp1+"</div>"
+		divsc.querySelector('.at3b_sc_center').innerHTML+=HTMLpp
+		}
+		
+	divsc.querySelector('.at3b_sc_left').innerHTML+="<div class='optioncolumn scadded autohide' style='position:absolute;transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:18px;right:-5px;top:"+(toptext-25)+"px;z-index:200' onmousedown='at3b_chpath(this,"+iatt+")'><b>...</b></div>"
+	
+	divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:220px;top:"+(toptext-18)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784'>"+sc.text+"</div>"
+	}
+}
+}
+
+function at3b_chpath(elem,idpath)
+{
+
+document.addEventListener("click", divmenuover_clickev);
+
+
+divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
+divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
+divmenuover.style.display="block"
+
+document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
+elem.closest('.at3b_sc').classList.add('scenarselected')
+
+divmenuover.innerHTML ="<div onclick='at3b_chpath2(1,"+idpath+")'><span style='padding:0 10px'>&#x270E;</span>Renommer</div>"
+divmenuover.innerHTML +="<div onclick='at3b_chpath2(5,"+idpath+")'><span style='padding:0 10px'> </span>Partie prenante</div>"
+
+divmenuover.innerHTML +="<div onclick='at3b_chpath2(2,"+idpath+")'><span style='padding:0 10px'>+</span>Monter</div>"
+divmenuover.innerHTML +="<div onclick='at3b_chpath2(3,"+idpath+")'><span style='padding:0 10px'>-</span>Descendre</div>"
+divmenuover.innerHTML +="<div onclick='at3b_chpath2(4,"+idpath+")'><span style='padding:0 10px'>X</span>Supprimer</div>"
+}
+
+function at3b_chpath2(x,idpath)
+{
+
+divmenuover.style.display="none"
+document.removeEventListener("click", divmenuover_clickev);
+
+
+var divsc = document.querySelector('.scenarselected')
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+
+
+if(x==2&&idpath==0)return;
+if(x==3&&idpath>=scenarobj.attackpath.length-1)return;
+
+
+if(x==1){var t=prompt("",scenarobj.attackpath[idpath].text);if(t)scenarobj.attackpath[idpath].text=t}
+if(x==2)scenarobj.attackpath = move_elem_in_array(scenarobj.attackpath,idpath,idpath-1)
+if(x==3)scenarobj.attackpath = move_elem_in_array(scenarobj.attackpath,idpath,idpath+1)
+if(x==4){delete(scenarobj.attackpath[idpath]);scenarobj.attackpath=scenarobj.attackpath.filter(val => val)}
+if(x==5){at3b_add_pp(idpath);return}
+
+
+
+divsc.dataset.attackinfo = JSON.stringify(scenarobj)
+
+
+
+
+at3b_redraw_graph()
+}
+
+
+function at3b_add_pp(idpath)
+{
+
+show_divcenter()
+at3b_addpp.style.display="block"
+
+var pps = document.querySelectorAll('.at3_pp') 
+
+var tabpps=[]
+for(var i=0;i<pps.length;i++)
+	{
+	var pp=pps[i]
+	tabpps.push([parseFloat(pp.dataset.menace),pp.querySelector('input').value ]);
+	}
+
+tabpps.sort(function(a,b) {return b[0]-a[0]}) // sort by menace
+
+if(!tabpps.length)
+	{ //demo Pp
+	tabpps=[[6,"Prestataire informatique"],[4,"Fournisseurs"],[2,"Laboratoires"],[2,"Pharmacies"],[2,"Établissements de santé"]]
+	}
+
+var HTML="<table style='border-collapse: collapse;'><tr><td>Pp.</td><td style='width:30px'></td><td>Menace<td></tr>"
+for(var i=0;i<tabpps.length;i++)
+	{
+	HTML+="<tr onclick='at3b_clickscenar(this)' data-idpath='"+idpath+"'style='cursor:pointer'><td>"+tabpps[i][1]+"</td><td></td><td> "+tabpps[i][0]+"</td></tr>"
+	}
+HTML+="</table>"
+
+at3b_addpp_1.innerHTML=HTML
+divmenuover_clickev(false)
+}
+
+function at3b_addppok()
+{
+var divsc = document.querySelector('.scenarselected')
+var idpath = parseInt(at3b_addpp_1.querySelector('.selected').dataset.idpath)
+var txtPP = at3b_addpp_1.querySelector('.selected').querySelector('td').innerText
+
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+scenarobj.attackpath[idpath].pp1 = txtPP
+divsc.dataset.attackinfo = JSON.stringify(scenarobj)
+
+hide_divgrey()
+at3b_redraw_graph()
+}
+
+
+
+function move_elem_in_array(array, from, to) {
+  if( to === from ) return array;
+
+  var target = array[from];                         
+  var i = to < from ? -1 : 1;
+
+  for(var k = from; k != to; k += i){
+    array[k] = array[k + i];
+  }
+  array[to] = target;
+  return array;
+}
 </script>
 </head>
 <body onload="go()">
 
 <div id="divgrey" onclick="hide_divgrey()"></div>
-<div id="divover">TEST TEST<br>test</div>
+<div id="divover">divover</div>
 <div id="divmenuover"></div>
 
 <div id="layout" style="display: flex;  width: 100%;">
@@ -1295,17 +1813,17 @@ for(var i=0;i<ds.length;i++)
 <div id="atelier1" onmousedown="clickmenu(this)"><div class="mini at1bg disabled">1</div>Cadrage</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1b',this)"><div class="mini at1bg">B</div>Périmètre</div>
-<div class="atelier1open submenu disabled" onmousedown="showatt('at1c',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
+<div class="atelier1open submenu" onmousedown="showatt('at1c',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
 
-<div id="atelier2" onmousedown="clickmenu(this)"><div class="mini at2bg">2</div>SR/OV</div>
-<div class="atelier2open submenu startscript" onmousedown="showatt('at2a',this)"><div class="mini at2bg">A</div>Identification</div>
+<div id="atelier2" onmousedown="clickmenu(this)"><div class="mini at2bg">2</div>Source de risque</div>
+<div class="atelier2open submenu" onmousedown="showatt('at2a',this)"><div class="mini at2bg">A</div>Identification</div>
 <div class="atelier2open submenu" onmousedown="showatt('at2b',this)"><div class="mini at2bg">B</div>Pertinence</div>
 <div class="atelier2open submenu" onmousedown="showatt('at2c',this)"><div class="mini at2bg">C</div>Rétention</div>
 
 <div id="atelier3" onmousedown="clickmenu(this)"><div class="mini at3bg">3</div>Scénarios stratégiques</div>
 <div class="atelier3open submenu" onmousedown="showatt('at3a',this)"><div class="mini at3bg">A</div>Cartographie</div>
-<div class="atelier3open submenu disabled" onmousedown="showatt('at3b',this)"><div class="mini at3bg">B</div>Scénario</div>
+<div class="atelier3open submenu startscript" onmousedown="showatt('at3b',this)"><div class="mini at3bg">B</div>Scénario</div>
 <div class="atelier3open submenu disabled" onmousedown="showatt('at3c',this)"><div class="mini at3bg">C</div>Mesures de sécurité</div>
 
 
@@ -1324,22 +1842,40 @@ for(var i=0;i<ds.length;i++)
 
 <div id="layout_content">
 
+<div id="at1c">
 
+<br/>
 
+<span style="border-bottom:#FED6EB solid 3px;margin-left:20px;">Identifier les événements redoutés</span>
+<br/><br/><br/>
+<button onclick="at1c_newsmetier()" style="padding:8px 16px">Ajouter valeur métier</button><br/>
 
+<div id="at21c_maindiv" style="width:800px">
 
+<table id='at21c_table' style="width:100%;display: inline-block;"><tr style='color:#FB45A3'><td class='at21c_tableheader'>Valeur métier</td><td class='at21c_tableheader'>Evènement redoutés</td><td class='at21c_tableheader'>Impacts</td><td class='at21c_tableheader'>Gravités</td></tr></table>
+
+</div>
+
+</div>
 <div id="at2a">
 
+<br/>
+
+<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Identifier les sources de risque et les objectifs visés</span>
+<br/><br/><br/>
 <button onclick="at2a_newsrov()" style="padding:8px 16px">Ajouter SR/OV</button><br/>
 
-<table id="at2a_srovlist" style="width:600px">
-<tr><td class='optioncolumn' style="transform: rotate(270deg);cursor:pointer;font-size:18px;" onmousedown="at2a_option(this)"><b>...</b></td><td></td><td width="130px">Source de Risque</td><td width="40px"></td><td>Objectif Visés</td></tr>
+<table id="at2a_srovlist" style="width:600px;border-collapse: collapse;">
+<tr style='background-color:#E2D3E0'><td class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:18px;" onmousedown="at2a_option(this)"><b>...</b></td><td></td><td width="130px">Source de Risque</td><td width="40px"></td><td>Objectif Visés</td></tr>
 </table>
 
 </div>
 
 
 <div id="at2b">
+<br/>
+<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Évaluer la pertinence des couples SR/OV</span>
+<br/><br/><br/>
 
 <table id="at2b_srovlist" style="width:1200px">
 <tr><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td>Cotation</td><td>Pertinence</td><td>Pertinence retenue</td><td>Retenue</td><td>Justification</td></tr>
@@ -1347,6 +1883,8 @@ for(var i=0;i<ds.length;i++)
 
 
 <br/>
+<div id="at2b_nosrov" style='text-align:center;'>Aucun couple SR/OV créer dans l'atelier 2-A</div>
+
 <br/>
 <div style="text-align:center;">
 <svg id="at2b_svg1" width="350" height="350" viewBox="-250 -250 500 500" xmlns="http://www.w3.org/2000/svg" style="background-color:#CFD6D5">
@@ -1411,15 +1949,16 @@ for(var i=0;i<ds.length;i++)
 
 
 <div id="at2c">
-
-<br/><br/>
-Couple SR/OV retenue :
+<br/>
+<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Couples SR/OV retenus pour la suite de l’analyse</span>
+<br/><br/><br/>
+<br/>
 <br/>
 <br/>
 <table id="at2c_srovlist" style="width:800px">
 <tr><td width="130px">Source de Risque</td><td>Objectif Visés</td></tr>
 </table>
-
+<div id="at2c_nosrov">Aucun couple SR/OV séléctionné dans l'atelier 2-B</div>
 
 <br/>
 <br/>
@@ -1430,6 +1969,10 @@ Couple SR/OV retenue :
 
 
 <div id="at3a">
+<br/>
+<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Cartographie de dangerosité de l’écosystème et identifier les parties prenantes critiques</span>
+<br/><br/><br/>
+
 
 <div id="div_menace">
 
@@ -1628,6 +2171,24 @@ Maturité cyber x Confiance
 </div>
 </div>
 
+
+
+<div id="at3b">
+<br/>
+<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Élaborer des scénarios stratégiques</span>
+<br/><br/><br/>
+<button onclick="at3b_new()" style="padding:8px 16px">Nouveau scénario</button>
+<br/>
+<br/>
+
+<div id="at3b_list">
+
+
+</div>
+</div>
+
+
+
 </div>
 </div>
 <div id="divcenter">
@@ -1643,25 +2204,12 @@ Predefini :
 
 <div style="height:200px;overflow: auto;">
 <table id="at2a_tablesrovexemple">
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td  width="120px">Activiste</td><td>Saboter la prochaine campagne nationale de
-vaccination en perturbant la production ou la
-distribution des vaccins, pour générer un choc
-psychologique sur la population et discréditer les
-pouvoirs publics.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Concurrent</td><td>Voler des informations en espionnant les travaux de
-R&D en vue d’obtenir un avantage concurrentiel.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Cybercriminel</td><td>Divulguer au grand public des informations sur la
-façon dont les vaccins sont conçus en collectant des
-photos et vidéos des tests animaliers afin de rallier
-l’opinion publique à sa cause.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition de vaccins
-distribués lors d’une campagne nationale de
-vaccination sous couvert de bioterrorisme à des fins
-d’extorsion d’une rançon.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td  width="120px">Activiste</td><td>Saboter la campagne nationale de vaccination.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Concurrent</td><td>Voler des informations en espionnant les travaux de R&D en vue d’obtenir un avantage concurrentiel.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Cybercriminel</td><td>Divulguer des informations sur les tests animaliers.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition des vaccins à des fins d’extorsion d’une rançon.</td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Etatique</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Crime organisé</td><td></td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Terroriste</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Officine spécialisée</td><td></td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Amateur</td><td></td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Vengeur</td><td></td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Espionnage</td><td></td></tr>
@@ -1684,6 +2232,32 @@ Objectifs Visés<br/>
 
 <br/>
 </div>
+<div id="at3b_newsscnear" style="width:700px">
+Nouveau scénario stratégiques<br/>
+<br/>
+<div id="at3b_nosrov">Aucun couple SR/OV séléctionné dans l'atelier 2-B</div>
+<div id="at3b_1"></div>
+<br/>
+<div id="at3b_2"></div>
+<br/>
+
+<center><button id='at3b_addbutton' onclick="at3b_add()" style="padding:8px 16px">Ajouter</button></center>
+
+<br/>
+</div>
+
+<div id="at3b_addpp" style="width:700px">
+<br/>
+Partie prenante :<br/>
+<br/>
+<div id="at3b_addpp_1"></div>
+
+<center><button onclick="at3b_addppok()" style="padding:8px 16px">Modifier</button></center>
+
+<br/>
+</div>
+
+
 </div>
 
 </body>
