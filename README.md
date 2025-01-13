@@ -15,10 +15,12 @@ EBIOS RM graph est un outil aidant à compléter les ateliers 2 et 3 en créant 
 Les graphiques peuvent être utilisés pour compléter des templates ou en tant qu'exemple.
 
 ## Exemple pour
+Atelier 1.c <br />
 Atelier 2.a <br />
 Atelier 2.b <br />
 Atelier 2.c <br />
-Atelier 3.a
+Atelier 3.a <br />
+Atelier 3.b <br />
 
 # Info
 - Based on the ANSSI EBIOS RM V1.5
