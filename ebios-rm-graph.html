@@ -14,6 +14,8 @@ margin:0;
 
 svg{
 border-radius:8px;
+user-select: none;
+margin: 0 16px;
 }
 .at1bg{
 background-color:#FB3199
@@ -37,10 +39,11 @@ margin:4px 0;
 #layout-sidebar{
 min-width:220px;
 height: 100vh;
-position: relative;
 user-select: none;
 background-color:#eee;
 white-space: nowrap;
+position:fixed;
+z-index: 99;
 }
 
 
@@ -55,6 +58,18 @@ text-align:center;
 border-radius:4px;
 margin-left:6px;
 margin-right:6px;
+}
+
+
+#at3b_table .trdata td:first-child{
+text-align:center;
+}
+
+
+.at3b_table_tdgravite{
+text-align:center;
+font-weight:bold;
+font-size:larger;
 }
 
 .submenu .mini{
@@ -253,10 +268,33 @@ position:relative;
 border-radius: 2px;
 }
 
-.at21c_tableheader{
+#at3c_table td, #at3b_table td{
+background-color:#CCEDEC;
+}
+
+#at3c_table tr:first-child td,#at3b_table tr:first-child td{
+text-align:center;
+font-weight:bold;
+}
+
+#at3c_table tr > td:last-of-type {
+background-color:#00A7A2;
+color:#fff;
+}
+
+#at3c_table tr > td:nth-last-child(-n + 2){
+text-align:center;
+font-weight:bold;
+}
+
+.at21c_tableheader, .at3c_tableheader, .at3b_tableheader{
 border:3px solid #FB45A3;
 background-color:#fff !important;
 text-align:center;
+}
+
+.at3c_tableheader, .at3b_tableheader{
+border-color:#00A7A2 !important;
 }
 
 .iconplus{
@@ -297,13 +335,13 @@ cursor:pointer;
 height:400px;
 width:100%;
 display:inline-block;
+margin-bottom:16px;
 }
 
 .at3b_sc_left{
 height:100%;
 display:inline-block;
 width:200px;
-margin-right:10px;
 position: relative;
 }
 
@@ -312,8 +350,8 @@ background-color:#CCEDEC;
 height:100%;
 display:inline-block;
 width:400px;
-margin-right:20px;
-position: relative;
+left:200px;
+position: absolute;
 }
 
 .at3b_sc_right{
@@ -321,7 +359,8 @@ background-color:#99DCDA;
 height:100%;
 display:inline-block;
 width:300px;
-position: relative;
+position: absolute;
+left:630px;
 }
 
 .at3b_sc .autohide{
@@ -329,6 +368,10 @@ display:none;
 }
 .at3b_sc:hover .autohide{
 display:block;
+}
+
+#at3b_addpp_1 td{
+text-indent:16px;
 }
 </style>
 
@@ -940,7 +983,8 @@ function load_att(att)
 if(att=="at2b") at2b_redraw_graph()
 if(att=="at2c") at2c_redraw()
 if(att=="at3a") at3a_redraw_graph()
-if(att=="at3b") at3b_redraw_graph()
+if(att=="at3b") at3b_redraw()
+if(att=="at3c") at3c_redraw()
 
 }
 
@@ -1340,7 +1384,8 @@ document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('sc
 elem.closest('.at3b_sc').classList.add('scenarselected')
 
 
-divmenuover.innerHTML ="<div onclick='at3b_add_attackpath(1)'><span style='padding:0 10px'> </span>Ajouter chemin d'attaque</div>"
+divmenuover.innerHTML ="<div onclick='at3b_editscnear()'><span style='padding:0 10px'> </span>Editer</div>"
+divmenuover.innerHTML +="<div onclick='at3b_add_attackpath(1)'><span style='padding:0 10px'> </span>Ajouter chemin d'attaque</div>"
 divmenuover.innerHTML +="<div onclick='at3b_add_attackpath(2)'><span style='padding:0 10px'> </span>Ajouter chemin écosystème</div>"
 divmenuover.innerHTML +="<div onclick='at3b_deletesc()'><span style='padding:0 10px'> </span>Supprimer scénario</div>"
 }
@@ -1352,7 +1397,7 @@ function at3b_deletesc()
 {
 document.querySelector('.scenarselected').remove();
 
-at3b_redraw_graph()
+at3b_redraw()
 divmenuover_clickev(false)
 }
 
@@ -1425,27 +1470,31 @@ function at21c_cell_1_2_3(cell1,cell2,cell3)
 {
 cell1.innerHTML = "Perte ou destruction des informations d’études et recherches conduisant à un fort impact, notamment sur les futures autorisations de mises sur le marché de l’entreprise";cell1.contentEditable=true
 cell2.innerHTML = "- Missions et services de l’organisme<br/>- Coûts de développement<br/>- Gouvernance de l’organisme";cell2.contentEditable=true
-cell3.innerHTML = "<div class='iconedit' style='font-size:xx-large;'>+</div><span class='at21c_table_gravite'>4</span>";cell3.className="tdgravite";cell3.onclick= function() {chtdgravite(this)};
+cell3.innerHTML = "<div class='iconedit' style='font-size:xx-large;'>+</div><span class='gravitespan'>4</span>";cell3.className="tdgravite";cell3.onclick= function() {chtdgravite(this)};
 chtdgravite(cell3)
 }
 
 function chtdgravite(elem)
 {
 var elemtd = elem.closest('td')
-var v = parseInt(elemtd.querySelector('.at21c_table_gravite').innerText)
+var v = parseInt(elemtd.querySelector('.gravitespan').innerText)
 
 v++;
 if(v>4)v=1
 
-var c=""
-if(v==1)c="#4DC2BE"
-if(v==2)c="#F9EF7B"
-if(v==3)c="#FFBF7E"
-if(v==4)c="#EC7581"
-elemtd.querySelector('.at21c_table_gravite').innerText=v
-elemtd.style.backgroundColor=c
-
+elemtd.querySelector('.gravitespan').innerText=v
+elemtd.style.backgroundColor=getcolorfromgravite(v)
 }
+
+function getcolorfromgravite(v)
+{
+if(v==1)return"#4DC2BE"
+if(v==2)return"#F9EF7B"
+if(v==3)return"#FFBF7E"
+if(v==4)return"#EC7581"
+return "#aaa"
+}
+
 
 function at1c_newsevent(elem)
 {
@@ -1516,6 +1565,9 @@ function at3b_add()
 var txt1 ="Attaquant"
 var txt2 ="Production des vaccins"
 
+document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
+
+
 var row = at3b_1.querySelector('.selected')
 if(row)
 	{
@@ -1523,7 +1575,7 @@ if(row)
 	txt2 = row.cells[1].innerText
 	}
 
-var HTML = "<div class='at3b_sc' style='position:relative' data-attackinfo='"+JSON.stringify({icon1:"testSR",txt1:txt1,txt2:txt2, icon2:"OVOV", attackpath:[]})+"'>"
+var HTML = "<div class='at3b_sc scenarselected' style='position:relative' data-attackinfo='"+JSON.stringify({icon1:"testSR",txt1:txt1,txt2:txt2,ov:"SOCIÉTÉ",gravite:1, icon2:"OVOV", attackpath:[]})+"'>"
 HTML+="<div class='optioncolumn' style='transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:18px;position:absolute;left:20px;top:10px' onmousedown='at3b_option(this)'><b>...</b></div>"
 HTML+="<div class='at3b_sc_left'> </div>"
 HTML+="<div class='at3b_sc_center'> </div>"
@@ -1532,7 +1584,9 @@ HTML+="</div>"
 
 at3b_list.innerHTML+=HTML
 hide_divgrey()
-at3b_redraw_graph()
+
+
+at3b_add_attackpath(1)
 }
 
 function at3b_add_attackpath(x)
@@ -1544,16 +1598,124 @@ var scenarobj=JSON.parse(divsc.dataset.attackinfo)
 if(scenarobj.attackpath.length>4) return; // max : 5
 
 var text = "Chemin d’attaque"
-if(x==1)scenarobj.attackpath.push({type:"direct",text:text})
-if(x==2)scenarobj.attackpath.push({type:"50%",text:text,pp1:"Partie prenante"})
 
+var path = {type:"XXX",	text:text,risk:1,at3c_messec:"",pp1:"",at3c_sec:"",at3c_sec:"",at3c_risk_residuel:1}
 
+if(x==1)path.type="direct"
+if(x==2){path.type="eco";path.pp1="Partie prenante";}
+
+scenarobj.attackpath.push(path)
 divsc.dataset.attackinfo = JSON.stringify(scenarobj)
-at3b_redraw_graph()
+at3b_redraw()
 divmenuover_clickev(false)
 }
 
 
+function at3b_editscnear()
+{
+var divsc = document.querySelector('.scenarselected')
+
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+
+at3b_diveditscnear_sr.value=scenarobj.txt1
+at3b_diveditscnear_ov.value=scenarobj.ov
+at3b_diveditscnear_obj.value=scenarobj.txt2
+at3b_diveditscnear_gravite.value=scenarobj.gravite
+
+
+show_divcenter()
+at3b_diveditscnear.style.display="block"
+divmenuover_clickev(false)
+}
+
+
+function at3b_diveditscnear_ok()
+{
+
+var divsc = document.querySelector('.scenarselected')
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+var idpath = parseInt(at3b_chpathdiv.dataset.idpath)
+
+scenarobj.txt1=at3b_diveditscnear_sr.value
+scenarobj.ov=at3b_diveditscnear_ov.value
+scenarobj.txt2=at3b_diveditscnear_obj.value
+scenarobj.gravite=at3b_diveditscnear_gravite.value
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+divsc.dataset.attackinfo = JSON.stringify(scenarobj)
+
+
+hide_divgrey()
+at3b_redraw()
+}
+
+function at3b_redraw()
+{
+at3b_redraw_graph()
+at3b_redraw_synthese()
+}
+
+function at3b_redraw_synthese()
+{
+var scenars = document.querySelectorAll('.at3b_sc')
+
+at3b_synthese.style.display = (scenars.length) ? "block" : "none";
+document.querySelectorAll("#at3b_table .trdata").forEach(e => e.remove());
+
+
+
+for(var i=0;i < scenars.length; i++)
+	{
+	var divsc = scenars[i]
+	var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+
+
+	var row = at3b_table.insertRow();
+	row.className="trdata"
+	var cell1 = row.insertCell(0);
+	var cell2 = row.insertCell(1);
+	var cell3 = row.insertCell(2);
+	var cell4 = row.insertCell(3);
+
+	
+	cell1.innerHTML = scenarobj.txt1;
+	cell2.innerHTML = scenarobj.txt2;
+	
+	cell4.innerHTML = scenarobj.gravite;
+	cell4.className = "at3b_table_tdgravite";
+	cell4.style.backgroundColor = getcolorfromgravite(scenarobj.gravite);
+	
+	// PATH
+	for(var iatt=0;iatt<scenarobj.attackpath.length;iatt++)
+		{
+		var sc = scenarobj.attackpath[iatt]
+		
+		var text = sc.text
+		if(sc.text3) text = sc.text3
+		cell3.innerHTML+="<p style='white-space: pre-wrap'>"+(iatt+1)+". "+text+"</p>"
+
+
+		}
+	}
+//at3b_synthese
+
+}
 function at3b_redraw_graph()
 {
 document.querySelectorAll('.scadded').forEach(e => e.remove());
@@ -1572,7 +1734,7 @@ var scenarobj = JSON.parse(divsc.dataset.attackinfo)
 divsc.querySelector('.at3b_sc_center').innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>ÉCOSYSTÈME</div>"
 
 //text right
-divsc.querySelector('.at3b_sc_right').innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>SOCIÉTÉ</div>"
+divsc.querySelector('.at3b_sc_right').innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>"+scenarobj.ov+"</div>"
 
 //SOURCE
 divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;border-radius:100px;width:76px;height:76px;left:59px;top:161px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 80px;'>SR</div>"
@@ -1600,7 +1762,7 @@ if(nbattackpath>5)nbattackpath=5;
 
 var postop=[]
 if(nbattackpath==1)postop.push(200)
-if(nbattackpath==2)postop.push(70,330)
+if(nbattackpath==2)postop.push(80,320)
 if(nbattackpath==3)postop.push(70,200,330)
 if(nbattackpath==4)postop.push(50,100,300,360)
 if(nbattackpath==5)postop.push(50,100,200,300,370)
@@ -1659,12 +1821,11 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 	if(sc.type=="direct")
 		divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;"+b+";height:"+h+"px;border-radius:10px;width:673px;left:100px;top:"+top+"px;position: absolute;z-index:"+(20-iatt)+"'></div>"// Fleche SR centre
 
-	if(sc.type=="50%")
+	if(sc.type=="eco")
 		divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;"+b+";height:"+h+"px;border-radius:10px;border-right:0;width:320px;left:100px;top:"+top+"px;position: absolute;z-index:"+(20-iatt)+"'></div>"
 	
 
-	
-	if(sc.pp1)
+	if(sc.pp1!="")
 		{
 		var HTMLpp = "<div class='scadded' style='left:"+145+"px;top:"+(toptext-20)+"px;width:120px;height:40px;z-index:60;position:absolute;background-color:#CCEDEC;line-height: 100px;text-align: center;white-space: nowrap;'>"
 		HTMLpp +="<div class='scadded' style='left:25px;top:0px;width:70px;height:40px;position:absolute;background-color:#fff'>"
@@ -1677,9 +1838,16 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 		divsc.querySelector('.at3b_sc_center').innerHTML+=HTMLpp
 		}
 		
-	divsc.querySelector('.at3b_sc_left').innerHTML+="<div class='optioncolumn scadded autohide' style='position:absolute;transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:18px;right:-5px;top:"+(toptext-25)+"px;z-index:200' onmousedown='at3b_chpath(this,"+iatt+")'><b>...</b></div>"
+	divsc.querySelector('.at3b_sc_left').innerHTML+="<div class='optioncolumn scadded autohide' style='position:absolute;transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:18px;right:0;top:"+(toptext-25)+"px;z-index:200' onmousedown='at3b_chpath(this,"+iatt+")'><b>...</b></div>"
 	
-	divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:220px;top:"+(toptext-18)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784'>"+sc.text+"</div>"
+	if(!sc.pp1)
+		divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:250px;top:"+(toptext-18)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:300px;text-align:center;'>"+sc.text+"</div>"
+	else
+		{
+		divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:205px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text+"</div>"
+		if(sc.text2)
+			divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:475px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text2+"</div>"
+		}
 	}
 }
 }
@@ -1697,7 +1865,7 @@ divmenuover.style.display="block"
 document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
 elem.closest('.at3b_sc').classList.add('scenarselected')
 
-divmenuover.innerHTML ="<div onclick='at3b_chpath2(1,"+idpath+")'><span style='padding:0 10px'>&#x270E;</span>Renommer</div>"
+divmenuover.innerHTML ="<div onclick='at3b_chpath2(1,"+idpath+")'><span style='padding:0 10px'>&#x270E;</span>Editer</div>"
 divmenuover.innerHTML +="<div onclick='at3b_chpath2(5,"+idpath+")'><span style='padding:0 10px'> </span>Partie prenante</div>"
 
 divmenuover.innerHTML +="<div onclick='at3b_chpath2(2,"+idpath+")'><span style='padding:0 10px'>+</span>Monter</div>"
@@ -1707,7 +1875,6 @@ divmenuover.innerHTML +="<div onclick='at3b_chpath2(4,"+idpath+")'><span style='
 
 function at3b_chpath2(x,idpath)
 {
-
 divmenuover.style.display="none"
 document.removeEventListener("click", divmenuover_clickev);
 
@@ -1720,22 +1887,53 @@ if(x==2&&idpath==0)return;
 if(x==3&&idpath>=scenarobj.attackpath.length-1)return;
 
 
-if(x==1){var t=prompt("",scenarobj.attackpath[idpath].text);if(t)scenarobj.attackpath[idpath].text=t}
+if(x==1){at3b_chpath2edit(idpath);return}
 if(x==2)scenarobj.attackpath = move_elem_in_array(scenarobj.attackpath,idpath,idpath-1)
 if(x==3)scenarobj.attackpath = move_elem_in_array(scenarobj.attackpath,idpath,idpath+1)
 if(x==4){delete(scenarobj.attackpath[idpath]);scenarobj.attackpath=scenarobj.attackpath.filter(val => val)}
 if(x==5){at3b_add_pp(idpath);return}
 
-
-
 divsc.dataset.attackinfo = JSON.stringify(scenarobj)
 
 
-
-
-at3b_redraw_graph()
+at3b_redraw()
 }
 
+function at3b_chpath2edit(idpath)
+{
+show_divcenter()
+at3b_chpathdiv.style.display="block"
+
+at3b_chpathdiv.dataset.idpath=idpath
+
+var divsc = document.querySelector('.scenarselected')
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+
+//at3b_synthese.style.display = 
+
+var p = scenarobj.attackpath[idpath]
+
+at3b_chpath1input.value=(p.text) ? p.text : "";
+at3b_chpath2input.value=(p.text2) ? p.text2 : "";
+at3b_chpath3input.value=(p.text3) ? p.text3 : "";
+
+}
+
+function at3b_chpath2edit_ok()
+{
+var divsc = document.querySelector('.scenarselected')
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+var idpath = parseInt(at3b_chpathdiv.dataset.idpath)
+
+scenarobj.attackpath[idpath].text=at3b_chpath1input.value
+scenarobj.attackpath[idpath].text2=at3b_chpath2input.value
+scenarobj.attackpath[idpath].text3=at3b_chpath3input.value
+
+divsc.dataset.attackinfo = JSON.stringify(scenarobj)
+
+hide_divgrey()
+at3b_redraw()
+}
 
 function at3b_add_pp(idpath)
 {
@@ -1754,15 +1952,17 @@ for(var i=0;i<pps.length;i++)
 
 tabpps.sort(function(a,b) {return b[0]-a[0]}) // sort by menace
 
-if(!tabpps.length)
-	{ //demo Pp
-	tabpps=[[6,"Prestataire informatique"],[4,"Fournisseurs"],[2,"Laboratoires"],[2,"Pharmacies"],[2,"Établissements de santé"]]
+at2c_nosrov.style.display="none"
+if(!tabpps.length) //demo Pp
+	{
+	at2c_nosrov.style.display="block"
+	tabpps=[[6,"Prestataire informatsique"],[4,"Fournisseurs"],[2,"Laboratoires"],[2,"Pharmacies"],[2,"Établissements de santé"]]
 	}
 
-var HTML="<table style='border-collapse: collapse;'><tr><td>Pp.</td><td style='width:30px'></td><td>Menace<td></tr>"
+var HTML="<table style='border-collapse: collapse;'><tr><td>Pp.</td><td>Menace<td></tr>"
 for(var i=0;i<tabpps.length;i++)
 	{
-	HTML+="<tr onclick='at3b_clickscenar(this)' data-idpath='"+idpath+"'style='cursor:pointer'><td>"+tabpps[i][1]+"</td><td></td><td> "+tabpps[i][0]+"</td></tr>"
+	HTML+="<tr onmousedown='at3b_clickscenar(this)' data-idpath='"+idpath+"'style='cursor:pointer'><td>"+tabpps[i][1]+"</td><td> "+tabpps[i][0]+"</td></tr>"
 	}
 HTML+="</table>"
 
@@ -1774,14 +1974,21 @@ function at3b_addppok()
 {
 var divsc = document.querySelector('.scenarselected')
 var idpath = parseInt(at3b_addpp_1.querySelector('.selected').dataset.idpath)
-var txtPP = at3b_addpp_1.querySelector('.selected').querySelector('td').innerText
-
+var tr = at3b_addpp_1.querySelector('.selected')
+var txtPP = tr.querySelector('td').innerText
+var risk = tr.querySelectorAll('td')[1].innerText
 var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+
+if(!txtPP)txtPP="";
 scenarobj.attackpath[idpath].pp1 = txtPP
+scenarobj.attackpath[idpath].risk = risk
+scenarobj.attackpath[idpath].at3c_risk_residuel = risk
+scenarobj.attackpath[idpath].at3c_messec = ""
+
 divsc.dataset.attackinfo = JSON.stringify(scenarobj)
 
 hide_divgrey()
-at3b_redraw_graph()
+at3b_redraw()
 }
 
 
@@ -1797,6 +2004,53 @@ function move_elem_in_array(array, from, to) {
   }
   array[to] = target;
   return array;
+}
+
+
+function at3c_redraw()
+{
+
+document.querySelectorAll("#at3c_table .trdata").forEach(e => e.remove());
+
+var scenars = document.querySelectorAll('.at3b_sc')
+var at3c_nopp_show=0;
+for(var i=0;i<scenars.length;i++)
+{
+var divsc = scenars[i]
+
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+
+var nbattackpath = scenarobj.attackpath.length
+
+if(nbattackpath>5)nbattackpath=5;
+
+
+// PATH
+for(var iatt=0;iatt<nbattackpath;iatt++)
+	{
+	var sc = scenarobj.attackpath[iatt]
+
+	if(sc.pp1)
+		{
+		at3c_nopp_show=1;
+		var row = at3c_table.insertRow();
+		row.className="trdata"
+		var cell1 = row.insertCell(0);
+		var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+		var cell4 = row.insertCell(3);
+		var cell5 = row.insertCell(3);
+		
+		cell1.innerHTML = sc.pp1??"";
+		cell2.innerHTML = sc.text;
+		cell3.innerHTML = sc.at3c_messec
+		cell4.innerHTML = sc.risk;
+		cell5.innerHTML = sc.at3c_risk_residuel;
+		}
+	}
+}
+
+at3c_nopp.style.display = (at3c_nopp_show) ? "none" : "block";
 }
 </script>
 </head>
@@ -1823,7 +2077,7 @@ function move_elem_in_array(array, from, to) {
 <div id="atelier3" onmousedown="clickmenu(this)"><div class="mini at3bg">3</div>Scénarios stratégiques</div>
 <div class="atelier3open submenu" onmousedown="showatt('at3a',this)"><div class="mini at3bg">A</div>Cartographie</div>
 <div class="atelier3open submenu" onmousedown="showatt('at3b',this)"><div class="mini at3bg">B</div>Scénario</div>
-<div class="atelier3open submenu disabled" onmousedown="showatt('at3c',this)"><div class="mini at3bg">C</div>Mesures de sécurité</div>
+<div class="atelier3open submenu" onmousedown="showatt('at3c',this)"><div class="mini at3bg">C</div>Mesures de sécurité</div>
 
 
 <div id="atelier4" onmousedown="clickmenu(this)"><div class="mini at4bg">4</div>Scénarios opérationnels</div>
@@ -1839,7 +2093,7 @@ function move_elem_in_array(array, from, to) {
 <div class="atelier5open submenu disabled" onmousedown="showatt('at5f',this)"><div class="mini at5bg">F</div>Surveillance</div>
 </div>
 
-<div id="layout_content">
+<div id="layout_content" style="margin-left:220px;width: 100vw;">
 
 <div id="at1c">
 
@@ -2066,7 +2320,7 @@ Maturité cyber x Confiance
 </div>
 
 
-<div id="cont_at3a" style="float:left;margin-right:8px;">
+<div id="cont_at3a" style="float:left;">
 <button onclick="seuil()" style="height:24px;cursor:pointer;margin:8px;"> Seuil </button><button id="butnewcat" onclick="new_cat()" style="height:24px;cursor:pointer;margin:8px;"> + Catégorie </button><br/>
 
 
@@ -2184,6 +2438,34 @@ Maturité cyber x Confiance
 
 
 </div>
+<br/>
+<div id="at3b_synthese">
+
+<table id='at3b_table' style="margin:0 auto;"><tr style='color:#00A7A2' class="at3b_tableheader">
+<td class='at3b_tableheader'>SOURCES DE RISQUE</td>
+<td class='at3b_tableheader' style='width: 220px;'>OBJECTIFS VISÉS</td>
+<td class='at3b_tableheader' style='width: 400px;'>CHEMINS D’ATTAQUE STRATÉGIQUES</td>
+<td class='at3b_tableheader'>GRAVITÉ</td>
+</tr></table>
+<br/>
+<br/>
+</div>
+</div>
+
+
+<div id="at3c">
+<br/>
+<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Définir des mesures de sécurité sur l'écosystème</span>
+<br/><br/><br/>
+<table id='at3c_table' style="width:100%;display: inline-block;"><tr style='color:#00A7A2'>
+<td class='at3c_tableheader'>PARTIE PRENANTE</td>
+<td class='at3c_tableheader'>CHEMINS D’ATTAQUE STRATÉGIQUES</td>
+<td class='at3c_tableheader'>MESURES DE SÉCURITÉ </td>
+<td class='at3c_tableheader'>MENACE INITIALE</td>
+<td class='at3c_tableheader' style='color:#00A7A2'>MENACE RÉSIDUELLES</td>
+</tr></table>
+
+<div id="at3c_nopp"><br/><br/><br/>Aucune partie prenante dans les scénarios de l'atelier 3-B.</div>
 </div>
 
 
@@ -2247,14 +2529,49 @@ Nouveau scénario stratégiques<br/>
 
 <div id="at3b_addpp" style="width:700px">
 <br/>
-Partie prenante :<br/>
+Partie prenante<br/>
 <br/>
+<div id="at2c_nosrov">Pas de PP dans l'atelier 3-A, exemple de PP :<br/><br/></div> 
 <div id="at3b_addpp_1"></div>
 
 <center><button onclick="at3b_addppok()" style="padding:8px 16px">Modifier</button></center>
 
 <br/>
 </div>
+
+<div id="at3b_chpathdiv" style="width:700px">
+<br/>
+Partie prenante<br/>
+<br/>
+<table>
+<tr><td>Attaquant &lt;-&gt;  Ecosystème</td><td><input id="at3b_chpath1input" /></td></tr>
+<tr><td>Ecosystème &lt;-&gt; Société</td><td><input id="at3b_chpath2input" /></td></tr>
+</table>
+<br/>
+Description<br/>
+<textarea id="at3b_chpath3input" style="width:500px;height:80px"></textarea>
+<br/><br/>
+<center><button onclick="at3b_chpath2edit_ok()" style="padding:8px 16px;">Ok</button></center>
+
+<br/>
+</div>
+
+<div id="at3b_diveditscnear" style="width:700px">
+<br/>
+<br/>
+<table>
+<tr><td>SR</td><td><input id="at3b_diveditscnear_sr" /></td></tr>
+<tr><td>OV</td><td><input id="at3b_diveditscnear_ov" /></td></tr>
+<tr><td>OV objectif</td><td><input id="at3b_diveditscnear_obj" /></td></tr>
+<tr><td>Gravité</td><td><select id="at3b_diveditscnear_gravite"><option value='1'>1 - Faible</option><option value='2'>2 - Moyen</option><option value='3'>3 - Grave</option><option value='4'>4 - Critique</option></select></td></tr>
+</table>
+<br/>
+<br/>
+<center><button onclick="at3b_diveditscnear_ok()" style="padding:8px 16px;">Ok</button></center>
+
+<br/>
+</div>
+
 
 
 </div>
