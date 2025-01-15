@@ -1,9 +1,8 @@
 # EBIOS-RM-Graph
-Help to create graph for EBIOS RM
+Aide a créer des graphique et schéma pour la méthode EBIOS RM
 
 
-Use it here : 
-[ebios-rm-graph](https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html)
+-> [EBIOS-RM-Graph](https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html)
 
 
 Screenshot :
@@ -21,6 +20,7 @@ Atelier 3 <br />
 
 
 # Info
-- Based on the ANSSI EBIOS RM V1.5
+- Basé sur le guide de l'ANSSI EBIOS RM V1.5
 
-- Single HTML file
+- Fichier HTML unique
+
