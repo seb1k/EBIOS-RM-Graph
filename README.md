@@ -1,5 +1,5 @@
 # EBIOS-RM-Graph
-Aide a créer des graphique et schéma pour la méthode EBIOS RM
+Aide à créer des graphiques et schémas pour la méthode EBIOS Risk Manager
 
 
 -> [EBIOS-RM-Graph](https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html)
