@@ -395,7 +395,7 @@ error = function() {    return Function.prototype.bind.call(console.error, conso
 
 function saveHTML(){localStorage.setItem("savetest", document.body.innerHTML);}
 
-function loadHTML(){document.body.innerHTML = localStorage.getItem("savetest");}
+function loadHTML(){if(localStorage.getItem("savetest"))document.body.innerHTML = localStorage.getItem("savetest");}
 
 function newpp(elem)
 {
