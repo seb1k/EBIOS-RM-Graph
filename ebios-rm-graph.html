@@ -230,6 +230,9 @@ border-collapse:collapse;
 background-color:#d2b3d0;
 }
 
+#at2a_tablesrovexemple td, #at2a_srovlist td,#at3b_1table td{
+padding: 4px 8px;
+}
 .td_reducetext{
 height:90px;
 width:300px;
@@ -378,6 +381,12 @@ text-indent:16px;
 
 .at2b_pertinence,.at2b_center{
 text-align:center;
+}
+
+#at3b_1table{
+border:3px solid #CCEDEC;
+border-collapse:collapse;
+margin: 8px;
 }
 </style>
 
@@ -1402,8 +1411,9 @@ divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
 divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
 divmenuover.style.display="block"
 
-divmenuover.innerHTML ="<div onclick='at2a_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
-divmenuover.innerHTML+="<div  onclick='at2a_chsr()'><div style='padding:0 0 0 4px;display: inline-block;font-size: 20px;'>&#x270E;</div> Changer SR</div>"
+divmenuover.innerHTML="<div onclick='at2a_chsr()'><div style='padding:0 0 0 4px;display: inline-block;font-size: 20px;'>&#x270E;</div> Changer SR</div>"
+divmenuover.innerHTML+="<div onclick='at2a_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
+
 }
 
 function at3b_option(elem)
@@ -1558,8 +1568,8 @@ at3b_newsscnear.style.display="block"
 var toshow=[]
 at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
 
-var HTML="<table>"
-HTML+="<tr><td>Source de Risque</td><td>Objectif Visés</td></tr>"
+var HTML="<table id='at3b_1table'>"
+HTML+="<tr style='background:#CCEDEC;'><td>Source de Risque</td><td>Objectif Visés</td></tr>"
 for(var i=0;i<toshow.length;i++)
 	{
 	var rowscenar = document.querySelector('#at2b_srovlist').querySelector("[data-idsrov='"+toshow[i]+"']")
@@ -2165,10 +2175,10 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 <span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Identifier les sources de risque et les objectifs visés</span>
 <br/><br/><br/>
-<button onclick="at2a_newsrov()" style="padding:8px 16px">Ajouter SR/OV</button><br/>
+<button onclick="at2a_newsrov()" style="padding:8px 16px;margin: 16px;">Ajouter SR/OV</button><br/>
 
-<table id="at2a_srovlist" style="width:600px;border-collapse: collapse;">
-<tr style='background-color:#E2D3E0'><td class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;" onmousedown="at2a_option(this)"><b>...</b></td><td></td><td width="130px">Source de Risque</td><td width="40px"></td><td>Objectif Visés</td></tr>
+<table id="at2a_srovlist" style="width:600px;border-collapse: collapse;margin: 8px;border: 2px solid #E2D3E0;">
+<tr style='background-color:#E2D3E0'><td class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;" onmousedown="at2a_option(this)"><b>...</b></td><td></td><td width="130px">Source de risque</td><td width="40px"></td><td>Objectif visés</td></tr>
 </table>
 
 </div>
@@ -2179,8 +2189,8 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 <span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Évaluer la pertinence des couples SR/OV</span>
 <br/><br/><br/>
 
-<table id="at2b_srovlist" style="width:1200px">
-<tr><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td>Cotation</td><td>Pertinence</td><td>Pertinence retenue</td><td>Retenue</td><td>Justification</td></tr>
+<table id="at2b_srovlist" style="width:1200px;border: 2px solid #E2D3E0;border-collapse:collapse;margin: 8px;">
+<tr style='background-color:#E2D3E0'><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td>Cotation</td><td>Pertinence</td><td>Pertinence retenue</td><td>Retenue</td><td>Justification</td></tr>
 </table>
 
 
@@ -2479,7 +2489,7 @@ Maturité cyber x Confiance
 <br/>
 <span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Élaborer des scénarios stratégiques</span>
 <br/><br/><br/>
-<button onclick="at3b_new()" style="padding:8px 16px">Nouveau scénario</button>
+<button onclick="at3b_new()" style="padding:8px 16px;margin: 16px;">Nouveau scénario</button>
 <br/>
 <br/>
 
@@ -2523,30 +2533,28 @@ Maturité cyber x Confiance
 </div>
 <div id="divcenter">
 
-<div id="at2a_newsrovdiv" style="width:700px">
+<div id="at2a_newsrovdiv" style="width:700px;padding: 8px;">
 <br/>
 <br/>
-Ajouter une Source de Risque / Objectif Visé<br/>
+<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Ajouter une Source de Risque / Objectif Visé</span>
 <br/>
-Predefini :
 <br/>
 <table>
 <tr  style="color:#6D2163"><td width="120px">Src. de Risque</td><td style="text-indent:20px">Objectif Visés</td></tr>
 </table>
 
-<div style="height:200px;overflow: auto;">
+<div style="height:300px;overflow: auto;">
 <table id="at2a_tablesrovexemple">
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td  width="120px">Activiste</td><td>Saboter la campagne nationale de vaccination.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition des vaccins à des fins d’extorsion d’une rançon.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Saboter la campagne nationale de vaccination.</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Amateur</td><td>Amusement</td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Concurrent</td><td>Voler des informations en espionnant les travaux de R&D en vue d’obtenir un avantage concurrentiel.</td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Cybercriminel</td><td>Divulguer des informations sur les tests animaliers.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition des vaccins à des fins d’extorsion d’une rançon.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Etatique</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Terroriste</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Amateur</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Vengeur</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Espionnage</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Influence</td><td></td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Lucratif</td><td></td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Espionnage</td><td>Vol de données</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Etatique</td><td>Compromission du réseau de télécommunication</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Ex-salarié</td><td>Suppression de données</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Officine spécialisée</td><td>Divulgation de fausses informations</td></tr>
+<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Terroriste</td><td>Arrêts d’un site de production</td></tr>
 </table>
 </div>
 <br/>
@@ -2555,7 +2563,7 @@ Predefini :
 Source de Risque : <input type="text" id="at2a_text_sr"><br/>
 Objectifs Visés<br/>
 <div style="width:100%;height:120px;display: contents;">
-<textarea id="at2a_text_ov" style="width: 100%;    height: 140px;     box-sizing: border-box;"></textarea>
+<textarea id="at2a_text_ov" style="width: 100%;    height: 120px;     box-sizing: border-box;"></textarea>
 </div>
 <br/>
 <br/>
@@ -2565,7 +2573,7 @@ Objectifs Visés<br/>
 <br/>
 </div>
 <div id="at3b_newsscnear" style="width:700px">
-Nouveau scénario stratégiques<br/>
+<br/><span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Nouveau scénario stratégiques</span><br/><br/>
 <br/>
 <div id="at3b_nosrov">Aucun couple SR/OV séléctionné dans l'atelier 2-B</div>
 <div id="at3b_1"></div>
