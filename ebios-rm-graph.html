@@ -2189,7 +2189,7 @@ var cell5 = row.insertCell();
 
 
 cell0.innerHTML = "<input type='checkbox' onclick='event.stopPropagation();' />";cell0.className = "optioncolumn";
-cell3.innerHTML = "<b></b><span></span>"
+cell3.innerHTML = "<b></b><span></span>";cell3.dataset.detail = ""
 hide_divcenter()
 
 
@@ -2304,7 +2304,7 @@ at3b_new_path.value		=	tr.cells[2].innerText
 
 
 at3b_new_mes.value		=	tr.cells[3].querySelector('b').innerText
-at3b_new_detail.value		=	tr.cells[3].querySelector('span').innerText
+at3b_new_detail.innerHTML	=	tr.cells[3].querySelector('span').innerHTML
 
 at3b_new_menace.value	=	tr.cells[4].innerText
 at3b_new_menaceres.value=	tr.cells[5].innerText
@@ -2317,7 +2317,9 @@ var tr = at3c_table.querySelector('.trselected')
 
 tr.cells[1].innerText	=	at3b_new_pp.value
 tr.cells[2].innerText	=	at3b_new_path.value
-tr.cells[3].innerHTML	=	"<b>"+at3b_new_mes.value+"</b><br/><span>"+at3b_new_detail.value+"</span>"
+
+tr.cells[3].innerHTML	=	"<b>"+at3b_new_mes.value+"</b><br/><span>"+at3b_new_detail.innerHTML+"</span>"
+
 tr.cells[4].innerText	=	at3b_new_menace.value
 tr.cells[5].innerText	=	at3b_new_menaceres.value
 
@@ -2892,7 +2894,7 @@ Description<br/>
 <tr><td>Chemins d’attaque stratégiques</td><td><input id="at3b_new_path" /></td></tr>
 <tr><td>Mesures de sécurité</td><td><input id="at3b_new_mes" /></td></tr>
 <tr><td colspan="2">Détail des mesures<br/>
-<textarea  id="at3b_new_detail"style="width:390px;height:100px"></textarea></td></tr>
+<div id="at3b_new_detail" style="width:390px;min-height:100px;border:1px solid grey" contenteditable='true'></div></td></tr>
 <tr><td>Menace initiale</td><td><input id="at3b_new_menace" style="width:30px"/></td></tr>
 <tr><td>Menace résiduelles</td><td><input id="at3b_new_menaceres" style="width:30px"/></td></tr>
 </table>
