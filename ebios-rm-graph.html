@@ -30,7 +30,32 @@ background-color:#00A7A2
 background-color:#BFA100
 }
 .at5bg{
-background-color:#E3394A
+background-color:#
+}
+
+.at1{
+--color: #FB3199;
+--colorlight: #FED6EB;
+}
+
+.at2{
+--color: #E2D3E0;
+--colorlight: #fff;
+}
+
+.at3{
+--color: #00A7A2;
+--colorlight: #CCEDEC;
+}
+
+.at4{
+--color: #BFA100;
+--colorlight: #E2D3E0;
+}
+
+.at5{
+--color: #00A7A2;
+--colorlight: #CCEDEC;
 }
 
 
@@ -230,11 +255,11 @@ border-collapse:collapse;
 background-color:#d2b3d0;
 }
 
-#at2a_tablesrovexemple td, #at2a_srovlist td,#at3b_1table td{
+#at2a_tablesrovexemple td, #at2a_srovlist td, #at2b_srovlist td{
 padding: 4px 8px;
 }
 .td_reducetext{
-height:90px;
+max-height:90px;
 width:300px;
 overflow:auto;
 }
@@ -267,17 +292,14 @@ text-align:center;
 z-index:10;
 }
 
-#at21c_table td{
+#at1c_table td{
 background-color:#FED6EB;
 position:relative;
 border-radius: 2px;
 }
 
-#at3c_table td, #at3b_table td{
-background-color:#CCEDEC;
-}
 
-#at3c_table tr:first-child td,#at3b_table tr:first-child td{
+#at3b_table tr:first-child td{
 text-align:center;
 font-weight:bold;
 }
@@ -292,14 +314,40 @@ text-align:center;
 font-weight:bold;
 }
 
-.at21c_tableheader, .at3c_tableheader, .at3b_tableheader{
+.at1c_tableheader{
 border:3px solid #FB45A3;
 background-color:#fff !important;
 text-align:center;
 }
 
-.at3c_tableheader, .at3b_tableheader{
-border-color:#00A7A2 !important;
+#at3c_table tr:not(:first-child):hover{
+filter: brightness(90%);
+}
+
+#at3c_table tr:not(:first-child) {
+cursor:pointer;
+}
+
+.tabletype{
+border-collapse:collapse;
+border:2px solid var(--color);
+margin: 8px;
+}
+
+.tabletype tr:first-child{
+text-align:center;
+font-weight:bold;
+color:#fff;
+background-color:var(--color);
+}
+
+.tabletype tr:not(:first-child) {
+background-color:var(--colorlight);
+}
+
+
+.tabletype td{
+padding: 8px 4px;
 }
 
 .iconplus{
@@ -321,7 +369,7 @@ position: absolute;
 display:none;
 }
 
-#at21c_table td:hover .iconedit{
+#at1c_table td:hover .iconedit{
 display:inline-block;
 }
 .tdmetier{
@@ -383,11 +431,10 @@ text-indent:16px;
 text-align:center;
 }
 
-#at3b_1table{
-border:3px solid #CCEDEC;
-border-collapse:collapse;
-margin: 8px;
+#at3c_table_before .trdata{
+cursor:pointer;
 }
+
 </style>
 
 
@@ -395,7 +442,7 @@ margin: 8px;
 <script>
 var ipp = 0;
 var icat = 0;
-
+var version = 1501;
 
 log = function() {    return Function.prototype.bind.call(console.log, console);}();
 warn = function() {    return Function.prototype.bind.call(console.warn, console);}();
@@ -404,7 +451,17 @@ error = function() {    return Function.prototype.bind.call(console.error, conso
 
 function saveHTML(){localStorage.setItem("savetest", document.body.innerHTML);}
 
-function loadHTML(){if(localStorage.getItem("savetest"))document.body.innerHTML = localStorage.getItem("savetest");}
+function loadHTML(){
+if(!localStorage.getItem("savetest"))return;
+
+var HTMLdata=localStorage.getItem("savetest")
+var x=HTMLdata.split('__divversion__')
+if(x[1] != ""+version)
+	if(!confirm("Sauvegarde compatible avec la version précédente, continuer le chargement ?"))return;
+//checkversion
+
+document.body.innerHTML = x;
+}
 
 function newpp(elem)
 {
@@ -468,6 +525,10 @@ function show_divgrey()
 divgrey.style.display="block"
 }
 
+function hide_divcenter()
+{
+hide_divgrey()
+}
 function hide_divgrey()
 {
 divgrey.style.display='none'
@@ -802,6 +863,7 @@ at3a_redraw_graph()
 
 function go()
 {
+divversion.innerText="__divversion__"+version+"__divversion__"
 new_cat()
 new_cat()
 new_cat()
@@ -1019,6 +1081,9 @@ document.querySelectorAll("#"+att).forEach(e => e.style.display="block");
 document.querySelectorAll('.submenu_activ').forEach(e => e.classList.remove('submenu_activ'));
 elem.classList.add('submenu_activ')
 
+
+document.body.className=att.slice(0,3)
+
 load_att(att)
 }
 
@@ -1028,13 +1093,13 @@ if(att=="at2b") at2b_redraw_graph()
 if(att=="at2c") at2c_redraw()
 if(att=="at3a") at3a_redraw_graph()
 if(att=="at3b") at3b_redraw()
-if(att=="at3c") at3c_redraw()
+
 
 }
 
 function at2c_redraw()
 {
-at2c_srovlist.querySelectorAll('tr').forEach(e => e.style.display="none");
+at2c_srovlist.querySelectorAll('tr:not(:first-child)').forEach(e => e.style.display="none");
 
 var toshow=[]
 at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
@@ -1405,11 +1470,7 @@ document.getElementById("at2b_svg2").append(newLine);
 
 function at2a_option(elem)
 {
-document.addEventListener("click", divmenuover_clickev);
-
-divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
-divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
-divmenuover.style.display="block"
+show_divmenuover(elem)
 
 divmenuover.innerHTML="<div onclick='at2a_chsr()'><div style='padding:0 0 0 4px;display: inline-block;font-size: 20px;'>&#x270E;</div> Changer SR</div>"
 divmenuover.innerHTML+="<div onclick='at2a_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
@@ -1418,12 +1479,7 @@ divmenuover.innerHTML+="<div onclick='at2a_delete()'><span style='padding:0 10px
 
 function at3b_option(elem)
 {
-document.addEventListener("click", divmenuover_clickev);
-
-
-divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
-divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
-divmenuover.style.display="block"
+show_divmenuover(elem)
 
 document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
 elem.closest('.at3b_sc').classList.add('scenarselected')
@@ -1499,20 +1555,25 @@ for(var i=0;i<ds.length;i++)
 
 function at1c_newsmetier()
 {
-var row = at21c_table.insertRow();
-var cell0 = row.insertCell(0);
-var cell1 = row.insertCell(1);
-var cell2 = row.insertCell(2);
-var cell3 = row.insertCell(3);
+var row = at1c_table.insertRow();
+
+var cellA = row.insertCell();
+var cell0 = row.insertCell();
+var cell1 = row.insertCell();
+var cell2 = row.insertCell();
+var cell3 = row.insertCell();
 
 
 
 cell0.innerHTML = "<p contenteditable='true'>R&D</p><div onclick='at1c_newsevent(this)' class='iconplus'>+</div>"; cell0.rowSpan=1; cell0.className="tdmetier";
-at21c_cell_1_2_3(cell1,cell2,cell3)
+at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
 }
 
-function at21c_cell_1_2_3(cell1,cell2,cell3)
+function at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
 {
+cellA.innerHTML = "<input type='checkbox' />";
+cellA.className = "optioncolumn";
+cellA.style.backgroundColor = "transparent";
 cell1.innerHTML = "Perte ou destruction des informations d’études et recherches conduisant à un fort impact, notamment sur les futures autorisations de mises sur le marché de l’entreprise";cell1.contentEditable=true
 cell2.innerHTML = "- Missions et services de l’organisme<br/>- Coûts de développement<br/>- Gouvernance de l’organisme";cell2.contentEditable=true
 cell3.innerHTML = "<div class='iconedit' style='font-size:xx-large;'>+</div><span class='gravitespan'>4</span>";
@@ -1545,17 +1606,18 @@ return "#aaa"
 
 function at1c_newsevent(elem)
 {
-var td = elem.closest('tr').querySelector('td')
+var td = elem.closest('tr').querySelectorAll('td')[1];
 var rowIndex = elem.closest('tr').rowIndex
 
-var row = at21c_table.insertRow(rowIndex+td.rowSpan);
+var row = at1c_table.insertRow(rowIndex+td.rowSpan);
 
 td.rowSpan++
-var cell1 = row.insertCell(0);
-var cell2 = row.insertCell(1);
-var cell3 = row.insertCell(2);
+var cellA = row.insertCell();
+var cell1 = row.insertCell();
+var cell2 = row.insertCell();
+var cell3 = row.insertCell();
 
-at21c_cell_1_2_3(cell1,cell2,cell3)
+at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
 }
 
 
@@ -1568,8 +1630,8 @@ at3b_newsscnear.style.display="block"
 var toshow=[]
 at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
 
-var HTML="<table id='at3b_1table'>"
-HTML+="<tr style='background:#CCEDEC;'><td>Source de Risque</td><td>Objectif Visés</td></tr>"
+var HTML="<table id='at3b_1table' class='tabletype'>"
+HTML+="<tr><td>Source de Risque</td><td>Objectif Visés</td></tr>"
 for(var i=0;i<toshow.length;i++)
 	{
 	var rowscenar = document.querySelector('#at2b_srovlist').querySelector("[data-idsrov='"+toshow[i]+"']")
@@ -1604,7 +1666,7 @@ d.forEach(e => e.classList.remove('selected'))
 
 
 elem.classList.add('selected')
-elem.style.backgroundColor="#ccc"
+elem.style.backgroundColor="#ACC8C7"
 }
 
 function at3b_add()
@@ -1646,7 +1708,7 @@ if(scenarobj.attackpath.length>4) return; // max : 5
 
 var text = "Chemin d’attaque"
 
-var path = {type:"XXX",	text:text,risk:1,at3c_messec:"",pp1:"",at3c_sec:"",at3c_sec:"",at3c_risk_residuel:1}
+var path = {type:"XXX",	text:text,risk:1,pp1:"",at3c_sec:"",at3c_sec:""}
 
 if(x==1)path.type="direct"
 if(x==2){path.type="eco";path.pp1="Partie prenante";}
@@ -1901,13 +1963,7 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 
 function at3b_chpath(elem,idpath)
 {
-
-document.addEventListener("click", divmenuover_clickev);
-
-
-divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
-divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
-divmenuover.style.display="block"
+show_divmenuover(elem)
 
 document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
 elem.closest('.at3b_sc').classList.add('scenarselected')
@@ -2029,8 +2085,6 @@ var scenarobj = JSON.parse(divsc.dataset.attackinfo)
 if(!txtPP)txtPP="";
 scenarobj.attackpath[idpath].pp1 = txtPP
 scenarobj.attackpath[idpath].risk = risk
-scenarobj.attackpath[idpath].at3c_risk_residuel = risk
-scenarobj.attackpath[idpath].at3c_messec = ""
 
 divsc.dataset.attackinfo = JSON.stringify(scenarobj)
 
@@ -2054,13 +2108,18 @@ function move_elem_in_array(array, from, to) {
 }
 
 
-function at3c_redraw()
+
+
+function at3c_newsec()
 {
 
-document.querySelectorAll("#at3c_table .trdata").forEach(e => e.remove());
+show_divcenter()
+at3c_newsmesurediv.style.display="block"
+
+
 
 var scenars = document.querySelectorAll('.at3b_sc')
-var at3c_nopp_show=0;
+//var at3c_nopp_show=0;
 for(var i=0;i<scenars.length;i++)
 {
 var divsc = scenars[i]
@@ -2079,32 +2138,198 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 
 	if(sc.pp1)
 		{
-		at3c_nopp_show=1;
-		var row = at3c_table.insertRow();
+		//at3c_nopp_show=1;
+		var row = at3c_table_before.insertRow();
 		row.className="trdata"
-		var cell1 = row.insertCell(0);
-		var cell2 = row.insertCell(1);
-		var cell3 = row.insertCell(2);
-		var cell4 = row.insertCell(3);
-		var cell5 = row.insertCell(3);
+		row.setAttribute('onclick','clickrow_at3c_table_before(this)');
+		var cell1 = row.insertCell();
+		var cell2 = row.insertCell();
+		var cell3 = row.insertCell();
+
 		
 		cell1.innerHTML = sc.pp1??"";
 		cell2.innerHTML = sc.text;
-		cell3.innerHTML = sc.at3c_messec
-		cell4.innerHTML = sc.risk;
-		cell5.innerHTML = sc.at3c_risk_residuel;
+		cell3.innerHTML = sc.risk;
 		}
 	}
 }
 
-at3c_nopp.style.display = (at3c_nopp_show) ? "none" : "block";
+
+}
+
+
+
+function clickrow_at3c_table_before(elem)
+{
+var d =at3c_table_before.querySelectorAll('.selected')
+
+d.forEach(e => e.style.backgroundColor="")
+d.forEach(e => e.classList.remove('selected'))
+
+
+elem.classList.add('selected')
+elem.style.backgroundColor="#ADC8C7"
+
+
+elem.closest('tr').classList.add('selected')
+}
+
+
+function at3c_newsec_add()
+{
+var row = at3c_table.insertRow();
+row.className="trdata"
+row.setAttribute('onclick','at3c_edit(this)');
+var cell0 = row.insertCell();
+var cell1 = row.insertCell();
+var cell2 = row.insertCell();
+var cell3 = row.insertCell();
+var cell4 = row.insertCell();
+var cell5 = row.insertCell();
+
+
+cell0.innerHTML = "<input type='checkbox' onclick='event.stopPropagation();' />";cell0.className = "optioncolumn";
+cell3.innerHTML = "<b></b><span></span>"
+hide_divcenter()
+
+
+var tr = at3c_table_before.querySelector('.selected').closest('tr')
+
+
+cell1.innerHTML = tr.cells[0].innerText
+cell2.innerHTML = tr.cells[1].innerText
+
+cell4.innerHTML = tr.cells[2].innerText
+cell5.innerHTML = tr.cells[2].innerText
+
+
+}
+
+function at1c_option(elem)
+{
+show_divmenuover(elem)
+
+divmenuover.innerHTML="<div onclick='at1c_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
+}
+
+function at3c_option(elem)
+{
+show_divmenuover(elem)
+divmenuover.innerHTML="<div onclick='at3c_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
+}
+
+function show_divmenuover(elem)
+{
+document.addEventListener("click", divmenuover_clickev);
+
+divmenuover.style.left=elem.getBoundingClientRect().right-12+"px"
+divmenuover.style.top=window.scrollY+elem.getBoundingClientRect().bottom+"px"
+divmenuover.style.display="block"
+}
+
+
+function at1c_delete()
+{
+at1c_table.querySelectorAll('input[type="checkbox"]:checked').forEach(e => at1c_deleteline(e.closest('tr')))
+divmenuover_clickev(false)
+}
+
+function at1c_deleteline(tr)
+{
+
+var nb_cell_full = at1c_table.querySelector('tr').cells.length
+
+var is_first = (tr.cells.length==nb_cell_full)
+var is_alone = (tr.querySelectorAll('td')[1].rowSpan==1)
+if( is_first && is_alone) // first & alone -> delete
+	{
+	tr.remove()
+	return
+	}
+
+if( is_first && !is_alone)  // first of block -> transfert text next line to line , delete next line
+	{
+	var trnext = tr.nextSibling
+
+	tr.cells[2].innerText=trnext.cells[1].innerText
+	tr.cells[3].innerText=trnext.cells[2].innerText
+	tr.querySelector('.gravitespan').innerText=trnext.querySelector('.gravitespan').innerText;
+	tr.cells[4].style.backgroundColor=trnext.cells[3].style.backgroundColor
+	tr.querySelectorAll('td')[1].rowSpan--
+	trnext.remove()
+	
+	
+	
+	
+	tr.querySelector('input').checked = false
+	return
+	}
+
+if( !is_first )  // a line in block
+	{
+	var tr_changerowspan  = tr
+	while(tr_changerowspan = tr_changerowspan.previousSibling) // find the first tr in bloc and change rowSpan
+		{
+		if(tr_changerowspan.querySelectorAll('td')[1].rowSpan!=1)
+			{
+			tr_changerowspan.querySelectorAll('td')[1].rowSpan--
+			break;
+			}
+		}
+	
+	tr.remove()
+	return
+	}
+}
+
+
+function at3c_delete()
+{
+at3c_table.querySelectorAll('input[type="checkbox"]:checked').forEach(e => e.closest('tr').remove())
+divmenuover_clickev(false)
+}
+
+function at3c_edit(tr)
+{
+
+show_divcenter()
+at3c_editmesurediv.style.display="block"
+
+at3c_table.querySelectorAll('.trselected').forEach(e => e.classList.remove('trselected'));
+tr.classList.add('trselected');
+
+
+at3b_new_pp.value		=	tr.cells[1].innerText
+at3b_new_path.value		=	tr.cells[2].innerText
+
+
+at3b_new_mes.value		=	tr.cells[3].querySelector('b').innerText
+at3b_new_detail.value		=	tr.cells[3].querySelector('span').innerText
+
+at3b_new_menace.value	=	tr.cells[4].innerText
+at3b_new_menaceres.value=	tr.cells[5].innerText
+
+}
+
+function at3c_edit_ok()
+{
+var tr = at3c_table.querySelector('.trselected')
+
+tr.cells[1].innerText	=	at3b_new_pp.value
+tr.cells[2].innerText	=	at3b_new_path.value
+tr.cells[3].innerHTML	=	"<b>"+at3b_new_mes.value+"</b><br/><span>"+at3b_new_detail.value+"</span>"
+tr.cells[4].innerText	=	at3b_new_menace.value
+tr.cells[5].innerText	=	at3b_new_menaceres.value
+
+
+hide_divcenter()
 }
 
 function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauvegarde
 </script>
 </head>
 <body onload="go()">
-
+<div id="divversion"style="display:none"></div>
 <div id="divgrey" onclick="hide_divgrey()"></div>
 <div id="divover">divover</div>
 <div id="divmenuover"></div>
@@ -2160,11 +2385,17 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 <span style="border-bottom:#FED6EB solid 3px;margin-left:20px;">Identifier les événements redoutés</span>
 <br/><br/><br/>
-<button onclick="at1c_newsmetier()" style="padding:8px 16px">Ajouter valeur métier</button><br/>
+<button onclick="at1c_newsmetier()" style="padding:8px 16px;margin: 16px;">Ajouter valeur métier</button><br/>
 
 <div id="at21c_maindiv" style="width:800px">
 
-<table id='at21c_table' style="width:100%;display: inline-block;"><tr style='color:#FB45A3'><td class='at21c_tableheader'>Valeur métier</td><td class='at21c_tableheader'>Evènement redoutés</td><td class='at21c_tableheader'>Impacts</td><td class='at21c_tableheader'>Gravités</td></tr></table>
+<table id='at1c_table' style="width:100%;display: inline-block;"><tr style='color:#FB45A3'>
+<td class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;background-color:transparent;" onmousedown="at1c_option(this)"><b>...</b></td>
+<td class='at1c_tableheader'>Valeur métier</td>
+<td class='at1c_tableheader'>Evènement redouté</td>
+<td class='at1c_tableheader'>Impacts</td>
+<td class='at1c_tableheader'>Gravité</td>
+</tr></table>
 
 </div>
 
@@ -2266,9 +2497,8 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 <br/><br/><br/>
 <br/>
 <br/>
-<br/>
-<table id="at2c_srovlist" style="width:800px">
-<tr><td width="130px">Source de Risque</td><td>Objectif Visés</td></tr>
+<table id="at2c_srovlist" class="tabletype" style="width:800px">
+<tr style="color:#000;font-weight:500"><td style="width:130px;text-align:left">Source de Risque</td><td>Objectif Visés</td></tr>
 </table>
 <div id="at2c_nosrov">Aucun couple SR/OV séléctionné dans l'atelier 2-B</div>
 
@@ -2500,7 +2730,7 @@ Maturité cyber x Confiance
 <br/>
 <div id="at3b_synthese">
 
-<table id='at3b_table' style="margin:0 auto;"><tr style='color:#00A7A2' class="at3b_tableheader">
+<table id='at3b_table'  class="tabletype" style="margin:0 auto;"><tr class="at3b_tableheader">
 <td class='at3b_tableheader'>SOURCES DE RISQUE</td>
 <td class='at3b_tableheader' style='width: 220px;'>OBJECTIFS VISÉS</td>
 <td class='at3b_tableheader' style='width: 400px;'>CHEMINS D’ATTAQUE STRATÉGIQUES</td>
@@ -2516,16 +2746,24 @@ Maturité cyber x Confiance
 <br/>
 <span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Définir des mesures de sécurité sur l'écosystème</span>
 <br/><br/><br/>
-<table id='at3c_table' style="width:100%;display: inline-block;"><tr style='color:#00A7A2'>
-<td class='at3c_tableheader'>PARTIE PRENANTE</td>
-<td class='at3c_tableheader'>CHEMINS D’ATTAQUE STRATÉGIQUES</td>
-<td class='at3c_tableheader'>MESURES DE SÉCURITÉ </td>
-<td class='at3c_tableheader'>MENACE INITIALE</td>
-<td class='at3c_tableheader' style='color:#00A7A2'>MENACE RÉSIDUELLES</td>
+<button onclick="at3c_newsec()" style="padding:8px 16px;margin: 16px;">Ajouter</button><br/>
+<table id='at3c_table' class='tabletype'><tr>
+<td class='at3c_tableheader'><div class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;" onmousedown="at3c_option(this)"><b>...</b></div></td>
+<td class='at3c_tableheader'>Partie prenante</td>
+<td class='at3c_tableheader'>Chemins d’attaque stratégiques</td>
+<td class='at3c_tableheader'>Mesures de sécurité</td>
+<td class='at3c_tableheader'>Menace initiale</td>
+<td class='at3c_tableheader'>Menace résiduelles</td>
 </tr></table>
 
-<div id="at3c_nopp"><br/><br/><br/>Aucune partie prenante dans les scénarios de l'atelier 3-B.</div>
 </div>
+
+
+
+
+
+
+
 
 
 
@@ -2620,7 +2858,7 @@ Description<br/>
 <table>
 <tr><td>SR</td><td><input id="at3b_diveditscnear_sr" /></td></tr>
 <tr><td>OV</td><td><input id="at3b_diveditscnear_ov" /></td></tr>
-<tr><td>OV objectif</td><td><input id="at3b_diveditscnear_obj" /></td></tr>
+<tr><td>OV objectif</td><td><input id="at3b_diveditscnear_obj" style="width:350px"/></td></tr>
 <tr><td>Gravité</td><td><select id="at3b_diveditscnear_gravite"><option value='1'>1 - Faible</option><option value='2'>2 - Moyen</option><option value='3'>3 - Grave</option><option value='4'>4 - Critique</option></select></td></tr>
 </table>
 <br/>
@@ -2631,6 +2869,38 @@ Description<br/>
 </div>
 
 
+
+<div id="at3c_newsmesurediv" style="width:700px">
+<br/>
+<br/>
+<table id="at3c_table_before" class="tabletype">
+<tr>
+<td>Partie prenante</td><td>Chemins d’attaque stratégiques</td><td>Menace</td>
+</tr>
+</table>
+<br/>
+<br/>
+<center><button onclick="at3c_newsec_add()" style="padding:8px 16px;">Ok</button></center>
+<br/>
+</div>
+
+<div id="at3c_editmesurediv" style="width:700px">
+<br/>
+<br/>
+<table>
+<tr><td>Partie prenante</td><td><input id="at3b_new_pp" /></td></tr>
+<tr><td>Chemins d’attaque stratégiques</td><td><input id="at3b_new_path" /></td></tr>
+<tr><td>Mesures de sécurité</td><td><input id="at3b_new_mes" /></td></tr>
+<tr><td colspan="2">Détail des mesures<br/>
+<textarea  id="at3b_new_detail"style="width:390px;height:100px"></textarea></td></tr>
+<tr><td>Menace initiale</td><td><input id="at3b_new_menace" style="width:30px"/></td></tr>
+<tr><td>Menace résiduelles</td><td><input id="at3b_new_menaceres" style="width:30px"/></td></tr>
+</table>
+<br/>
+<br/>
+<center><button onclick="at3c_edit_ok()" style="padding:8px 16px;">Ok</button></center>
+<br/>
+</div>
 
 </div>
 
