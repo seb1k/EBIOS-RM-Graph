@@ -12,25 +12,29 @@ body{
 margin:0;
 }
 
+.bodyhidescroll{
+overflow:hidden;
+}
+
 svg{
 border-radius:8px;
 user-select: none;
 margin: 0 16px;
 }
 .at1bg{
-background-color:#FB3199
+background-color:#FB3199;
 }
 .at2bg{
-background-color:#6D2163
+background-color:#6D2163;
 }
 .at3bg{
-background-color:#00A7A2
+background-color:#00A7A2;
 }
 .at4bg{
-background-color:#BFA100
+background-color:#BFA100;
 }
 .at5bg{
-background-color:#
+background-color:#E3394A;
 }
 
 .at1{
@@ -44,7 +48,7 @@ background-color:#
 }
 
 .at3{
---color: #00A7A2;
+--color: #99DCDA;
 --colorlight: #CCEDEC;
 }
 
@@ -160,7 +164,7 @@ cursor:pointer;
 
 
 #divgrey{
-position:absolute;
+position:fixed;
 width:100%;
 height:100%;
 top:0;
@@ -209,20 +213,19 @@ cursor:pointer;
 
 #div_menace, #divcenter{
 display:none;
-position:absolute;
+position:fixed;
 top:20px;
 background-color:#fff;
 min-width:550px;
 z-index:150;
-
 left: 0; 
-  right: 0; 
- margin-inline: auto; 
-  width: fit-content;
-  
-  
+right: 0; 
+margin-inline: auto; 
+width: fit-content;
+ 
 padding:4px;
 border-radius:8px;
+max-height: calc(100vh - 40px);
 }
 
 .at3_cat
@@ -301,7 +304,6 @@ border-radius: 2px;
 
 #at3b_table tr:first-child td{
 text-align:center;
-font-weight:bold;
 }
 
 #at3c_table tr > td:last-of-type {
@@ -336,8 +338,6 @@ margin: 8px;
 
 .tabletype tr:first-child{
 text-align:center;
-font-weight:bold;
-color:#fff;
 background-color:var(--color);
 }
 
@@ -442,7 +442,7 @@ cursor:pointer;
 <script>
 var ipp = 0;
 var icat = 0;
-var version = 1501;
+var version = 250117;
 
 log = function() {    return Function.prototype.bind.call(console.log, console);}();
 warn = function() {    return Function.prototype.bind.call(console.warn, console);}();
@@ -523,6 +523,7 @@ divcenter.querySelectorAll(":scope > div").forEach(e => e.style.display="none");
 function show_divgrey()
 {
 divgrey.style.display="block"
+document.body.classList.add('bodyhidescroll')
 }
 
 function hide_divcenter()
@@ -534,6 +535,7 @@ function hide_divgrey()
 divgrey.style.display='none'
 div_menace.style.display='none'
 divcenter.style.display='none'
+document.body.classList.remove('bodyhidescroll')
 }
 
 function menaceok()
@@ -569,7 +571,7 @@ clickmenacediv.dataset.menace = m
 
 
 
-function new_cat()
+function at3a_newcat()
 {
 
 var listblock = document.querySelector('.listblock')
@@ -864,9 +866,8 @@ at3a_redraw_graph()
 function go()
 {
 divversion.innerText="__divversion__"+version+"__divversion__"
-new_cat()
-new_cat()
-new_cat()
+at3a_newcat()
+at3a_newcat()
 
 showatt('at2a',document.querySelector('.startscript'))
 }
@@ -2119,7 +2120,11 @@ at3c_newsmesurediv.style.display="block"
 
 
 var scenars = document.querySelectorAll('.at3b_sc')
-//var at3c_nopp_show=0;
+var at3c_nopp_show=0;
+
+var selectfirst=true
+at3c_table_before.querySelectorAll('tr:not(:first-child)').forEach(e => e.remove());
+
 for(var i=0;i<scenars.length;i++)
 {
 var divsc = scenars[i]
@@ -2127,8 +2132,6 @@ var divsc = scenars[i]
 var scenarobj = JSON.parse(divsc.dataset.attackinfo)
 
 var nbattackpath = scenarobj.attackpath.length
-
-if(nbattackpath>5)nbattackpath=5;
 
 
 // PATH
@@ -2138,10 +2141,13 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 
 	if(sc.pp1)
 		{
-		//at3c_nopp_show=1;
+		at3c_nopp_show=1;
 		var row = at3c_table_before.insertRow();
 		row.className="trdata"
 		row.setAttribute('onclick','clickrow_at3c_table_before(this)');
+		
+		if(selectfirst){row.className+=" selected";selectfirst=false;}
+		
 		var cell1 = row.insertCell();
 		var cell2 = row.insertCell();
 		var cell3 = row.insertCell();
@@ -2154,7 +2160,7 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 	}
 }
 
-
+at3c_nopp.style.display = (at3c_nopp_show) ? "none" : "block";
 }
 
 
@@ -2230,7 +2236,13 @@ divmenuover.style.display="block"
 
 function at1c_delete()
 {
-at1c_table.querySelectorAll('input[type="checkbox"]:checked').forEach(e => at1c_deleteline(e.closest('tr')))
+
+var lst = at1c_table.querySelectorAll('input[type="checkbox"]:checked')
+for(var i=lst.length;i>0;i--) // deleting last one first
+	{
+	at1c_deleteline(lst[i-1].closest('tr'))
+	}
+
 divmenuover_clickev(false)
 }
 
@@ -2247,7 +2259,7 @@ if( is_first && is_alone) // first & alone -> delete
 	return
 	}
 
-if( is_first && !is_alone)  // first of block -> transfert text next line to line , delete next line
+if( is_first && !is_alone)  // first of block -> transfert text from next line, delete next line
 	{
 	var trnext = tr.nextSibling
 
@@ -2257,10 +2269,7 @@ if( is_first && !is_alone)  // first of block -> transfert text next line to lin
 	tr.cells[4].style.backgroundColor=trnext.cells[3].style.backgroundColor
 	tr.querySelectorAll('td')[1].rowSpan--
 	trnext.remove()
-	
-	
-	
-	
+		
 	tr.querySelector('input').checked = false
 	return
 	}
@@ -2612,7 +2621,7 @@ Maturité cyber x Confiance
 
 
 <div id="cont_at3a" style="float:left;">
-<button onclick="seuil()" style="height:24px;cursor:pointer;margin:8px;"> Seuil </button><button id="butnewcat" onclick="new_cat()" style="height:24px;cursor:pointer;margin:8px;"> + Catégorie </button><br/>
+<button onclick="seuil()" style="height:24px;cursor:pointer;margin:8px;"> Seuil </button><button id="butnewcat" onclick="at3a_newcat()" style="height:24px;cursor:pointer;margin:8px;"> + Catégorie </button><br/>
 
 
 
@@ -2733,10 +2742,10 @@ Maturité cyber x Confiance
 <div id="at3b_synthese">
 
 <table id='at3b_table'  class="tabletype" style="margin:0 auto;"><tr class="at3b_tableheader">
-<td class='at3b_tableheader'>SOURCES DE RISQUE</td>
-<td class='at3b_tableheader' style='width: 220px;'>OBJECTIFS VISÉS</td>
-<td class='at3b_tableheader' style='width: 400px;'>CHEMINS D’ATTAQUE STRATÉGIQUES</td>
-<td class='at3b_tableheader'>GRAVITÉ</td>
+<td class='at3b_tableheader'>Sources de risque</td>
+<td class='at3b_tableheader' style='width: 220px;'>Objectifs visés</td>
+<td class='at3b_tableheader' style='width: 400px;text-align: left;'>Chemins d’attaque stratégiques</td>
+<td class='at3b_tableheader'>Gravité</td>
 </tr></table>
 <br/>
 <br/>
@@ -2750,12 +2759,12 @@ Maturité cyber x Confiance
 <br/><br/><br/>
 <button onclick="at3c_newsec()" style="padding:8px 16px;margin: 16px;">Ajouter</button><br/>
 <table id='at3c_table' class='tabletype'><tr>
-<td class='at3c_tableheader'><div class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;" onmousedown="at3c_option(this)"><b>...</b></div></td>
-<td class='at3c_tableheader'>Partie prenante</td>
-<td class='at3c_tableheader'>Chemins d’attaque stratégiques</td>
-<td class='at3c_tableheader'>Mesures de sécurité</td>
-<td class='at3c_tableheader'>Menace initiale</td>
-<td class='at3c_tableheader'>Menace résiduelles</td>
+<td><div class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;" onmousedown="at3c_option(this)"><b>...</b></div></td>
+<td>Partie prenante</td>
+<td>Chemins d’attaque stratégiques</td>
+<td>Mesures de sécurité</td>
+<td style='font-weight:initial'>Menace initiale</td>
+<td style='font-weight:initial'>Menace résiduelles</td>
 </tr></table>
 
 </div>
@@ -2774,7 +2783,6 @@ Maturité cyber x Confiance
 <div id="divcenter">
 
 <div id="at2a_newsrovdiv" style="width:700px;padding: 8px;">
-<br/>
 <br/>
 <span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Ajouter une Source de Risque / Objectif Visé</span>
 <br/>
@@ -2800,7 +2808,7 @@ Maturité cyber x Confiance
 <br/>
 
 <br/>
-Source de Risque : <input type="text" id="at2a_text_sr"><br/>
+Source de Risque &nbsp; <input type="text" id="at2a_text_sr"><br/>
 Objectifs Visés<br/>
 <div style="width:100%;height:120px;display: contents;">
 <textarea id="at2a_text_ov" style="width: 100%;    height: 120px;     box-sizing: border-box;"></textarea>
@@ -2881,8 +2889,9 @@ Description<br/>
 </tr>
 </table>
 <br/>
+<div id="at3c_nopp">Aucune partie prenante dans les scénarios de l'atelier 3-B.<br/><br/></div>
 <br/>
-<center><button onclick="at3c_newsec_add()" style="padding:8px 16px;">Ok</button></center>
+<center><button onclick="at3c_newsec_add()" style="padding:8px 16px;">Ajouter</button></center>
 <br/>
 </div>
 
