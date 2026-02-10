@@ -92,6 +92,9 @@ margin-right:6px;
 }
 
 
+#at3a{
+max-width:1900px;
+}
 #at3b_table .trdata td:first-child{
 text-align:center;
 }
@@ -435,6 +438,10 @@ text-align:center;
 cursor:pointer;
 }
 
+
+.div_menacepptext{
+font-style: italic;
+}
 </style>
 
 
@@ -499,8 +506,12 @@ pen.value = pp.dataset.pen
 mat.value = pp.dataset.mat
 conf.value =  pp.dataset.conf
 
+var ppname = pp.querySelector('input').value
 
 clickmenace=elem;
+
+div_menace.querySelectorAll('.div_menacepptext').forEach(e => e.innerText=ppname);
+
 
 show_divgrey()
 div_menace.style.display='block'
@@ -999,7 +1010,7 @@ cell6.className = "at2b_pertinence";
 cell7.className = "at2b_center";
 cell7.innerHTML = "<select  onchange='at2c_chinput(this)'><option value='1'>1 - Faible</option><option value='2'>2 - Moyen</option><option value='3'>3 - Elevé</option></select>"
 cell8.className = "at2b_center";
-cell8.innerHTML = "<input class='checkboxsrov' type='checkbox' onchange='clickcheck(this);at2b_redraw_graph(this)'/>"
+cell8.innerHTML = "<input class='checkboxsrov' type='checkbox' onchange='clickcheck(this);at2b_redraw_graph(this)' style='cursor:pointer'/>"
 cell9.innerHTML = "<textarea style='width:200px;height:90px' onchange='textreea_cleanhtml(this)'></textarea>"
 
 
@@ -1807,7 +1818,7 @@ for(var i=0;i < scenars.length; i++)
 	cell1.innerHTML = scenarobj.txt1;
 	cell2.innerHTML = scenarobj.txt2;
 	
-	cell4.innerHTML = scenarobj.gravite;
+	cell4.innerHTML = scenarobj.gravite+gravite2text(scenarobj.gravite);
 	cell4.className = "at3b_table_tdgravite";
 	cell4.style.backgroundColor = getcolorfromgravite(scenarobj.gravite);
 	
@@ -1825,6 +1836,17 @@ for(var i=0;i < scenars.length; i++)
 	}
 //at3b_synthese
 
+}
+
+function gravite2text(x)
+{
+x=parseInt(x)
+var t = "Faible"
+if(x==2)t = "Moyen"
+if(x==3)t = "Grave"
+if(x==4)t = "Critique"
+
+return "<br/><span style='font-size:smaller'>"+t+"</span>"
 }
 function at3b_redraw_graph()
 {
@@ -2394,7 +2416,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 <br/>
 
-<span style="border-bottom:#FED6EB solid 3px;margin-left:20px;">Identifier les événements redoutés</span>
+<span style="border-bottom:#FED6EB solid 3px;margin-left:20px;">Identification des événements redoutés</span>
 <br/><br/><br/>
 <button onclick="at1c_newsmetier()" style="padding:8px 16px;margin: 16px;">Ajouter valeur métier</button><br/>
 
@@ -2415,7 +2437,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 <br/>
 
-<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Identifier les sources de risque et les objectifs visés</span>
+<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Identification des SR/OV : <b>S</b>ources de <b>R</b>isque et <b>O</b>bjectifs <b>V</b>isés</span>
 <br/><br/><br/>
 <button onclick="at2a_newsrov()" style="padding:8px 16px;margin: 16px;">Ajouter SR/OV</button><br/>
 
@@ -2428,7 +2450,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 <div id="at2b">
 <br/>
-<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Évaluer la pertinence des couples SR/OV</span>
+<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Évaluation de la pertinence des SR/OV</span>
 <br/><br/><br/>
 
 <table id="at2b_srovlist" style="width:1200px;border: 2px solid #E2D3E0;border-collapse:collapse;margin: 8px;">
@@ -2437,7 +2459,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 
 <br/>
-<div id="at2b_nosrov" style='text-align:center;'>Aucun couple SR/OV créer dans l'atelier 2-A</div>
+<div id="at2b_nosrov" style='text-align:center;'>Aucun SR/OV créer dans l'atelier 2-A</div>
 
 <br/>
 <div style="text-align:center;">
@@ -2466,7 +2488,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
   
   <text x="-235" y="-230" font-size="22" style="fill:#002742">Vision par sources de risques</text>
   <circle cx="220" cy="225" r="18" fill="#FF3824" />
-  <text x="195" y="233" text-anchor="end" font-size="18" style="fill:#002742">Couple SR/OV retenu</text>
+  <text x="195" y="233" text-anchor="end" font-size="18" style="fill:#002742">SR/OV retenu</text>
 </svg>
 
 <svg id="at2b_svg2" width="350" height="350" viewBox="-250 -250 500 500" xmlns="http://www.w3.org/2000/svg" style="background-color:#CFF1F3">
@@ -2494,7 +2516,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
   <text x="-235" y="-230" font-size="22" style="fill:#002742">Vision par objectifs visés</text>
   <circle cx="-220" cy="225" r="18" fill="#89C06D" />
-  <text x="-190" y="233" font-size="18" style="fill:#002742">Couple SR/OV non retenu</text>
+  <text x="-190" y="233" font-size="18" style="fill:#002742">SR/OV non retenu</text>
 
 </svg>
 </div>
@@ -2504,14 +2526,14 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 <div id="at2c">
 <br/>
-<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Couples SR/OV retenus pour la suite de l’analyse</span>
+<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">SR/OV retenus pour la suite de l’analyse</span>
 <br/><br/><br/>
 <br/>
 <br/>
 <table id="at2c_srovlist" class="tabletype" style="width:800px">
 <tr style="color:#000;font-weight:500"><td style="width:130px;text-align:left">Source de Risque</td><td>Objectif Visés</td></tr>
 </table>
-<div id="at2c_nosrov">Aucun couple SR/OV séléctionné dans l'atelier 2-B</div>
+<div id="at2c_nosrov">Aucun SR/OV retenu dans l'atelier 2-B</div>
 
 <br/>
 <br/>
@@ -2523,7 +2545,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 <div id="at3a">
 <br/>
-<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Cartographie de dangerosité de l’écosystème et identifier les parties prenantes critiques</span>
+<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Cartographie de dangerosité de l’écosystème et identification des parties prenantes critiques</span>
 <br/><br/><br/>
 
 
@@ -2534,7 +2556,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 <tr><td style="width:200px">
 <div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 2px;">
 <center>Dépendance</center>
-<p>La relation avec cette partie prenante est-elle vitale pour mon activité ?</p>
+<p>La relation avec <span class='div_menacepptext'></span> est-elle vitale pour mon activité ?</p>
 </div>
 </td>
 <td style="text-align: center;">
@@ -2549,21 +2571,17 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 <tr><td>
 <div style="background-color:#A5C6EE;border-radius:4px;padding:4px">
 <center>Pénétration</center>
-<p>Dans quelle mesure la partie prenante accede-t-elle a mes ressouces internes ?</p>
+<p>Quel sont les accès de <span class='div_menacepptext'></span> aux ressouces internes ?</p>
 </div>
 </td>
 <td style="text-align: center;">
 <select name="pen" id="pen" style="max-width:300px" onchange="calcexpo()">
-<option value="1">1 - Pas d’accès ou accès avec privilèges de type utilisateur à des
-terminaux utilisateurs (poste de travail, téléphone mobile, etc.).</option>
-<option value="2">2 - Accès avec privilèges de type administrateur à des terminaux
-utilisateurs (parc informatique, flotte de terminaux mobiles, etc.)
+<option value="1">1 - Pas d’accès ou accès utilisateur aux terminaux (poste de travail, téléphone mobile...).</option>
+<option value="2">2 - Accès administrateur aux terminaux (parc informatique, flotte de terminaux mobiles...)
 ou accès physique aux sites de l’organisation.</option>
-<option value="3">3 - Accès avec privilèges de type administrateur à des serveurs « métier » (serveur de fichiers, bases
-de données, serveur web, serveur d’application, etc.).</option>
-<option value="4">4 - Accès avec privilèges de type administrateur à des équipements
-d’infrastructure (annuaires, DNS, DHCP, commutateurs, pare-feu, hyperviseurs, baies de stockage,
-etc.) ou accès physique aux salles serveurs de l’organisation.</option>
+<option value="3">3 - Accès administrateur aux serveurs « métier » (serveur de fichiers, bases
+de données, serveur web, serveur d’application...).</option>
+<option value="4">4 - Accès administrateur à l’infrastructure (annuaires, DNS, DHCP, switchs, pare-feu, hyperviseurs, baies de stockage...) ou accès physique aux salles serveurs de l’organisation.</option>
 </select></td>
 </tr>
 </table>
@@ -2575,32 +2593,30 @@ etc.) ou accès physique aux salles serveurs de l’organisation.</option>
 <tr><td style="width:200px">
 <div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 2px;">
 <center>Maturité cyber</center>
-<p>Quelles sont les capacités de la partie prenante en matiere de sécurité ?</p>
+<p>Efficacité de <span class='div_menacepptext'></span> en matiere de sécurité ?</p>
 </div>
 </td>
 <td style="text-align: center;">
 <select name="mat" id="mat" style="max-width:300px" onchange="calcfiab()">
-<option value="1">1 - Des règles d’hygiène informatique sont appliquées ponctuellement et non formalisées. La capacité de réaction sur incident est incertaine.</option>
-<option value="2">2 - Les règles d’hygiène et la réglementation sont prises en compte, sans intégration dans une politique globale. La sécurité numérique est conduite selon un mode réactif.</option>
-<option value="3">3 - Une politique globale est appliquée en matière de sécurité numérique. Celle-ci est assurée selon un mode réactif, avec une recherche de centralisation et d’anticipation sur certains risques.</option>
-<option value="4">4 - La partie prenante met en œuvre une politique de management du risque. La politique est intégrée et se réalise de manière proactive.</option>
+<option value="1">1 - Incertaine : Des règles d’hygiène informatique sont appliquées ponctuellement et non formalisées.</option>
+<option value="2">2 - Réactive : Les règles d’hygiène et la réglementation sont prises en compte, sans intégration dans une politique globale.</option>
+<option value="3">3 - Réactive + anticipation + centralisation : Une politique globale est appliquée en matière de sécurité numérique.</option>
+<option value="4">4 - Proactive : La partie prenante met en œuvre une politique de management du risque.</option>
 </select>
 </td>
 </tr>
 <tr><td>
 <div style="background-color:#A5C6EE;border-radius:4px;padding:4px;">
 <center>Confiance</center>
-<p>Est-ce que les intentions ou les intérets de la partie prenante peuvent m'etre contraires ?</p>
+<p>Les intentions ou les intérets de <span class='div_menacepptext'></span> peuvent m'etre contraires ?</p>
 </div>
 </td>
 <td style="text-align: center;">
 <select name="conf" id="conf" style="max-width:300px" onchange="calcfiab()">
-<option value="1">1 - Pas d’accès ou accès avec privilèges de type utilisateur à des terminaux utilisateurs (poste de travail, téléphone mobile, etc.).</option>
-<option value="2">2 - Accès avec privilèges de type administrateur à des terminaux utilisateurs (parc informatique, flotte de terminaux mobiles, etc.)
-ou accès physique aux sites de l’organisation.</option>
-<option value="3">3 - Accès avec privilèges de type administrateur à des serveurs « métier » (serveur de fichiers, bases de données, serveur web, serveur d’application, etc.).</option>
-<option value="4">4 - Accès avec privilèges de type administrateur à des équipements d’infrastructure (annuaires, DNS, DHCP, commutateurs, pare-feu, hyperviseurs, baies de stockage,
-etc.) ou accès physique aux salles serveurs de l’organisation.</option>
+<option value="1">1 - Les intentions de la partie prenante ne peuvent être évaluées.</option>
+<option value="2">2 - Les intentions de la partie prenante sont considérées comme neutres.</option>
+<option value="3">3 - Les intentions de la partie prenante sont connues et probablement positives.</option>
+<option value="4">4 - Les intentions de la partie prenante sont parfaitement connues et pleinement compatibles avec celles de l’organisation étudiée.</option>
 </select></td>
 </tr>
 </table>
@@ -2728,7 +2744,7 @@ Maturité cyber x Confiance
 
 <div id="at3b">
 <br/>
-<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Élaborer des scénarios stratégiques</span>
+<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Élaboration des scénarios stratégiques</span>
 <br/><br/><br/>
 <button onclick="at3b_new()" style="padding:8px 16px;margin: 16px;">Nouveau scénario</button>
 <br/>
@@ -2755,7 +2771,7 @@ Maturité cyber x Confiance
 
 <div id="at3c">
 <br/>
-<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Définir des mesures de sécurité sur l'écosystème</span>
+<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Définition des mesures de sécurité sur l'écosystème</span>
 <br/><br/><br/>
 <button onclick="at3c_newsec()" style="padding:8px 16px;margin: 16px;">Ajouter</button><br/>
 <table id='at3c_table' class='tabletype'><tr>
@@ -2823,7 +2839,7 @@ Objectifs Visés<br/>
 <div id="at3b_newsscnear" style="width:700px">
 <br/><span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Nouveau scénario stratégiques</span><br/><br/>
 <br/>
-<div id="at3b_nosrov">Aucun couple SR/OV séléctionné dans l'atelier 2-B</div>
+<div id="at3b_nosrov">Aucun SR/OV retenu dans l'atelier 2-B</div>
 <div id="at3b_1"></div>
 <br/>
 <div id="at3b_2"></div>
