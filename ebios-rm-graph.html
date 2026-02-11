@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>EBIOS RM Graph</title>
 <style>
 
@@ -442,6 +443,156 @@ cursor:pointer;
 .div_menacepptext{
 font-style: italic;
 }
+
+#at4a_scenar {
+white-space: nowrap;
+}
+#at4a_scenar .col{
+min-width:240px;
+display: inline-block;
+margin-left:20px;
+position:relative;
+
+}
+
+#at4a_scenar .resize{
+display:none;
+top:60px;
+right:-12px;
+width:24px;
+height:24px;
+background-color:#001E3C;
+position:absolute;
+border-radius:24px;
+color:#eee;
+text-align:center;
+line-height:24px;
+font-weight:bold;
+cursor:ew-resize;
+}
+
+.at4a_scenar_mod .resize,.at4a_scenar_mod .newbulle,.at4a_scenar_mod .arrowdot{
+display:block !important;
+}
+
+
+
+.bulleover:hover{
+outline-width: 2px;
+outline-color: #001E3C;
+outline-style: groove;
+}
+
+#at4a_scenar .head{
+background-color:#89C2DF;
+font-weight:bold;
+color:#001E3C;
+text-align:center;
+height:40px;
+width:100%;
+display:inline-block;
+line-height:40px;
+border-radius:8px 8px 0 0;
+}
+
+.scenarcont{
+min-height:400px;
+background-color:#B6D8EC;
+}
+
+
+
+
+.bulle{
+width:200px;
+height:80px;
+border-radius:8px;
+background-color:#FFF;
+position:absolute;
+
+text-align:center;
+white-space: normal;
+display: flex;
+align-items: center;
+color: #001E3C;
+}
+
+.at4a_scenar_mod .bulle{
+cursor:move;
+}
+.newbulle{
+outline-style: dashed;
+outline-width: 2px;
+outline-color: #a6c8dC;
+opacity:.7;
+cursor:pointer;
+display:none;
+left:20px;
+}
+
+.bulledot{
+width:12px;
+height:12px;
+border-radius:12px;
+background-color:#001E3C;
+position:absolute;
+cursor:crosshair;
+}
+
+.arrowdot{
+width:10px;
+height:10px;
+border-radius:10px;
+background-color:#BF1414;
+position:absolute;
+cursor:crosshair;
+display:none;
+}
+
+
+
+
+
+
+.newbulle:hover{opacity:1}
+.bulledrag{
+box-shadow: 0 4px 16px 0 #aaa;
+}
+
+
+.pic_col div{
+width:18px;
+height:18px;
+border-radius:18px;
+display:inline-block;
+cursor:pointer;
+}
+
+.pic_col .colselect{
+transform: scale(1.25);
+}
+
+.at4a_scenar_mod .bulle:hover .bulleedit{
+display:block !important;
+}
+
+.bulleedit{
+position:absolute;
+left:5px;
+top:1px;
+font-size:18px;
+display:none;
+cursor:pointer;
+}
+
+.probaicon{
+position:absolute;
+right:4px;
+bottom:2px;
+font-size:18px;
+cursor:pointer;
+}
+
 </style>
 
 
@@ -880,7 +1031,7 @@ divversion.innerText="__divversion__"+version+"__divversion__"
 at3a_newcat()
 at3a_newcat()
 
-showatt('at2a',document.querySelector('.startscript'))
+showatt('at4a',document.querySelector('.startscript'))
 }
 
 
@@ -2359,6 +2510,927 @@ hide_divcenter()
 }
 
 function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauvegarde
+
+
+function at4a_modclick()
+{
+if(at4a_buttonmod.innerText=="OK")
+		stop_at4amod()
+else	start_at4amod()
+}
+
+
+
+
+function start_at4amod()
+{
+at4a_buttonmod.innerText="OK"
+at4a_scenar.classList.add('at4a_scenar_mod');
+
+redraw_newbulle()
+}
+
+
+function stop_at4amod()
+{
+at4a_buttonmod.innerText="Modifier"
+at4a_scenar.classList.remove('at4a_scenar_mod');
+at4a_bulleinfo.style.visibility="hidden"
+
+document.querySelectorAll('.bulledot').forEach(e => e.remove('bulledot'));
+
+}
+
+
+
+
+function click_bulledot(elm,e)
+{
+
+  
+
+var arrowTool = installArrowCanvasFollowMouse();
+arrowTool.startFromElement(e.currentTarget);
+
+
+e.preventDefault();
+e.stopPropagation();	
+
+
+//prepare bulle who can be selected
+var idcol = parseInt(elm.closest('.col').id.charAt(3))
+
+var txt="#col4 .bulle:not(.newbulle)";
+if(idcol<=3)txt+=",#col3 .bulle:not(.newbulle)";
+if(idcol<=2)txt+=",#col2 .bulle:not(.newbulle)";
+if(idcol<=1)txt+=",#col1 .bulle:not(.newbulle)";
+
+document.querySelectorAll(txt).forEach(el => { el.classList.add('bulleover'); });
+}
+
+
+var at4a_arrowlist=[]
+function at4a_createarrow(startEl,endEl)
+{
+
+var frompos="right"
+if(startEl.classList.contains('top'))	frompos="top"
+if(startEl.classList.contains('bottom'))frompos="bottom"
+
+var topos="left"
+
+if(startEl.closest('.col')==endEl.closest('.col')) // is in same column ?
+	{
+	if(startEl.getBoundingClientRect().top<endEl.getBoundingClientRect().top)
+		topos="top"
+	else topos="bottom"
+
+	}
+
+var path = {from:startEl.parentElement.id,to:endEl.id,frompos:frompos,topos:topos,fromposxy:"",toposxy:"",col:at4a_arrow_col()}
+
+
+at4a_arrowlist.push(path)
+
+last_selected_arrowid = at4a_arrowlist.length-1;
+
+at4a_showarrow()
+}
+
+function at4a_showarrow()
+{
+document.querySelectorAll('.arrowdot').forEach(e => e.remove('arrowdot'));
+
+var at4a_canvas = document.getElementById('at4a_canvas');
+if(!at4a_canvas)
+	{
+	at4a_canvas = document.createElement('canvas');
+
+	at4a_canvas.id = 'at4a_canvas';
+	at4a_canvas.style.position = 'fixed';
+	at4a_canvas.style.top = 0;
+	at4a_canvas.style.left = 0;
+	at4a_canvas.style.width = '100vw';
+	at4a_canvas.style.height = '100vh';
+	at4a_canvas.style.pointerEvents = 'none';
+	at4a_canvas.style.zIndex = 9999;
+
+	at4a.appendChild(at4a_canvas);
+	window.addEventListener('resize', at4a_resizeCanvas);
+	at4a_resizeCanvas();
+	}
+
+
+
+const ctx = at4a_canvas.getContext('2d');
+ctx.clearRect(0, 0, at4a_canvas.width, at4a_canvas.height);
+
+// at4a_arrowlist
+for(var i=0;i<at4a_arrowlist.length;i++)
+	{
+	
+	var AnArrow = at4a_arrowlist[i]
+	
+
+	  var elmStart=	getpos(document.querySelector('#'+AnArrow.from),AnArrow.frompos,AnArrow.fromposxy,0)
+	  var elmStop=	getpos(document.querySelector('#'+AnArrow.to),AnArrow.topos,AnArrow.toposxy,0)
+
+
+	  var startX = elmStart.x
+	  var startY = elmStart.y
+	  var endX = elmStop.x
+	  var endY = elmStop.y
+	  
+	  
+	  ctx.strokeStyle = AnArrow.col;
+	  ctx.lineWidth = 3;
+	  ctx.beginPath();
+
+	  // Tracé orthogonal (L)
+		// trouver le centre de la ligne vertical-align
+		var colinfo =document.querySelector('#'+AnArrow.from).closest('.col').getBoundingClientRect();
+		var midX = colinfo.left+ colinfo.width+10
+
+
+	//midX+=.5
+
+   // meme col
+  if(document.querySelector('#'+AnArrow.from).closest('.col')==document.querySelector('#'+AnArrow.to).closest('.col'))
+	{
+	//startY+=.5
+	//endY+=.5
+
+	const midY = startY + (endY - startY) / 2; 
+
+	ctx.beginPath();
+	ctx.moveTo(startX, startY);
+	ctx.lineTo(startX, midY);
+	ctx.lineTo(endX, midY);
+	ctx.lineTo(endX, endY);
+	ctx.stroke();
+	}
+  else if(AnArrow.frompos=="top"||AnArrow.frompos=="bottom")
+	{
+	//endY+=.5
+	ctx.beginPath();
+	ctx.moveTo(startX, startY);
+	ctx.lineTo(startX, endY);
+	ctx.lineTo(endX, endY);
+	ctx.stroke();
+	}
+  else
+	{
+	//startX+=.5
+	//startY+=.5
+	//endY+=.5
+	//midX+=.5
+	  ctx.beginPath();
+	  ctx.moveTo(startX, startY);
+	  ctx.lineTo(midX, startY);
+	  ctx.lineTo(midX, endY);
+	  ctx.lineTo(endX, endY);
+	  ctx.stroke();
+	  
+	}
+	
+	
+	  // Pointe de flèche
+	  const size = 8;
+	  ctx.beginPath();
+	if(AnArrow.topos=="left")
+		{
+		ctx.moveTo(endX, endY);
+		ctx.lineTo(endX - size*2, endY - size);
+		ctx.lineTo(endX - size*2, endY + size);
+		}
+	if(AnArrow.topos=="top")
+		{
+		ctx.moveTo(endX, endY);
+		ctx.lineTo(endX - size, endY - size*2);
+		ctx.lineTo(endX + size, endY - size*2);
+		}
+	if(AnArrow.topos=="bottom")
+		{
+		ctx.moveTo(endX, endY);
+		ctx.lineTo(endX - size, endY - size*-2);
+		ctx.lineTo(endX + size, endY - size*-2);
+		}
+	  ctx.closePath();
+	  ctx.fillStyle = AnArrow.col;
+	  ctx.fill();
+	  
+	  
+	  //begin point
+	var elmStart=	getpos(document.querySelector('#'+AnArrow.from),AnArrow.frompos,AnArrow.fromposxy,1)
+	
+	elmStart=mod_arrowdot(elmStart,AnArrow.frompos)
+	
+	NEWdiv = document.createElement("div");
+	NEWdiv.className = "arrowdot";
+	NEWdiv.style.position = "absolute";
+	NEWdiv.style.left = elmStart.x+"px"
+	NEWdiv.style.top  = elmStart.y+"px"
+	NEWdiv.dataset.arrowid  = i
+	NEWdiv.dataset.arrowtype  = "start"
+	NEWdiv.setAttribute("onmousedown", "click_arrowdot(this,event)");
+	document.querySelector('#'+AnArrow.from).appendChild(NEWdiv);	
+	  
+	  // end point
+	var elmStop=	getpos(document.querySelector('#'+AnArrow.to),AnArrow.topos,AnArrow.toposxy,1)
+	elmStop=mod_arrowdot(elmStop,AnArrow.topos)
+	NEWdiv = document.createElement("div");
+	NEWdiv.className = "arrowdot";
+	NEWdiv.style.position = "absolute";
+	NEWdiv.style.left = elmStop.x+"px"
+	NEWdiv.style.top  = elmStop.y+"px"
+	NEWdiv.dataset.arrowid  = i
+	NEWdiv.dataset.arrowtype  = "end"
+	NEWdiv.setAttribute("onmousedown", "click_arrowdot(this,event)");
+	document.querySelector('#'+AnArrow.to).appendChild(NEWdiv);	
+	}
+
+}
+
+function mod_arrowdot(elmStart,where)
+{
+if(where=="top")	{	elmStart.y -=	10;elmStart.x -=	5	}
+else if(where=="right")	{	elmStart.y -=	5	}
+else if(where=="bottom")	{	elmStart.x -=	5	}
+else	{	elmStart.x -=	10;elmStart.y -=	5}
+return elmStart
+}
+
+function getpos(elem,where,mod,is_in_elem)
+{
+var bulle = elem.getBoundingClientRect();
+
+//by default, right
+
+var x=bulle.left
+var y=bulle.top
+
+if(is_in_elem)
+	{
+	x=y=0;
+	}
+
+if(where=="top")
+	{
+	x +=	bulle.width/2
+	x -=	mod
+	}
+else if(where=="right")
+	{
+	x +=	bulle.width
+	y +=	bulle.height/2
+	y -=	mod
+	}
+else if(where=="bottom")
+	{
+	x +=	bulle.width/2
+	y +=	bulle.height
+	x -=	mod
+	}
+else // left
+	{
+	y +=	bulle.height/2
+	y -=	mod
+	}
+
+return {x:x,y:y}
+}
+
+
+var last_selected_arrowid = false;
+function click_arrowdot(dot, event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const container = dot.parentElement; // ou document.getElementById("container")
+  const rect = container.getBoundingClientRect();
+
+  // Pour centrer le dot sur le curseur (optionnel)
+  const dotW = dot.offsetWidth;
+  const dotH = dot.offsetHeight;
+
+  function snap10(v) {
+    return Math.round(v / 5) * 5;
+  }
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function setOnBorder(clientX, clientY) {
+    // position du curseur relative au container
+    let x = clientX - rect.left;
+    let y = clientY - rect.top;
+
+    // clamp dans la div
+    x = clamp(x, 0, rect.width);
+    y = clamp(y, 0, rect.height);
+
+    // snap au pas de 10
+    x = snap10(x);
+    y = snap10(y);
+	
+	x-=10
+	y+=5
+
+    // distances aux bords
+    const dTop = y;
+    const dBottom = rect.height - y;
+    const dLeft = x;
+    const dRight = rect.width - x;
+
+    const minD = Math.min(dTop, dBottom, dLeft, dRight);
+
+    // IMPORTANT: comme le dot a une taille, on le positionne avec un offset
+    // pour qu'il reste visible sur le bord (centre sur la ligne du bord)
+	var arrowpos = ""
+	var MODposxy = ""
+    if (minD === dTop) {
+			arrowpos="top"
+			MODposxy=rect.width/2-x - dotW
+			dot.style.top = (-dotH ) + "px";
+			dot.style.left = (x - dotW ) + "px";
+    } else if (minD === dBottom) {
+			arrowpos="bottom"
+			MODposxy=rect.width/2-x - dotW
+			dot.style.top = (rect.height  ) + "px";
+			dot.style.left = (x - dotW ) + "px";
+    } else if (minD === dLeft) {
+			arrowpos="left"
+			MODposxy=rect.height/2-(y - dotH / 2)
+			dot.style.left = (-dotW ) + "px";
+			dot.style.top = (y - dotH / 2) + "px";
+    } else { // right
+			arrowpos="right"
+			MODposxy=rect.height/2-(y - dotH / 2)
+			dot.style.left = (rect.width ) + "px";
+			dot.style.top = (y - dotH / 2) + "px";
+    }
+	
+	//var path = {from:startEl.parentElement.id,to:endEl.id,frompos:frompos,topos:topos,fromposxy:"",toposxy:""}
+
+	var arrowid = dot.dataset.arrowid
+	var arrowtype = dot.dataset.arrowtype
+	if(arrowtype=="start"){at4a_arrowlist[arrowid].frompos=arrowpos;at4a_arrowlist[arrowid].fromposxy=MODposxy;}
+	if(arrowtype=="end"){at4a_arrowlist[arrowid].topos=arrowpos;at4a_arrowlist[arrowid].toposxy=MODposxy;}
+	
+	at4a_col_2_picker(at4a_arrowlist[arrowid].col)
+	last_selected_arrowid = arrowid;
+	delete_arrow_icon.style.visibility="visible"
+	
+	
+	at4a_showarrow()
+  }
+
+  // 1) on place tout de suite au mousedown (optionnel, mais agréable)
+  setOnBorder(event.clientX, event.clientY);
+
+  // 2) drag: on écoute le move sur document (sinon ça coupe si on sort du dot)
+  function onMove(e) {
+    setOnBorder(e.clientX, e.clientY);
+  }
+
+  // 3) fin du drag
+  function onUp() {
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+  }
+
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+}
+
+
+
+function at4a_resizeCanvas() {
+  at4a_canvas.width = window.innerWidth;
+  at4a_canvas.height = window.innerHeight;
+}
+
+
+
+
+function installArrowCanvasFollowMouse(options = {}) {
+  const {
+    zIndex = 999999,
+    lineWidth = 3,
+    headLength = 14,
+    strokeStyle = "rgba(255, 0, 0, 0.9)",
+    pickElement = (evt) => document.elementFromPoint(evt.clientX, evt.clientY),
+    isValidTarget = (el) => !!el && el !== document.documentElement && el !== document.body,
+  } = options;
+
+  // Canvas overlay
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  Object.assign(canvas.style, {
+    position: "fixed",
+    inset: "0",
+    width: "100vw",
+    height: "100vh",
+    pointerEvents: "none",
+    zIndex: String(zIndex),
+  });
+
+  document.body.appendChild(canvas);
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(window.innerWidth * dpr);
+    canvas.height = Math.floor(window.innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+
+  let isDragging = false;
+  let startEl = null;
+  let startPt = null;
+
+  function centerOf(el) {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  function clear() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function drawArrow(from, to) {
+    clear();
+
+    ctx.save();
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Ligne
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+
+    // Tête
+    const angle = Math.atan2(to.y - from.y, to.x - from.x);
+    const hl = headLength;
+
+    ctx.beginPath();
+    ctx.moveTo(to.x, to.y);
+    ctx.lineTo(to.x - hl * Math.cos(angle - Math.PI / 6), to.y - hl * Math.sin(angle - Math.PI / 6));
+    ctx.moveTo(to.x, to.y);
+    ctx.lineTo(to.x - hl * Math.cos(angle + Math.PI / 6), to.y - hl * Math.sin(angle + Math.PI / 6));
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function onMouseDown(evt) {
+    const el = pickElement(evt);
+    if (!isValidTarget(el)) return;
+
+    isDragging = true;
+    startEl = el;
+    startPt = centerOf(el);
+
+    // Première peinture immédiate vers la position actuelle
+    drawArrow(startPt, { x: evt.clientX, y: evt.clientY });
+  }
+
+  function onMouseMove(evt) {
+    if (!isDragging || !startPt) return;
+    drawArrow(startPt, { x: evt.clientX, y: evt.clientY });
+  }
+
+  function onMouseUp(evt) {
+    if (!isDragging || !startPt) return;
+
+    var endEl = pickElement(evt);
+    if (isValidTarget(endEl)) {
+      // Fixe la flèche sur l'élément de destination
+      const endPt = centerOf(endEl);
+      drawArrow(startPt, endPt);
+    } else {
+      // Sinon, on efface ou on laisse la dernière flèche (ici on efface)
+      clear();
+    }
+	
+	
+	if(!endEl.classList.contains('bulleover') && endEl.closest('.bulleover'))
+		{
+		endEl=endEl.closest('.bulleover');
+		}
+	
+	
+	if(endEl!=startEl.parentElement && endEl.classList.contains('bulleover'))
+		{
+		at4a_createarrow(startEl,endEl)
+		}
+		
+    isDragging = false;
+    startEl = null;
+    startPt = null;
+	
+	document.removeEventListener("mousedown", onMouseDown, true);
+	document.removeEventListener("mousemove", onMouseMove, true);
+	document.removeEventListener("mouseup", onMouseUp, true);
+	canvas.remove();
+	document.querySelectorAll('.bulleover').forEach(e => e.classList.remove('bulleover'));
+	
+
+
+  }
+
+  function startFromElement(el) {
+    isDragging = true;
+    startEl = el;
+    startPt = centerOf(el);
+  }
+
+  function updateToPoint(pt) {
+    if (!isDragging || !startPt) return;
+    drawArrow(startPt, pt);
+  }
+
+  function endOnElement(el) {
+    if (!isDragging || !startPt) return;
+    drawArrow(startPt, centerOf(el));
+    isDragging = false;
+    startEl = null;
+    startPt = null;
+  }
+
+  function endAtPoint(pt) {
+    if (!isDragging || !startPt) return;
+    drawArrow(startPt, pt);
+    isDragging = false;
+    startEl = null;
+    startPt = null;
+  }
+
+  window.addEventListener("resize", () => {
+    resize();
+    // Si drag en cours, on redessine vers la dernière position connue si besoin
+  });
+
+  // Écoute globale (recommandé)
+  document.addEventListener("mousedown", onMouseDown, true);
+  document.addEventListener("mousemove", onMouseMove, true);
+  document.addEventListener("mouseup", onMouseUp, true);
+
+  return {
+    canvas,
+    clear,
+    // API manuelle si tu veux piloter depuis tes handlers
+    startFromElement,
+    updateToPoint,
+    endOnElement,
+    endAtPoint,
+
+  };
+}
+
+
+
+
+
+
+
+
+
+
+
+function at4a_col_2_picker(col) {
+var el= document.querySelector(`.pic_col div[style*="background-color:${col.toUpperCase()}"]`);
+pick_col(el)
+}
+
+
+function at4a_arrow_col() {
+  //return document.querySelector('.pic_col .colselect').style.backgroundColor 
+  // rgb (x,y,z) -> #0123456
+  return '#' + getComputedStyle(document.querySelector('.pic_col .colselect'))
+  .backgroundColor.match(/\d+/g).slice(0,3)
+  .map(x=>(+x).toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+function pick_col(elm)
+{
+document.querySelectorAll('.colselect').forEach(e => e.classList.remove('colselect'));
+elm.classList.add('colselect');
+
+
+}
+
+function click_pick_col(elm)
+{
+pick_col(elm)
+if(last_selected_arrowid !== false)
+	{
+	log('change')
+	last_selected_arrowid=parseInt(last_selected_arrowid)
+	at4a_arrowlist[last_selected_arrowid].col=at4a_arrow_col()
+	at4a_showarrow()
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function redraw_newbulle()
+{
+var maxY = 290;
+document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
+	  const y = el.offsetTop+el.offsetHeight
+	  if (y > maxY) maxY = y;
+	});
+	
+document.querySelectorAll('.newbulle').forEach(el => {
+	  el.style.top = maxY+40+"px"
+	});
+	
+document.querySelectorAll('.scenarcont').forEach(el => {
+	  el.style.height = maxY+40+60+"px"
+	});
+	
+	
+document.querySelectorAll('.bulledot').forEach(el => el.remove());
+
+	// draw DOT for new arrow
+document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
+	
+	NEWdiv = document.createElement("div");
+	NEWdiv.className = "bulledot top";
+	NEWdiv.style.position = "absolute";
+	NEWdiv.style.left = el.offsetWidth/2-6+"px"
+	NEWdiv.style.top  = "0px"
+	NEWdiv.setAttribute("onmousedown", "click_bulledot(this,event)");
+	el.appendChild(NEWdiv);	
+	
+	var NEWdiv = document.createElement("div");
+	NEWdiv.className = "bulledot left";
+	NEWdiv.style.position = "absolute";
+	NEWdiv.style.left = el.offsetWidth-12+"px"
+	NEWdiv.style.top  = el.offsetHeight/2-6+"px"
+	NEWdiv.setAttribute("onmousedown", "click_bulledot(this,event)");
+	el.appendChild(NEWdiv);
+	
+	NEWdiv = document.createElement("div");
+	NEWdiv.className = "bulledot bottom";
+	NEWdiv.style.position = "absolute";
+	NEWdiv.style.left = el.offsetWidth/2-6+"px"
+	NEWdiv.style.top  = el.offsetHeight-12+"px"
+	NEWdiv.setAttribute("onmousedown", "click_bulledot(this,event)");
+	el.appendChild(NEWdiv);	
+
+	});
+}
+
+
+
+
+
+
+
+
+function dragdropresize(elem, e) {
+  e.preventDefault();
+
+  const parent = elem.offsetParent;
+  if (!parent) return;
+
+  const cs = window.getComputedStyle(elem);
+  if (cs.position === "static") elem.style.position = "absolute";
+
+  const parentRect = parent.getBoundingClientRect();
+  const elemRect = elem.getBoundingClientRect();
+
+  const startLeft = elemRect.left - parentRect.left;
+
+  const startMouseX = e.clientX;
+
+  elem.style.left = `${startLeft}px`;
+  function onMouseMove(ev) {
+    var dx = ev.clientX - startMouseX;
+	
+	
+	dx = Math.round(dx / 20) * 20;
+	
+	var parentCOL = elem.closest('.col')
+	
+	var finalCOLsize = startLeft + dx
+
+	
+	if(finalCOLsize<220)return
+	if(finalCOLsize>=800)return
+	
+    elem.style.left = finalCOLsize+'px';
+	parentCOL.style.width=finalCOLsize+12+'px';
+	
+	at4a_showarrow()
+  }
+
+  function onMouseUp() {
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+	
+  }
+
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+}
+
+function dragdropbulle(elem, e) {
+
+if(!document.querySelector('.at4a_scenar_mod')) return; // not Modify mod
+
+  e.preventDefault();
+  elem.classList.add('bulledrag')
+
+  const parent = elem.offsetParent;
+  if (!parent) return;
+
+  const cs = window.getComputedStyle(elem);
+  if (cs.position === "static") elem.style.position = "absolute";
+
+  const parentRect = parent.getBoundingClientRect();
+  const elemRect = elem.getBoundingClientRect();
+
+  const startLeft = elemRect.left - parentRect.left;
+  const startTop  = elemRect.top  - parentRect.top;
+
+  const startMouseX = e.clientX;
+  const startMouseY = e.clientY;
+
+  elem.style.left = `${startLeft}px`;
+  
+  const GRID = 20;
+	
+  function onMouseMove(ev) {
+    let dx = ev.clientX - startMouseX;
+    let dy = ev.clientY - startMouseY;
+
+    dx = Math.round(dx / GRID) * GRID;
+    dy = Math.round(dy / GRID) * GRID;
+
+	var maxleft = elem.closest('.col').offsetWidth - elem.offsetWidth
+	var maxtop = elem.closest('.col').offsetHeight +500
+
+
+
+	if(startLeft + dx>0&&(startLeft + dx)<maxleft)elem.style.left = `${startLeft + dx}px`;
+	
+    if(startTop + dy>40&&(startTop + dy)<maxtop)elem.style.Top =  elem.style.top  = `${startTop + dy}px`;
+	at4a_showarrow()
+  }
+
+  function onMouseUp() {
+	elem.classList.remove('bulledrag')
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+	
+	
+	if(elem.classList.contains('newbulle')) // are we dropping a new bulle ?
+		{
+		
+		//create a new one based on actual place
+		var actualplace = elem.getBoundingClientRect();
+		
+		const containerRect = elem.parentElement;
+
+		// position souris → repère du container
+		const x = e.clientX - containerRect.left;
+		const y = e.clientY - containerRect.top;
+
+		var NEWdiv = document.createElement("div");
+		NEWdiv.className = "bulle";
+		NEWdiv.style.position = "absolute";
+		NEWdiv.style.left = elem.style.left
+		NEWdiv.style.top  = elem.style.top
+		
+		var i=1;
+		while(document.querySelector('#bulle'+i))
+			{i++}
+		NEWdiv.id  = 'bulle'+i
+		
+		
+		NEWdiv.innerHTML = "<span style='width: 100%;' class='bulletxt'>"+at4a_find_text(parent)+"</span>"
+		NEWdiv.setAttribute("onmousedown", "dragdropbulle(this,event)");
+		containerRect.appendChild(NEWdiv);
+
+		var NEWdivedit = document.createElement("div");
+		NEWdivedit.className = "bulleedit";
+		NEWdivedit.setAttribute("onmousedown", "bulle_edit(this)");
+		NEWdivedit.innerText='✎'
+		NEWdiv.appendChild(NEWdivedit);
+
+		var NEWdivedit = document.createElement("div");
+		NEWdivedit.className = "probaicon";
+		NEWdivedit.dataset.value = 3;
+		NEWdivedit.innerText="⚠️"
+		NEWdivedit.setAttribute("onmousedown", "bulle_edit(this)");
+		NEWdiv.appendChild(NEWdivedit);
+
+//		//back to place
+		elem.style.left = 20+"px";
+
+		}
+		redraw_newbulle()
+  }
+
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+}
+
+
+
+
+
+var at4a_bull_sel=false;
+
+function bulle_edit(elm)
+{
+event.preventDefault();
+event.stopPropagation();
+
+at4a_bull_sel = elm.closest('.bulle')
+at4a_bulleinfo.style.visibility="visible"
+
+at4a_bulleinfotexte.value = at4a_bull_sel.querySelector('.bulletxt').innerText
+at4a_proba_succes.value = at4a_bull_sel.querySelector('.probaicon').dataset.value
+
+
+
+}
+
+
+function at4a_proba_succes_change(elm)
+{
+if(elm.value==0)icon="🟢"
+if(elm.value==1)icon="🟡"
+if(elm.value==2)icon="🟠"
+if(elm.value==3)icon="⚠️"
+if(elm.value==4)icon="⛔"
+
+at4a_bull_sel.querySelector('.probaicon').innerHTML=icon
+at4a_bull_sel.querySelector('.probaicon').dataset.value=elm.value
+
+}
+
+function at4a_texte_change(elm)
+{
+
+at4a_bull_sel.querySelector('.bulletxt').innerText=elm.value
+}
+
+function at4a_delete()
+{
+
+var idbulle = at4a_bull_sel.id
+
+at4a_arrowlist = at4a_arrowlist.filter(item =>  item.from !== idbulle && item.to !== idbulle);
+
+at4a_bull_sel.remove()
+at4a_bull_sel=false;
+at4a_bulleinfo.style.visibility="hidden"
+
+at4a_showarrow()
+}
+
+function at4a_find_text(elm)
+{
+var colid = elm.closest('.col').id
+
+if(colid=="col1") return "Reconnaissance externe sources ouvertes"
+if(colid=="col2") return "Corruption d’un personnel"
+if(colid=="col3") return "Latéralisation vers réseau LAN IT"
+if(colid=="col4") return "Vol et exploitation de données"
+}
+
+function delete_arrow()
+{
+at4a_arrowlist.splice(last_selected_arrowid, 1);
+delete_arrow_icon.style.display="hidden"
+at4a_showarrow()
+}
 </script>
 </head>
 <body onload="go()">
@@ -2387,7 +3459,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
 
 <div id="atelier2" onmousedown="clickmenu(this)"><div class="mini at2bg">2</div>Source de risque</div>
-<div class="atelier2open submenu startscript" onmousedown="showatt('at2a',this)"><div class="mini at2bg">A</div>Identification</div>
+<div class="atelier2open submenu" onmousedown="showatt('at2a',this)"><div class="mini at2bg">A</div>Identification</div>
 <div class="atelier2open submenu" onmousedown="showatt('at2b',this)"><div class="mini at2bg">B</div>Pertinence</div>
 <div class="atelier2open submenu" onmousedown="showatt('at2c',this)"><div class="mini at2bg">C</div>Rétention</div>
 
@@ -2398,7 +3470,7 @@ function chinput(elem){elem.setAttribute('value',elem.value)} // utile pour sauv
 
 
 <div id="atelier4" onmousedown="clickmenu(this)"><div class="mini at4bg">4</div>Scénarios opérationnels</div>
-<div class="atelier4open submenu disabled" onmousedown="showatt('at4a',this)"><div class="mini at4bg">A</div>Scénarios</div>
+<div class="atelier4open submenu startscript" onmousedown="showatt('at4a',this)"><div class="mini at4bg">A</div>Scénarios</div>
 <div class="atelier4open submenu disabled" onmousedown="showatt('at4b',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
 
 <div id="atelier5" onmousedown="clickmenu(this)"><div class="mini at5bg">5</div>Traitement du risque</div>
@@ -2644,9 +3716,9 @@ Maturité cyber x Confiance
 <div id="divseuil" style="display:none;width:310px;margin-left:8px;">
 
 <table>
-<tr><td><div style="width:22px;height:22px;border:4px solid #00A7A2;border-radius:18px;"></div></td><td>Zone de veille</td><td>		<input id="seuil1" type="number" value="0.2" min=0 max=6 step=".1"onchange="chinput(this);at3a_redraw_graph()"></td></tr>
-<tr><td><div style="width:19px;height:19px;border:4px solid #F6E742;border-radius:18px;margin-left:1px;"></div><div></div></td><td>Zone de controle</td><td>	<input id="seuil2" type="number" value="0.9" min=0 max=6 step=".1"onchange="chinput(this);at3a_redraw_graph()"></td></tr>
-<tr><td><div style="width:16px;height:16px;border:4px solid #E3394A;border-radius:18px;margin-left:3px;"></div><div></div></td><td>Zone de danger</td><td>		<input id="seuil3" type="number" value="2.5" min=0 max=6 step=".1" onchange="chinput(this);at3a_redraw_graph()"></td></tr>
+<tr><td><div style="width:22px;height:22px;border:4px solid #00A7A2;border-radius:18px;"></div></td><td>Veille</td><td>		<input id="seuil1" type="number" value="0.2" min=0 max=6 step=".1"onchange="chinput(this);at3a_redraw_graph()"></td></tr>
+<tr><td><div style="width:19px;height:19px;border:4px solid #F6E742;border-radius:18px;margin-left:1px;"></div><div></div></td><td>Contrôle</td><td>	<input id="seuil2" type="number" value="0.9" min=0 max=6 step=".1"onchange="chinput(this);at3a_redraw_graph()"></td></tr>
+<tr><td><div style="width:16px;height:16px;border:4px solid #E3394A;border-radius:18px;margin-left:3px;"></div><div></div></td><td>Danger</td><td>		<input id="seuil3" type="number" value="2.5" min=0 max=6 step=".1" onchange="chinput(this);at3a_redraw_graph()"></td></tr>
 </table>
 </div>
 
@@ -2784,6 +3856,109 @@ Maturité cyber x Confiance
 </tr></table>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="at4a">
+<br/>
+<span style="border-bottom:#F4EECC solid 3px;margin-left:20px;">Élaboration des scénarios opérationnels</span>
+<br/><br/><br/>
+<table style="min-width:800px">
+<tr><td>
+<button id="at4a_buttonmod" onclick="at4a_modclick()" style="padding:8px 16px;margin: 16px;">Modifier</button>
+</td><td>
+Méthode  : Standard
+<span class='pic_col' style="float:right;">
+<div class="colselect" style='background-color:#0081BB' onclick="click_pick_col(this)"></div>
+<div style='background-color:#00AEAB' onclick="click_pick_col(this)"></div>
+<div style='background-color:#AE3A63' onclick="click_pick_col(this)"></div>
+<div style='background-color:#F19502' onclick="click_pick_col(this)"></div>
+&nbsp; <div id="delete_arrow_icon" style='visibility:hidden;transform: translateY(-4px);' onclick="delete_arrow(this)"> X </div>
+</span>
+</td></tr/>
+</table>
+
+<div id="at4a_bulleinfo" style="wdith:800px;display:inline-block;margin-left:20px;visibility:hidden;">
+
+<input id="at4a_bulleinfotexte" type="text" style="width:400px" onchange="at4a_texte_change(this)" onkeyup="at4a_texte_change(this)"/>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+Probabilité de succès :
+<select id="at4a_proba_succes" onchange="at4a_proba_succes_change(this)">
+<option value='0'>0 - Très faible</option>
+<option value='1'>1 - Faible</option>
+<option value='2'>2 - Significative</option>
+<option value='3'>3 - Très élevée</option>
+<option value='4'>4 - Quasi-certaine</option>
+</select>
+
+<button style="float:right;margin-left: 50px;" onclick="at4a_delete()">Supprimer</button>
+</div>
+<br/>
+<br/>
+
+<div id='at4a_scenar'>
+
+<div class='col' id='col1'>
+<div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
+<div class='head'>Connaitre</div>
+<div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
+</div>
+
+<div class='col' id='col2'>
+<div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
+<div class='head'>Rentrer</div>
+<div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
+</div>
+
+<div class='col' id='col3'>
+<div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
+<div class='head'>Trouver</div>
+<div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
+</div>
+
+<div class='col' id='col4'>
+<div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
+<div class='head'>Exploiter</div>
+<div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
+</div>
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
