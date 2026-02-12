@@ -496,7 +496,7 @@ border-radius:8px 8px 0 0;
 }
 
 .scenarcont{
-min-height:400px;
+min-height:200px;
 background-color:#B6D8EC;
 }
 
@@ -591,6 +591,15 @@ right:4px;
 bottom:2px;
 font-size:18px;
 cursor:pointer;
+}
+
+.at4a_target{
+background-color:#EB3E51;
+color:#fff;
+}
+
+.at4a_target .probaicon{
+display:none;
 }
 
 </style>
@@ -2536,11 +2545,23 @@ function stop_at4amod()
 at4a_buttonmod.innerText="Modifier"
 at4a_scenar.classList.remove('at4a_scenar_mod');
 at4a_bulleinfo.style.visibility="hidden"
-
+at4a_but_click_target.style.visibility="hidden"
 at4a_tdmod.style.visibility="hidden"
-delete_arrow_icon.style.visibility="hidden"
+
 document.querySelectorAll('.bulledot').forEach(e => e.remove('bulledot'));
 
+
+var maxY = 200;
+document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
+	  const y = el.offsetTop+el.offsetHeight
+	  if (y > maxY) maxY = y;
+	});
+		
+document.querySelectorAll('.scenarcont').forEach(el => {
+	  el.style.height = maxY-20+"px"
+	});
+
+release_arrow()
 }
 
 
@@ -2657,6 +2678,14 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	//midX+=.5
 
    // meme col
+   var endxpath = endX
+   var endypath = endY
+   
+   if(AnArrow.topos=="left")	endxpath-=5;
+   if(AnArrow.topos=="right")	endxpath+=5;
+   if(AnArrow.topos=="top")		endypath-=5;
+   if(AnArrow.topos=="bottom")	endypath+=5;
+   
   if(document.querySelector('#'+AnArrow.from).closest('.col')==document.querySelector('#'+AnArrow.to).closest('.col'))
 	{
 	//startY+=.5
@@ -2667,8 +2696,8 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	ctx.beginPath();
 	ctx.moveTo(startX, startY);
 	ctx.lineTo(startX, midY);
-	ctx.lineTo(endX, midY);
-	ctx.lineTo(endX, endY);
+	ctx.lineTo(endxpath, midY);
+	ctx.lineTo(endxpath, endypath);
 	ctx.stroke();
 	}
   else if(AnArrow.frompos=="top"||AnArrow.frompos=="bottom")
@@ -2676,8 +2705,8 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	//endY+=.5
 	ctx.beginPath();
 	ctx.moveTo(startX, startY);
-	ctx.lineTo(startX, endY);
-	ctx.lineTo(endX, endY);
+	ctx.lineTo(startX, endypath);
+	ctx.lineTo(endxpath, endypath);
 	ctx.stroke();
 	}
   else
@@ -2689,8 +2718,8 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	  ctx.beginPath();
 	  ctx.moveTo(startX, startY);
 	  ctx.lineTo(midX, startY);
-	  ctx.lineTo(midX, endY);
-	  ctx.lineTo(endX, endY);
+	  ctx.lineTo(midX, endypath);
+	  ctx.lineTo(endxpath, endypath);
 	  ctx.stroke();
 	  
 	}
@@ -2835,8 +2864,7 @@ function click_arrowdot(dot, event) {
     x = snap10(x);
     y = snap10(y);
 	
-	x-=10
-	y+=5
+
 
     // distances aux bords
     const dTop = y;
@@ -2844,8 +2872,15 @@ function click_arrowdot(dot, event) {
     const dLeft = x;
     const dRight = rect.width - x;
 
+
+	
     const minD = Math.min(dTop, dBottom, dLeft, dRight);
 
+
+	x-=10
+	y+=5
+	
+	
     // IMPORTANT: comme le dot a une taille, on le positionne avec un offset
     // pour qu'il reste visible sur le bord (centre sur la ligne du bord)
 	var arrowpos = ""
@@ -3123,8 +3158,6 @@ function pick_col(elm)
 {
 document.querySelectorAll('.colselect').forEach(e => e.classList.remove('colselect'));
 elm.classList.add('colselect');
-
-
 }
 
 function click_pick_col(elm)
@@ -3132,14 +3165,17 @@ function click_pick_col(elm)
 pick_col(elm)
 if(last_selected_arrowid !== false)
 	{
-	log('change')
 	last_selected_arrowid=parseInt(last_selected_arrowid)
 	at4a_arrowlist[last_selected_arrowid].col=at4a_arrow_col()
 	at4a_showarrow()
 	}
 }
 
-
+function release_arrow()
+{
+last_selected_arrowid = false;
+delete_arrow_icon.style.visibility="hidden"
+}
 
 
 
@@ -3264,8 +3300,11 @@ function dragdropbulle(elem, e) {
 
 if(!document.querySelector('.at4a_scenar_mod')) return; // not Modify mod
 
+
   e.preventDefault();
   elem.classList.add('bulledrag')
+
+release_arrow();
 
   const parent = elem.offsetParent;
   if (!parent) return;
@@ -3373,28 +3412,29 @@ function bulle_edit(elm)
 event.preventDefault();
 event.stopPropagation();
 
+if(!document.querySelector('.at4a_scenar_mod')) return; // not Modify mod
+
+
 at4a_bull_sel = elm.closest('.bulle')
 at4a_bulleinfo.style.visibility="visible"
 
 at4a_bulleinfotexte.value = at4a_bull_sel.querySelector('.bulletxt').innerText
 at4a_proba_succes.value = at4a_bull_sel.querySelector('.probaicon').dataset.value
 
-
-
+at4a_but_click_target.style.visibility = at4a_bull_sel.closest('#col4') ? "visible" : "hidden";
 }
 
 
-function at4a_proba_succes_change(elm)
+function at4a_proba_succes_change(v)
 {
-if(elm.value==0)icon="🟢"
-if(elm.value==1)icon="🟡"
-if(elm.value==2)icon="🟠"
-if(elm.value==3)icon="⚠️"
-if(elm.value==4)icon="⛔"
+var i="🟢"
+if(v==1)i="🟡"
+if(v==2)i="⚠️"
+if(v==3)i="<span style='filter: hue-rotate(-45deg) saturate(5) brightness(0.9);'>⚠️</span>"
+if(v==4)i="💥"
 
-at4a_bull_sel.querySelector('.probaicon').innerHTML=icon
-at4a_bull_sel.querySelector('.probaicon').dataset.value=elm.value
-
+at4a_bull_sel.querySelector('.probaicon').innerHTML=i
+at4a_bull_sel.querySelector('.probaicon').dataset.value=v
 }
 
 function at4a_texte_change(elm)
@@ -3413,7 +3453,7 @@ at4a_arrowlist = at4a_arrowlist.filter(item =>  item.from !== idbulle && item.to
 at4a_bull_sel.remove()
 at4a_bull_sel=false;
 at4a_bulleinfo.style.visibility="hidden"
-
+at4a_but_click_target.style.visibility="hidden"
 at4a_showarrow()
 }
 
@@ -3430,8 +3470,17 @@ if(colid=="col4") return "Vol et exploitation de données"
 function delete_arrow()
 {
 at4a_arrowlist.splice(last_selected_arrowid, 1);
-delete_arrow_icon.style.display="hidden"
+release_arrow()
 at4a_showarrow()
+}
+
+function at4a_click_target()
+{
+
+
+document.querySelectorAll('.at4a_target').forEach(e => e.classList.remove('at4a_target'));
+//at4a_but_click_target
+at4a_bull_sel.classList.add('at4a_target')
 }
 </script>
 </head>
@@ -3899,13 +3948,17 @@ Méthode  : Standard
 
 
 Probabilité de succès :
-<select id="at4a_proba_succes" onchange="at4a_proba_succes_change(this)">
+<select id="at4a_proba_succes" onchange="at4a_proba_succes_change(this.value)">
 <option value='0'>0 - Très faible</option>
 <option value='1'>1 - Faible</option>
 <option value='2'>2 - Significative</option>
 <option value='3'>3 - Très élevée</option>
 <option value='4'>4 - Quasi-certaine</option>
 </select>
+
+<button id="at4a_but_click_target" style="margin-left: 20px;" onclick="at4a_click_target()">🎯</button>
+
+
 
 <button style="float:right;margin-left: 50px;" onclick="at4a_delete()">Supprimer</button>
 </div>
@@ -3918,21 +3971,15 @@ Probabilité de succès :
 <div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
 <div class='head'>Connaitre</div>
 <div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
-</div>
-
-<div class='col' id='col2'>
+</div><div class='col' id='col2'>
 <div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
 <div class='head'>Rentrer</div>
 <div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
-</div>
-
-<div class='col' id='col3'>
+</div><div class='col' id='col3'>
 <div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
 <div class='head'>Trouver</div>
 <div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
-</div>
-
-<div class='col' id='col4'>
+</div><div class='col' id='col4'>
 <div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
 <div class='head'>Exploiter</div>
 <div class='scenarcont'><div class="bulle newbulle" onmousedown="dragdropbulle(this,event)"></div></div>
