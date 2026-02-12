@@ -142,13 +142,14 @@ filter: brightness(.7);
 
 
 .at3_pp{
-border : 1px solid grey;
-border-radius:8px;
+
+border-radius:4px;
 display:block;
 max-width:400px;
-margin:8px;
+margin:8px 8px 8px 30px;
 padding:4px;
 position:relative;
+background:#eee;
 }
 
 .overcircle{
@@ -237,10 +238,9 @@ max-height: calc(100vh - 40px);
 position: relative;
 display:block;
 padding:4px;
-border: 1px solid black;
-border-radius:8px;
 width:300px;
 margin-bottom:8px;
+border-left: 2px solid gray;
 }
 
 .svgaddedclick{
@@ -1256,7 +1256,7 @@ if(att=="at2b") at2b_redraw_graph()
 if(att=="at2c") at2c_redraw()
 if(att=="at3a") at3a_redraw_graph()
 if(att=="at3b") at3b_redraw()
-
+if(att=="at4a") at4a_showarrow()
 
 }
 
@@ -2526,7 +2526,7 @@ function start_at4amod()
 {
 at4a_buttonmod.innerText="OK"
 at4a_scenar.classList.add('at4a_scenar_mod');
-
+at4a_tdmod.style.visibility="visible"
 redraw_newbulle()
 }
 
@@ -2537,6 +2537,8 @@ at4a_buttonmod.innerText="Modifier"
 at4a_scenar.classList.remove('at4a_scenar_mod');
 at4a_bulleinfo.style.visibility="hidden"
 
+at4a_tdmod.style.visibility="hidden"
+delete_arrow_icon.style.visibility="hidden"
 document.querySelectorAll('.bulledot').forEach(e => e.remove('bulledot'));
 
 }
@@ -3685,10 +3687,10 @@ de données, serveur web, serveur d’application...).</option>
 </td>
 <td style="text-align: center;">
 <select name="conf" id="conf" style="max-width:300px" onchange="calcfiab()">
-<option value="1">1 - Les intentions de la partie prenante ne peuvent être évaluées.</option>
-<option value="2">2 - Les intentions de la partie prenante sont considérées comme neutres.</option>
-<option value="3">3 - Les intentions de la partie prenante sont connues et probablement positives.</option>
-<option value="4">4 - Les intentions de la partie prenante sont parfaitement connues et pleinement compatibles avec celles de l’organisation étudiée.</option>
+<option value="1">1 - Les intentions ne peuvent être évaluées.</option>
+<option value="2">2 - Les intentions sont considérées comme neutres.</option>
+<option value="3">3 - Les intentions sont connues et probablement positives.</option>
+<option value="4">4 - Les intentions sont parfaitement connues et pleinement compatibles avec celles de l’organisation étudiée.</option>
 </select></td>
 </tr>
 </table>
@@ -3877,7 +3879,7 @@ Maturité cyber x Confiance
 <table style="min-width:800px">
 <tr><td>
 <button id="at4a_buttonmod" onclick="at4a_modclick()" style="padding:8px 16px;margin: 16px;">Modifier</button>
-</td><td>
+</td><td id="at4a_tdmod" style="visibility:hidden">
 Méthode  : Standard
 <span class='pic_col' style="float:right;">
 <div class="colselect" style='background-color:#0081BB' onclick="click_pick_col(this)"></div>
