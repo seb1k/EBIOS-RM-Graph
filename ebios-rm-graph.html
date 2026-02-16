@@ -18,10 +18,11 @@ overflow:hidden;
 }
 
 svg{
-border-radius:8px;
+
 user-select: none;
-margin: 0 16px;
+
 }
+
 .at1bg{
 background-color:#FB3199;
 }
@@ -142,14 +143,12 @@ filter: brightness(.7);
 
 
 .at3_pp{
-
-border-radius:4px;
-display:block;
-max-width:400px;
-margin:8px 8px 8px 30px;
-padding:4px;
-position:relative;
-background:#eee;
+display: block;
+max-width: 400px;
+margin: 0px 8px 0px 25px;
+position: relative;
+border-left: 2px solid gray;
+padding: 10px 0 5px 12px;
 }
 
 .overcircle{
@@ -162,7 +161,7 @@ display:inline-block;
 position:absolute;
 top:0px;
 right:0px;
-padding: 4px 6px;
+padding: 8px 8px;
 
 cursor:pointer;
 }
@@ -214,6 +213,7 @@ background-color:#eee;
 
 .menacelvl{
 cursor:pointer;
+line-height: 20px;
 }
 
 #div_menace, #divcenter{
@@ -227,11 +227,11 @@ left: 0;
 right: 0; 
 margin-inline: auto; 
 width: fit-content;
- 
-padding:4px;
 border-radius:8px;
 max-height: calc(100vh - 40px);
 }
+
+
 
 .at3_cat
 {
@@ -240,7 +240,6 @@ display:block;
 padding:4px;
 width:300px;
 margin-bottom:8px;
-border-left: 2px solid gray;
 }
 
 .svgaddedclick{
@@ -469,6 +468,7 @@ text-align:center;
 line-height:24px;
 font-weight:bold;
 cursor:ew-resize;
+z-index:1;
 }
 
 .at4a_scenar_mod .resize,.at4a_scenar_mod .newbulle,.at4a_scenar_mod .arrowdot{
@@ -572,18 +572,6 @@ cursor:pointer;
 transform: scale(1.25);
 }
 
-.at4a_scenar_mod .bulle:hover .bulleedit{
-display:block !important;
-}
-
-.bulleedit{
-position:absolute;
-left:5px;
-top:1px;
-font-size:18px;
-display:none;
-cursor:pointer;
-}
 
 .probaicon{
 position:absolute;
@@ -602,6 +590,52 @@ color:#fff;
 display:none;
 }
 
+.at4a_target_clicked{
+background: #B1B1B9;
+border-radius: 4px;
+}
+
+
+.mitrename
+{
+font-size:smaller;
+color:#aaa;
+padding-left:6px;
+}
+
+
+#at4a_bookexploit{
+display:inline-block;
+width:28px;
+height:16px;
+opacity:.7;
+cursor:pointer;
+}
+#at4a_bookexploit:hover{
+opacity:1;
+transform: scale(1.1) ;
+}
+
+.mitreblock{
+cursor:pointer;
+}
+.mitreblockselected{
+background-color:#eee;
+}
+
+#tabmitre2ebios a{
+color:#666;
+text-decoration:none;
+}
+#tabmitre2ebios a:hover{
+color:#000;
+text-decoration:underline;
+}
+
+.mitre2ebiosclick:hover{
+cursor:pointer;
+background: #E9F3F9;
+}
 </style>
 
 
@@ -2636,7 +2670,7 @@ if(!at4a_canvas)
 	at4a_canvas.style.width = '100vw';
 	at4a_canvas.style.height = '100vh';
 	at4a_canvas.style.pointerEvents = 'none';
-	at4a_canvas.style.zIndex = 9999;
+	at4a_canvas.style.zIndex = 90;
 
 	at4a.appendChild(at4a_canvas);
 	window.addEventListener('resize', at4a_resizeCanvas);
@@ -2686,40 +2720,56 @@ for(var i=0;i<at4a_arrowlist.length;i++)
    if(AnArrow.topos=="top")		endypath-=5;
    if(AnArrow.topos=="bottom")	endypath+=5;
    
-  if(document.querySelector('#'+AnArrow.from).closest('.col')==document.querySelector('#'+AnArrow.to).closest('.col'))
+  if(document.querySelector('#'+AnArrow.from).closest('.col')==document.querySelector('#'+AnArrow.to).closest('.col')) // meme block
 	{
-	//startY+=.5
-	//endY+=.5
-
 	const midY = startY + (endY - startY) / 2; 
-
+	
+	var startH=0
+	var endH=0
+	if(AnArrow.frompos=="top"||AnArrow.frompos=="bottom") startH=1
+	if(AnArrow.topos=="top"||AnArrow.topos=="bottom") endH=1
+	
+	
 	ctx.beginPath();
-	ctx.moveTo(startX, startY);
-	ctx.lineTo(startX, midY);
-	ctx.lineTo(endxpath, midY);
-	ctx.lineTo(endxpath, endypath);
+	ctx.moveTo(startX+.5, startY+.5);
+	if(startH != endH)
+		{
+		if(AnArrow.frompos=="right")
+			ctx.lineTo(endxpath+.5, startY+.5);
+		else
+			ctx.lineTo(startX+.5, endypath+.5);
+		}
+	else
+		{
+		ctx.lineTo(startX+.5, midY);
+		ctx.lineTo(endxpath+.5, midY);
+		}
+	ctx.lineTo(endxpath+.5, endypath+.5);
 	ctx.stroke();
 	}
   else if(AnArrow.frompos=="top"||AnArrow.frompos=="bottom")
 	{
-	//endY+=.5
 	ctx.beginPath();
-	ctx.moveTo(startX, startY);
-	ctx.lineTo(startX, endypath);
-	ctx.lineTo(endxpath, endypath);
+	ctx.moveTo(startX+.5, startY+.5);
+	ctx.lineTo(startX+.5, endypath+.5);
+	ctx.lineTo(endxpath+.5, endypath+.5);
+	ctx.stroke();
+	}
+  else if(AnArrow.topos=="top"||AnArrow.topos=="bottom")
+	{
+	ctx.beginPath();
+	ctx.moveTo(startX+.5, startY+.5);
+	ctx.lineTo(endxpath+.5, startY+.5);
+	ctx.lineTo(endxpath+.5, endypath+.5);
 	ctx.stroke();
 	}
   else
 	{
-	//startX+=.5
-	//startY+=.5
-	//endY+=.5
-	//midX+=.5
 	  ctx.beginPath();
-	  ctx.moveTo(startX, startY);
-	  ctx.lineTo(midX, startY);
-	  ctx.lineTo(midX, endypath);
-	  ctx.lineTo(endxpath, endypath);
+	  ctx.moveTo(startX+.5, startY+.5);
+	  ctx.lineTo(midX+.5, startY+.5);
+	  ctx.lineTo(midX+.5, endypath+.5);
+	  ctx.lineTo(endxpath+.5, endypath+.5);
 	  ctx.stroke();
 	  
 	}
@@ -2728,24 +2778,23 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	  // Pointe de flèche
 	  const size = 8;
 	  ctx.beginPath();
-	if(AnArrow.topos=="left")
+	  
+	var reverse = 1;
+	if(AnArrow.topos=="left"||AnArrow.topos=="right")
 		{
+		if(AnArrow.topos=="right")reverse = -1;
 		ctx.moveTo(endX, endY);
-		ctx.lineTo(endX - size*2, endY - size);
-		ctx.lineTo(endX - size*2, endY + size);
+		ctx.lineTo(endX - size*2*reverse, endY - size);
+		ctx.lineTo(endX - size*2*reverse, endY + size);
 		}
-	if(AnArrow.topos=="top")
+	if(AnArrow.topos=="top"||AnArrow.topos=="bottom")
 		{
+		if(AnArrow.topos=="bottom")reverse = -1;
 		ctx.moveTo(endX, endY);
-		ctx.lineTo(endX - size, endY - size*2);
-		ctx.lineTo(endX + size, endY - size*2);
+		ctx.lineTo(endX - size, endY - size*2*reverse);
+		ctx.lineTo(endX + size, endY - size*2*reverse);
 		}
-	if(AnArrow.topos=="bottom")
-		{
-		ctx.moveTo(endX, endY);
-		ctx.lineTo(endX - size, endY - size*-2);
-		ctx.lineTo(endX + size, endY - size*-2);
-		}
+
 	  ctx.closePath();
 	  ctx.fillStyle = AnArrow.col;
 	  ctx.fill();
@@ -2945,6 +2994,7 @@ function click_arrowdot(dot, event) {
 function at4a_resizeCanvas() {
   at4a_canvas.width = window.innerWidth;
   at4a_canvas.height = window.innerHeight;
+  at4a_showarrow()
 }
 
 
@@ -2952,7 +3002,7 @@ function at4a_resizeCanvas() {
 
 function installArrowCanvasFollowMouse(options = {}) {
   const {
-    zIndex = 999999,
+    zIndex = 90,
     lineWidth = 3,
     headLength = 14,
     strokeStyle = "rgba(255, 0, 0, 0.9)",
@@ -3300,6 +3350,8 @@ function dragdropbulle(elem, e) {
 
 if(!document.querySelector('.at4a_scenar_mod')) return; // not Modify mod
 
+	if(!elem.classList.contains('newbulle'))
+		bulle_edit(elem);
 
   e.preventDefault();
   elem.classList.add('bulledrag')
@@ -3378,12 +3430,6 @@ release_arrow();
 		containerRect.appendChild(NEWdiv);
 
 		var NEWdivedit = document.createElement("div");
-		NEWdivedit.className = "bulleedit";
-		NEWdivedit.setAttribute("onmousedown", "bulle_edit(this)");
-		NEWdivedit.innerText='✎'
-		NEWdiv.appendChild(NEWdivedit);
-
-		var NEWdivedit = document.createElement("div");
 		NEWdivedit.className = "probaicon";
 		NEWdivedit.dataset.value = 3;
 		NEWdivedit.innerText="⚠️"
@@ -3392,7 +3438,8 @@ release_arrow();
 
 //		//back to place
 		elem.style.left = 20+"px";
-
+		
+		bulle_edit(NEWdiv);
 		}
 		redraw_newbulle()
   }
@@ -3422,6 +3469,12 @@ at4a_bulleinfotexte.value = at4a_bull_sel.querySelector('.bulletxt').innerText
 at4a_proba_succes.value = at4a_bull_sel.querySelector('.probaicon').dataset.value
 
 at4a_but_click_target.style.visibility = at4a_bull_sel.closest('#col4') ? "visible" : "hidden";
+
+if(at4a_bull_sel.classList.contains('at4a_target'))
+	{
+	at4a_but_click_target.classList.add('at4a_target_clicked')
+	}
+else at4a_but_click_target.classList.remove('at4a_target_clicked')
 }
 
 
@@ -3476,12 +3529,200 @@ at4a_showarrow()
 
 function at4a_click_target()
 {
-
-
-document.querySelectorAll('.at4a_target').forEach(e => e.classList.remove('at4a_target'));
-//at4a_but_click_target
-at4a_bull_sel.classList.add('at4a_target')
+var divC=at4a_bull_sel.classList
+if(divC.contains('at4a_target'))
+	{
+	divC.remove('at4a_target')
+	at4a_but_click_target.classList.remove('at4a_target_clicked')
+	}
+else
+	{
+	divC.add('at4a_target')
+	at4a_but_click_target.classList.add('at4a_target_clicked')
+	}
 }
+
+function at4a_exploit_list()
+{
+show_divcenter()
+at4a_exploitlist.style.display="block"
+
+
+
+var colid = at4a_bull_sel.closest('.col').id.charAt(3)
+
+loadmitre(colid)
+}
+
+
+function filterByTactics(data, allowedTactics) {
+  return data.filter(row => allowedTactics.includes(row[0]));
+}
+
+
+function loadmitre(mitreID)
+{
+var MITRE_LIST2EBIOS=`
+TA0043	T1585	Establish Accounts	Création de comptes factices pour préparer une attaque ciblée
+TA0043	T1586	Compromise Accounts	Compromission de comptes tiers pour collecter des informations
+TA0043	T1587	Develop Capabilities	Développement d’outils adaptés au contexte technique cible
+TA0043	T1588	Obtain Capabilities	Acquisition d’outils ou services nécessaires à l’attaque
+TA0043	T1589	Gather Victim Identity Information	Collecte d’informations sur les personnes clés de l’organisation
+TA0043	T1590	Gather Victim Network Information	Collecte d’informations sur l’architecture et l’exposition réseau
+TA0043	T1591	Gather Victim Organization Information	Collecte d’informations sur la structure et les partenaires
+TA0043	T1592	Gather Victim Host Information	Identification des systèmes, serveurs et technologies utilisés
+TA0043	T1593	Search Open Websites/Domains	Recherche d’informations via sites et sources ouvertes
+TA0043	T1594	Search Victim-Owned Websites	Analyse des sites de la cible pour détecter des informations utiles
+TA0043	T1595	Active Scanning	Scan actif des services exposés et vulnérabilités potentielles
+TA0043	T1596	Search Open Technical Databases	Recherche d’informations techniques en bases publiques
+TA0043	T1597	Search Closed Sources	Recherche d’informations via sources fermées ou clandestines
+TA0043	T1598	Phishing for Information	Obtention d’informations par hameçonnage ou ingénierie sociale
+TA0043	T1599	Network Boundary Bridging	Préparation d’un rebond entre environnements interconnectés
+
+TA0042	T1583	Acquire Infrastructure	Acquisition ou location d’infrastructures techniques d’attaque
+TA0042	T1584	Compromise Infrastructure	Compromission d’infrastructures tierces pour masquer l’origine
+TA0042	T1585	Establish Accounts	Création de comptes numériques pour préparer une intrusion
+TA0042	T1586	Compromise Accounts	Compromission de comptes existants pour usurpation d’identité
+TA0042	T1587	Develop Capabilities	Développement ou adaptation d’outils malveillants ciblés
+TA0042	T1588	Obtain Capabilities	Achat d’outils offensifs ou d’accès initiaux
+TA0042	T1608	Stage Capabilities	Pré-positionnement d’infrastructures ou charges malveillantes
+
+TA0001	T1566	Phishing	Obtention d’un accès initial par hameçonnage
+TA0001	T1190	Exploit Public-Facing Application	Exploitation d’une vulnérabilité sur service exposé Internet
+TA0001	T1133	External Remote Services	Accès initial via un service distant légitime
+TA0001	T1078	Valid Accounts	Utilisation de comptes valides pour accéder aux systèmes
+TA0001	T1189	Drive-by Compromise	Compromission via la consultation d’un site web piégé
+TA0001	T1200	Hardware Additions	Introduction d’un équipement physique malveillant
+TA0001	T1195	Supply Chain Compromise	Compromission via un fournisseur ou prestataire lié
+TA0001	T1199	Trusted Relationship	Exploitation d’une relation de confiance interconnectée
+
+TA0002	T1059	Command and Scripting Interpreter	Exécution de commandes via interpréteur natif du système
+TA0002	T1204	User Execution	Exécution de code malveillant après action utilisateur
+TA0002	T1047	Windows Management Instrumentation	Exécution de commandes via mécanismes WMI
+TA0002	T1053	Scheduled Task/Job	Exécution différée via tâche planifiée
+TA0002	T1129	Shared Modules	Chargement d’une bibliothèque malveillante en mémoire
+TA0002	T1106	Native API	Exécution d’actions via appels API natives
+TA0002	T1569	System Services	Exécution par création ou modification d’un service
+TA0002	T1559	Inter-Process Communication	Exécution via mécanismes de communication inter-processus
+TA0002	T1609	Container Administration Command	Exécution de commandes dans un environnement conteneurisé
+
+TA0003	T1547	Boot or Logon Autostart Execution	Exécution automatique au démarrage ou à la connexion
+TA0003	T1136	Create Account	Création d’un compte local, domaine ou cloud persistant
+TA0003	T1098	Account Manipulation	Modification de droits ou paramètres de comptes existants
+TA0003	T1505	Server Software Component	Implantation d’un composant malveillant sur serveur
+TA0003	T1574	Hijack Execution Flow	Détournement du flux d’exécution d’une application
+TA0003	T1543	Create or Modify System Process	Création ou modification d’un processus système
+TA0003	T1546	Event Triggered Execution	Persistance déclenchée par un événement système
+TA0003	T1176	Browser Extensions	Installation d’une extension navigateur malveillante
+TA0003	T1525	Implant Internal Image	Déploiement d’une image système compromise
+TA0003	T1556	Modify Authentication Process	Altération du mécanisme d’authentification
+
+TA0004	T1068	Exploitation for Privilege Escalation	Exploitation locale pour obtenir des privilèges supérieurs
+TA0004	T1078	Valid Accounts	Usage de comptes disposant de privilèges élevés
+TA0004	T1484	Domain or Tenant Policy Modification	Modification des politiques de sécurité du domaine
+TA0004	T1134	Access Token Manipulation	Manipulation de jetons d’accès pour élever les droits
+TA0004	T1548	Abuse Elevation Control Mechanism	Contournement des mécanismes de contrôle d’élévation
+
+TA0005	T1027	Obfuscated Files or Information	Obfuscation ou chiffrement du code pour éviter la détection
+TA0005	T1562	Impair Defenses	Désactivation ou altération des outils de sécurité
+TA0005	T1070	Indicator Removal	Suppression des journaux et traces d’activité
+TA0005	T1036	Masquerading	Usurpation de l’apparence de fichiers ou processus légitimes
+TA0005	T1218	Signed Binary Proxy Execution	Exécution via binaire légitime signé
+TA0005	T1497	Virtualization/Sandbox Evasion	Contournement des environnements d’analyse ou sandbox
+TA0005	T1222	File and Directory Permissions Modification	Modification des permissions pour dissimuler l’accès
+
+TA0006	T1003	OS Credential Dumping	Extraction d’identifiants stockés en mémoire système
+TA0006	T1555	Credentials from Password Stores	Extraction de mots de passe depuis navigateurs ou coffres
+TA0006	T1552	Unsecured Credentials	Exploitation d’identifiants stockés sans protection
+TA0006	T1110	Brute Force	Tentatives répétées pour deviner des identifiants
+TA0006	T1187	Forced Authentication	Forçage d’un système à révéler des informations d’authentification
+TA0006	T1539	Steal Web Session Cookie	Vol de cookie de session pour usurpation web
+
+TA0007	T1082	System Information Discovery	Identification des caractéristiques du système compromis
+TA0007	T1018	Remote System Discovery	Identification des systèmes accessibles sur le réseau
+TA0007	T1057	Process Discovery	Recensement des processus actifs sur le système
+TA0007	T1049	System Network Connections Discovery	Analyse des connexions réseau actives
+TA0007	T1069	Permission Groups Discovery	Identification des groupes et privilèges associés
+TA0007	T1087	Account Discovery	Recensement des comptes locaux ou domaine
+TA0007	T1518	Software Discovery	Identification des logiciels installés sur le système
+TA0007	T1482	Domain Trust Discovery	Identification des relations de confiance inter-domaines
+
+TA0008	T1021	Remote Services	Déplacement latéral via services distants légitimes
+TA0008	T1550	Use of Stolen Credentials	Rebond interne via identifiants compromis
+TA0008	T1210	Exploitation of Remote Services	Exploitation d’une vulnérabilité sur système interne
+TA0008	T1570	Lateral Tool Transfer	Transfert d’outils malveillants vers d’autres systèmes
+TA0008	T1563	Remote Service Session Hijacking	Détournement d’une session distante existante
+
+TA0009	T1560	Archive Collected Data	Compression ou archivage des données collectées
+TA0009	T1114	Email Collection	Collecte de courriels depuis un système compromis
+TA0009	T1005	Data from Local System	Collecte de données locales sur le système
+TA0009	T1039	Data from Network Shared Drive	Collecte de données depuis un partage réseau
+TA0009	T1113	Screen Capture	Capture d’écran pour collecter des informations
+TA0009	T1123	Audio Capture	Capture de flux audio du système compromis
+TA0009	T1119	Automated Collection	Collecte automatisée de données selon critères
+
+TA0011	T1071	Application Layer Protocol	Commande et contrôle via protocole applicatif légitime
+TA0011	T1095	Non-Application Layer Protocol	Commande et contrôle via protocole non standard
+TA0011	T1105	Ingress Tool Transfer	Téléchargement d’outils depuis infrastructure distante
+TA0011	T1573	Encrypted Channel	Utilisation d’un canal chiffré pour le C2
+TA0011	T1001	Data Obfuscation	Dissimulation des communications de commande
+TA0011	T1219	Remote Access Software	Utilisation d’un outil d’accès distant légitime
+
+TA0010	T1041	Exfiltration Over C2 Channel	Extraction de données via le canal C2 établi
+TA0010	T1567	Exfiltration Over Web Service	Exfiltration via service web ou cloud légitime
+TA0010	T1020	Automated Exfiltration	Extraction automatisée de données sensibles
+TA0010	T1011	Exfiltration Over Other Network Medium	Exfiltration via autre protocole réseau interne
+TA0010	T1052	Exfiltration Over Physical Medium	Extraction de données via support physique
+
+TA0040	T1486	Data Encrypted for Impact	Chiffrement massif de données à des fins d’extorsion
+TA0040	T1490	Inhibit System Recovery	Neutralisation des mécanismes de sauvegarde
+TA0040	T1485	Data Destruction	Destruction ou suppression irréversible de données
+TA0040	T1499	Endpoint Denial of Service	Interruption volontaire d’un système ou serveur
+TA0040	T1498	Network Denial of Service	Déni de service visant l’infrastructure réseau
+TA0040	T1565	Data Manipulation	Altération ou corruption volontaire de données
+TA0040	T1531	Account Access Removal	Suppression ou blocage de comptes légitimes`
+
+
+var MITRE_ARRAY = MITRE_LIST2EBIOS
+  .trim()                 // enlève les lignes vides début/fin
+  .split("\n")            // découpe en lignes
+  .map(line => line.split("\t")); // découpe chaque ligne en colonnes
+
+// MITRE -> EBIOS
+// https://club-ebios.org/site/wp-content/uploads/productions/ClubEBIOS-GuideMethodologique-Atelier4-V1.1.pdf page 33
+
+var get_mitr ="TA0043 TA0042"								// Reconnaitre
+if(mitreID==2)get_mitr ="TA0001 TA0002 TA0003 TA0004 TA0005"// Rentrer
+if(mitreID==3)get_mitr ="TA0006 TA0007 TA0008 TA0009"		// Trouver
+if(mitreID==4)get_mitr ="TA0011 TA0010 TA0040"				// Exploiter
+
+var filtered = filterByTactics(MITRE_ARRAY, get_mitr.split(' '));
+
+
+var HTML="";
+
+HTML +="<tr style='font-size:smaller'><td>MitreID</td><td style='text-align:center'> Description Ebios</td></tr>";
+
+filtered.forEach(function(element, index) {
+	HTML +="<tr><td><a href='https://attack.mitre.org/techniques/"+element[1]+"/' title='"+element[2]+"' target='_blank'>"+element[1]+"</a></td><td onclick='selectmitreebios(this.innerText)' class='mitre2ebiosclick'>"+element[3]+"</td></tr>";
+});
+
+
+tabmitre2ebios.innerHTML=HTML
+
+
+document.querySelectorAll(".mitreblockselected").forEach(e => e.classList.remove('mitreblockselected'));
+document.querySelector(".mitreblock"+mitreID).classList.add('mitreblockselected');
+}
+
+function selectmitreebios(txt)
+{
+at4a_bulleinfotexte.value=txt
+at4a_texte_change(at4a_bulleinfotexte)
+hide_divcenter()
+}
+
+
 </script>
 </head>
 <body onload="go()">
@@ -3672,12 +3913,12 @@ at4a_bull_sel.classList.add('at4a_target')
 <br/><br/><br/>
 
 
-<div id="div_menace">
+<div id="div_menace" style="padding:4px;">
 
 <div style="width:100%;font-size:larger;color:#fff;background-color:#251B36;padding: 6px 0;border-radius:6px;text-align:center;">Exposition <span id='calcexpotext'>AAA</span></div>
 <table style="width:100%;border-collapse: collapse;">
 <tr><td style="width:200px">
-<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 2px;">
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 4px;">
 <center>Dépendance</center>
 <p>La relation avec <span class='div_menacepptext'></span> est-elle vitale pour mon activité ?</p>
 </div>
@@ -3692,7 +3933,7 @@ at4a_bull_sel.classList.add('at4a_target')
 </td>
 </tr>
 <tr><td>
-<div style="background-color:#A5C6EE;border-radius:4px;padding:4px">
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 4px;">
 <center>Pénétration</center>
 <p>Quel sont les accès de <span class='div_menacepptext'></span> aux ressouces internes ?</p>
 </div>
@@ -3714,7 +3955,7 @@ de données, serveur web, serveur d’application...).</option>
 <div style="width:100%;font-size:larger;color:#fff;background-color:#251B36;padding: 6px 0;border-radius:6px;text-align:center;">Fiabilité cyber<span id='calcfiabtext'>BBB</span></div>
 <table style="width:100%;border-collapse: collapse;">
 <tr><td style="width:200px">
-<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 2px;">
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;margin-top: 4px;">
 <center>Maturité cyber</center>
 <p>Efficacité de <span class='div_menacepptext'></span> en matiere de sécurité ?</p>
 </div>
@@ -3729,7 +3970,7 @@ de données, serveur web, serveur d’application...).</option>
 </td>
 </tr>
 <tr><td>
-<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;">
+<div style="background-color:#A5C6EE;border-radius:4px;padding:4px;;margin-top: 4px;">
 <center>Confiance</center>
 <p>Les intentions ou les intérets de <span class='div_menacepptext'></span> peuvent m'etre contraires ?</p>
 </div>
@@ -3940,9 +4181,9 @@ Méthode  : Standard
 </td></tr/>
 </table>
 
-<div id="at4a_bulleinfo" style="wdith:800px;display:inline-block;margin-left:20px;visibility:hidden;">
+<div id="at4a_bulleinfo" style="width:1000px;display:inline-block;margin-left:20px;visibility:hidden;">
 
-<input id="at4a_bulleinfotexte" type="text" style="width:400px" onchange="at4a_texte_change(this)" onkeyup="at4a_texte_change(this)"/>
+<div id="at4a_bookexploit" onclick="at4a_exploit_list()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="30" height="30" fill="#000000" style="position:absolute;margin-top: -4px;  margin-left: -4px;"><path  d="M192 576h320c17.7 0 32-14.3 32-32s-14.3-32-32-32v-66.7c18.6-6.6 32-24.4 32-45.3V112c0-26.5-21.5-48-48-48H192c-53 0-96 43-96 96v320c0 53 43 96 96 96m-32-96c0-17.7 14.3-32 32-32h256v64H192c-17.7 0-32-14.3-32-32m208-252.8V240c0 8.8-7.2 16-16 16h-64c-8.8 0-16-7.2-16-16v-12.8c-19.4-11.7-32-30.3-32-51.2c0-35.3 35.8-64 80-64s80 28.7 80 64c0 20.9-12.6 39.5-32 51.2M304 176c0-8.8-7.2-16-16-16s-16 7.2-16 16s7.2 16 16 16s16-7.2 16-16m48 16c8.8 0 16-7.2 16-16s-7.2-16-16-16s-16 7.2-16 16s7.2 16 16 16m74.2 95.7c4.6 10.1.1 21.9-9.9 26.5L368.4 336l47.9 21.8c10.1 4.6 14.5 16.4 9.9 26.5s-16.4 14.5-26.5 9.9L320 358l-79.7 36.2c-10.1 4.6-21.9.1-26.5-9.9s-.1-21.9 9.9-26.5l47.9-21.8l-47.9-21.8c-10.1-4.6-14.5-16.4-9.9-26.5s16.4-14.5 26.5-9.9L320 314l79.7-36.2c10.1-4.6 21.9-.1 26.5 9.9"/></svg></div> <input id="at4a_bulleinfotexte" type="text" style="width:400px" onchange="at4a_texte_change(this)" onkeyup="at4a_texte_change(this)"/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -4152,6 +4393,47 @@ Description<br/>
 <center><button onclick="at3c_edit_ok()" style="padding:8px 16px;">Ok</button></center>
 <br/>
 </div>
+
+<div id="at4a_exploitlist" style="width:700px;">
+
+<div style="width:180px;display:inline-block;margin-top:8px">
+<div onclick="loadmitre(1)" class='mitreblock mitreblock1'>
+<span>&nbsp;Connaitre<span><br/>
+<span class='mitrename'>MITRE Reconnaissance</span><br/>
+<span class='mitrename'>MITRE Préparat. ressources</span><br/>
+</div>
+<br/>
+<div onclick="loadmitre(2)" class='mitreblock mitreblock2'>
+<span>&nbsp;Rentrer</span><br/>
+<span class='mitrename'>MITRE Accès initiaux</span><br/>
+<span class='mitrename'>MITRE Exécution</span><br/>
+<span class='mitrename'>MITRE Persistance</span><br/>
+<span class='mitrename'>MITRE Elévation privilèges</span><br/>
+<span class='mitrename'>MITRE Evasion de défense</span><br/>
+</div>
+<br/>
+<div onclick="loadmitre(3)" class='mitreblock mitreblock3'>
+<span>&nbsp;Trouver</span><br/>
+<span class='mitrename'>MITRE Récup. d'authent.</span><br/>
+<span class='mitrename'>MITRE Découverte</span><br/>
+<span class='mitrename'>MITRE Latéralisation</span><br/>
+<span class='mitrename'>MITRE Collecte</span><br/>
+</div>
+<br/>
+<div onclick="loadmitre(4)" class='mitreblock mitreblock4'>
+<span>&nbsp;Exploiter</span><br/>
+<span class='mitrename'>MITRE C&C</span><br/>
+<span class='mitrename'>MITRE Exfiltration</span><br/>
+<span class='mitrename'>MITRE Impact</span><br/>
+</div>
+</div>
+<div style="max-height:90vh;float: right; width: 520px; font-size:smaller;overflow: auto; scrollbar-width: thin;margin: 8px 0;">
+<table id="tabmitre2ebios" >
+
+</table>
+</div>
+</div>
+
 
 </div>
 
