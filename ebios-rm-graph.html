@@ -156,16 +156,22 @@ background-color:#F4B7BD;
 border-color:#000;
 }
 
-.close{
-display:inline-block;
+.at3_cat .close{
 position:absolute;
-top:0px;
-right:0px;
-padding: 8px 8px;
-
+top:-1px;
+left:-3px;
+padding: 8px;
 cursor:pointer;
+display:none;
+}
+.at3_cat:hover .close{
+display:inline-block;
 }
 
+.at3_pp .close{
+left:-23px;
+top:15px
+}
 
 #divgrey{
 position:fixed;
@@ -240,6 +246,7 @@ display:block;
 padding:4px;
 width:300px;
 margin-bottom:8px;
+padding-left: 20px;
 }
 
 .svgaddedclick{
@@ -248,7 +255,7 @@ cursor:pointer;
 
 
 .listblock{
-margin-left:8px;
+
 }
 
 #at2a_tablesrovexemple{
@@ -261,7 +268,7 @@ border-collapse:collapse;
 background-color:#d2b3d0;
 }
 
-#at2a_tablesrovexemple td, #at2a_srovlist td, #at2b_srovlist td{
+#at2a_tablesrovexemple td, #at2b_srovlist td{
 padding: 4px 8px;
 }
 .td_reducetext{
@@ -636,6 +643,72 @@ text-decoration:underline;
 cursor:pointer;
 background: #E9F3F9;
 }
+
+.big{
+border-radius:4px;
+color:#fff;
+padding:4px 8px;
+font-weight: bold;
+margin: 20px 15px 20px 20px;
+}
+
+.menacecolor{
+display:inline-block;
+padding:0px 8px;
+cursor:pointer;
+border-radius:4px;
+width:60px;
+background-color: rgb(246, 231, 66, 0.66);
+margin-top:2px;
+}
+
+#at2b_srovlist select{
+background:transparent;
+border:0;
+border-bottom:1px solid transparent;
+cursor:pointer;
+appearance: none;
+padding-right: 18px;
+}
+
+
+#at2b_srovlist tr:hover select{
+border-bottom:1px solid #ccc;
+appearance: auto;
+padding-right: 0px;
+}
+
+
+#at2b_srovlist tr:hover .at2b_deleterow span{
+visibility:visible;
+}
+.at2b_deleterow span{
+visibility:hidden;
+cursor:pointer;
+}
+
+
+.tabledeleicon{
+visibility:hidden;
+cursor:pointer;
+}
+
+table:hover .tabledeleicon{
+visibility:visible;
+}
+
+.pathover{
+outline-width: 2px;
+outline-color: #001E3C;
+outline-style: groove;
+}
+
+.bulleselected{
+outline-width: 2px;
+outline-color: #dd0000;
+outline-style: groove;
+}
+
 </style>
 
 
@@ -643,7 +716,7 @@ background: #E9F3F9;
 <script>
 var ipp = 0;
 var icat = 0;
-var version = 250117;
+var version = 260117;
 
 log = function() {    return Function.prototype.bind.call(console.log, console);}();
 warn = function() {    return Function.prototype.bind.call(console.warn, console);}();
@@ -678,7 +751,7 @@ HTML+="<input type=text value='Partie p. "+ipp+"'  onchange='chinput(this)'></in
 
 HTML+="<div class='close' onclick=deletepp(this)>X</div>"
 
-HTML+="<span class='menacelvl' onclick='chmenace(this)'>Menace : <span class='menace'>2.25</span> <div style='transform: scale(-1, 1);display: inline-block;font-size: 20px;'>&#x270E;</div></span><br/>"
+HTML+="<span class='menacelvl' onclick='chmenace(this)'>Menace <div class='menacecolor'><span class='menace'>2.25</span> <div style='transform: scale(-1, 1);display: inline-block;font-size: 20px;'>&#x270E;</div></span></div><br/>"
 
 
 
@@ -750,6 +823,7 @@ var newexpo = (dep.value*pen.value)
 var newfiab = (mat.value*conf.value)
 var newmenace=Math.round(newexpo/newfiab * 100) / 100
 
+clickmenace.querySelector('.menacecolor').style.backgroundColor=get_menacecolor(newmenace)
 clickmenace.querySelector('.menace').innerHTML=newmenace
 
 
@@ -760,6 +834,15 @@ div_menace.style.display='none'
 divgrey.style.display='none'
 
 at3a_redraw_graph()
+}
+
+function get_menacecolor(m)
+{
+if(m>=seuil3.value)return "#E3394AAA"
+if(m>=seuil2.value)return "#F6E742AA"
+if(m>=seuil1.value)return "#00A7A2AA"
+return "#8BCCCA"
+
 }
 
 function menace_set(clickmenacediv,e,f,m)
@@ -782,6 +865,7 @@ function at3a_newcat()
 var listblock = document.querySelector('.listblock')
 icat++
 var HTML ="<div class='at3_cat'>"
+HTML+="<div class='close' onclick=deletecat(this)>X</div>"
 
 var txt = "Clients"
 if(icat==2)txt = "Partenaires"
@@ -791,7 +875,7 @@ if(icat>4) txt = "Cat. "+icat
 HTML+="<input type=text value='"+txt+"' onchange='chinput(this)'></input> "
 HTML+='<button onclick="newpp(this)" style="height:24px;cursor:pointer"> + Partie prenante </button><br/>'
 
-HTML+="<div class='close' onclick=deletecat(this)>X</div>"
+
 
 
 
@@ -1074,7 +1158,7 @@ divversion.innerText="__divversion__"+version+"__divversion__"
 at3a_newcat()
 at3a_newcat()
 
-showatt('at4a',document.querySelector('.startscript'))
+showatt('at2abc',document.querySelector('.startscript'))
 }
 
 
@@ -1132,85 +1216,99 @@ if(at2a_text_ov.value=="")
 	{
 	return;
 	}
-	
-var nbline = at2a_srovlist.rows.length
-var sr="SR"+(nbline+1)
-for(var i=0;i<nbline;i++)
-	{
-	if(at2a_srovlist.rows[i].cells[2].innerText==at2a_text_sr.value)
-		{
-		sr=at2a_srovlist.rows[i].dataset.sr
-		break;
-		}
-	}
+
+var srlist=[]
 var ovlist=[]
+
 var idsrovlist=[]
-for(var i=0;i<nbline;i++)
+
+
+
+
+
+var nbline = at2b_srovlist.rows.length
+
+var SRfound = false;
+var OVfound = false;
+
+for(var i=1;i<nbline;i++)
 	{
-	ovlist.push(at2a_srovlist.rows[i].dataset.ov);
-	idsrovlist.push(at2a_srovlist.rows[i].dataset.idsrov);
-	}
+	srlist.push(at2b_srovlist.rows[i].cells[1].querySelector('select').value)
+	ovlist.push(at2b_srovlist.rows[i].cells[3].querySelector('select').value)
 	
-for(var ovi=1;ovi<9999;ovi++)
-	{
-	if(!ovlist.includes("OV"+ovi)) 
-		break;
+	if(!SRfound && at2b_srovlist.rows[i].cells[2].innerText==at2a_text_sr.value)
+		SRfound = srlist.pop()
+		
+	if(!OVfound && at2b_srovlist.rows[i].cells[4].innerText==at2a_text_ov.value)
+		OVfound = ovlist.pop()
 	}
 
-
-for(var idsrov=1;idsrov<9999;idsrov++)
+if(!SRfound)
 	{
-	if(!idsrovlist.includes("idsrov"+idsrov)) 
+	for(var sri=1;sri<9999;sri++)
 		{
-		idsrov="idsrov"+idsrov
+		if(!srlist.includes("SR"+sri)) 
+			break;
+		}
+	SRfound="SR"+sri
+	}
+if(!OVfound)
+	{
+	for(var ovi=1;ovi<9999;ovi++)
+		{
+		if(!ovlist.includes("OV"+ovi)) 
+			break;
+		}
+	OVfound="OV"+ovi
+	}
+
+var idsrov=1;
+while(at2b_srovlist.querySelector("[data-idsrov='"+idsrov+"']"))
+	{
+	idsrov++;
+
+	if(i>=9999)
+		{
+		alert("error 1228 : idsrov")
 		break;
 		}
 	}
 	
-
-var row = at2a_srovlist.insertRow();
-row.dataset.idsrov=idsrov
-row.dataset.sr=sr
-row.dataset.ov="OV"+ovi
-var cell0 = row.insertCell(0);
-var cell1 = row.insertCell(1);
-var cell2 = row.insertCell(2);
-var cell3 = row.insertCell(3);
-var cell4 = row.insertCell(4);
-cell0.innerHTML = "<input type='checkbox' />";cell0.className = "optioncolumn";
-cell1.innerHTML = sr;
-cell2.innerHTML = at2a_text_sr.value;
-cell3.innerHTML = "OV"+ovi;
-cell4.innerHTML = at2a_text_ov.value;
 
 var row = at2b_srovlist.insertRow();
 row.dataset.idsrov=idsrov
-var cell1 = row.insertCell(0);
-var cell2 = row.insertCell(1);
-var cell3 = row.insertCell(2);
-var cell4 = row.insertCell(3);
-var cell5 = row.insertCell(4);
-var cell6 = row.insertCell(5);
-var cell7 = row.insertCell(6);
-var cell8 = row.insertCell(7);
-var cell9 = row.insertCell(8);
+row.dataset.pertinence=1
 
-cell1.innerHTML = sr;
+var cell0 = row.insertCell();
+var cell1 = row.insertCell();
+var cell2 = row.insertCell();
+var cell3 = row.insertCell();
+var cell4 = row.insertCell();
+var cell5 = row.insertCell();
+var cell6 = row.insertCell();
+//var cell7 = row.insertCell(6);
+var cell8 = row.insertCell();
+var cell9 = row.insertCell();
+
+cell0.innerHTML = "<span onclick='at2b_deleterow(this)'>X</span>"
+cell0.className = "at2b_deleterow";
+cell1.innerHTML = at2b_selectsrov("SR",SRfound)
 cell2.innerHTML = at2a_text_sr.value;
-cell3.innerHTML = "OV"+ovi;
+cell3.innerHTML = at2b_selectsrov("OV",OVfound)
 cell4.innerHTML = "<div class='td_reducetext'>"+at2a_text_ov.value+"</div>"
 cell5.innerHTML = "<div class='mra2do'></div>";
 cell6.className = "at2b_pertinence";
-cell7.className = "at2b_center";
-cell7.innerHTML = "<select  onchange='at2c_chinput(this)'><option value='1'>1 - Faible</option><option value='2'>2 - Moyen</option><option value='3'>3 - Elevé</option></select>"
+//cell7.className = "at2b_center";
+//cell7.innerHTML = "<select  onchange='at2c_chinput(this)'><option value='1'>1 - Faible</option><option value='2'>2 - Moyen</option><option value='3'>3 - Elevé</option></select>"
 cell8.className = "at2b_center";
-cell8.innerHTML = "<input class='checkboxsrov' type='checkbox' onchange='clickcheck(this);at2b_redraw_graph(this)' style='cursor:pointer'/>"
+cell8.innerHTML = "<input class='checkboxsrov' type='checkbox' onchange='clickcheck(this);at2b_redraw_graph(this);at2c_redraw()' style='cursor:pointer'/>"
 cell9.innerHTML = "<textarea style='width:200px;height:90px' onchange='textreea_cleanhtml(this)'></textarea>"
 
 
 
 var row = at2c_srovlist.insertRow();
 row.dataset.idsrov=idsrov
+row.style.display="none"
 var cell1 = row.insertCell(0);
 var cell2 = row.insertCell(1);
 
@@ -1218,7 +1316,102 @@ cell1.innerHTML = at2a_text_sr.value;
 cell2.innerHTML = "<div class='td_reducetext'>"+at2a_text_ov.value+"</div>"
 
 
-create_mra2do()
+document.querySelectorAll(".mra2do").forEach(e => createmradiv(e));
+at2b_redraw_graph()
+}
+
+function at2b_deleterow(elm)
+{
+elm.closest('tr').remove();
+at2b_redraw_graph()
+at2c_redraw()
+}
+
+
+function at2b_selectsrov(type,id)
+{
+var HTML="<select onchange='at2b_redraw_graph()'>"
+
+for(var i=1;i<=20;i++)
+	{
+	var selected =""
+	
+	if(id==type+i)
+		selected ="SELECTED"
+	HTML+="<option value='"+type+i+"' "+selected+">"+type+i+"</option>"
+	}
+
+return HTML+"</select>"
+}
+
+function at2b_selectmra(type,id)
+{
+var HTML="<div style='display:inline-block'><select onchange='at2b_selectmrachange(this)'>"
+
+for(var i=1;i<=3;i++)
+	{
+	var selected =""
+	
+	if(id==type+i)
+		selected ="SELECTED"
+		
+	var name = "Motivation"
+	if(type=="r") name = "Ressource";
+	
+	var iname = "faible"
+	if(i==2) iname = "moyen"
+	if(i==3) iname = "élevé"
+	HTML+="<option value='"+type+i+"' "+selected+">"+name+ " "+iname+"</option>"
+	}
+
+return HTML+"</select></div>"
+}
+
+
+function at2b_selectmrachange(elm)
+{
+var eleminfo=elm.closest(".at2b_mra")
+
+var t = elm.value.charAt(0)
+var v = parseInt(elm.value.charAt(1));
+
+var c = "rgba(0, 167, 162, 0.667)"
+if(v==2) c="rgb(246, 231, 66, 0.66)"
+if(v==3) c="rgba(227, 57, 74, 0.667)"
+elm.parentElement.style.backgroundColor=c
+
+
+
+if(t=="m")	eleminfo.dataset.m=v
+if(t=="r")	eleminfo.dataset.r=v
+if(t=="a")	eleminfo.dataset.a=v
+
+
+var m = eleminfo.dataset.m
+var r = eleminfo.dataset.r
+//var a = eleminfo.dataset.a
+
+var pertinencecalc=m*r
+var pertinence=1
+if(pertinencecalc>2)pertinence=2
+if(pertinencecalc>4)pertinence=3
+
+var tr = elm.closest("tr")
+var perttd=tr.querySelector(".at2b_pertinence")
+
+
+var c=["#afa","#ffa","#faa"]
+var pert_text=["Faible","Moyen","Elevé"]
+
+tr.dataset.pertinence=pertinence
+perttd.style.backgroundColor=c[pertinence-1]
+perttd.innerText=pert_text[pertinence-1]
+
+
+
+
+//at2b_chmra_draw(eleminfo)
+at2b_redraw_graph()
 }
 
 
@@ -1227,14 +1420,14 @@ function textreea_cleanhtml(elem)
 elem.textContent=elem.value.replace("<br>","\n")
 }
 
-
+/*
 function at2c_chinput(elem)
 {
 var i = elem.selectedIndex
 document.querySelectorAll("option").forEach(e => e.removeAttribute('selected'));
 elem[i].setAttribute('selected','selected');
 }
-
+*/
 function clickcheck(elem)
 {
 if(elem.checked)
@@ -1249,30 +1442,21 @@ else
 	}
 }
 
-function create_mra2do(elem)
-{
-document.querySelectorAll(".mra2do").forEach(e => createmradiv(e));
 
-at2b_redraw_graph()
-}
 
 function createmradiv(elem)
 {
-elem.innerHTML="<div class='at2b_mra_m' onclick='at2b_chmra(this)'><div>Motivation</div></div><div class='at2b_mra_r' onclick='at2b_chmra(this)'><div>Ressources</div></div><div class='at2b_mra_a' onclick='at2b_chmra(this)'><div>Activité</div></div>"
+//elem.innerHTML="<div class='at2b_mra_m' onclick='at2b_chmra(this)'><div>Motivation</div></div><div class='at2b_mra_r' onclick='at2b_chmra(this)'><div>Ressources</div></div><div class='at2b_mra_a' onclick='at2b_chmra(this)'><div>Activité</div></div>"
+elem.innerHTML=at2b_selectmra("m",1)+at2b_selectmra("r",2)
 elem.className="at2b_mra"
 elem.dataset.m = "1"
 elem.dataset.r = "2"
 elem.dataset.a = "3"
-at2b_chmra_draw(elem)
+//at2b_chmra_draw(elem)
 }
 
 function at2a_choosesrov(elem)
 {
-/*
-if(at2a_text_ov.value.length>20)
-	if(!confirm('Effacer le texte "Objectifs Visés"'))
-		return;
-*/
 at2a_text_sr.value=elem.querySelectorAll("td")[0].innerText
 at2a_text_ov.value=elem.querySelectorAll("td")[1].innerText
 }
@@ -1295,13 +1479,46 @@ load_att(att)
 
 function load_att(att)
 {
-if(att=="at2b") at2b_redraw_graph()
-if(att=="at2c") at2c_redraw()
+if(att=="at2abc") at2b_redraw_graph()
 if(att=="at3a") at3a_redraw_graph()
 if(att=="at3b") at3b_redraw()
-if(att=="at4a") at4a_showarrow()
+if(att=="at4a") at4a_load()
 
 }
+
+function at4a_load()
+{
+
+if(document.querySelector('#at4a_canvas'))
+	at4a_canvas.remove(); // prevent bug
+
+if(!at4a_scenar.dataset.arrow)return;
+
+var JSONarrows = at4a_scenar.dataset.arrow
+
+if(!isValidJson(JSONarrows))
+	{
+	error("JSON ARROW INVALID :"+at4a_scenar.dataset.arrow)
+	return
+	}
+
+
+at4a_arrowlist=JSON.parse(JSONarrows)
+
+at4a_showarrow()
+at4a_refresh_path_at4b()
+}
+
+
+function isValidJson(json) {
+    try {
+        JSON.parse(json);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 
 function at2c_redraw()
 {
@@ -1321,7 +1538,7 @@ if(!toshow.length)
 	at2c_nosrov.style.display="block"
 }
 
-
+/*
 function at2b_chmra(elem)
 {
 var eleminfo=elem.closest(".at2b_mra")
@@ -1342,7 +1559,8 @@ if(elem.className=="at2b_mra_a") eleminfo.dataset.a=v
 at2b_chmra_draw(eleminfo)
 at2b_redraw_graph()
 }
-
+*/
+/*
 function at2b_chmra_draw(elem)
 {
 var m=parseInt(elem.dataset.m)
@@ -1377,14 +1595,10 @@ tr.dataset.pertinence=pertinence
 perttd.style.backgroundColor=c[pertinence-1]
 perttd.innerText=pert_text[pertinence-1]
 }
-
+*/
 function at2b_redraw_graph()
 {
 document.querySelectorAll('.svgadded, .svgaddedclick').forEach(e => e.remove());
-
-at2b_nosrov.style.display="block"
-if(at2b_srovlist.querySelector("[data-idsrov]")!=null)
-	at2b_nosrov.style.display="none"
 
 
 at2b_redraw_svg1()
@@ -1403,12 +1617,13 @@ var nbline = tab.rows.length
 var tabSR=[]
 var infoangleblock = {};
 
-for(var i=0;i<nbline;i++)
+for(var i=1;i<nbline;i++)
 	{
-	var txt = tab.rows[i].cells[0].innerText.trim()
+	var txt = tab.rows[i].cells[1].querySelector('select').value
 	if(txt)tabSR.push(txt)
 	}
 tabSR = [...new Set(tabSR)]; // filter unique
+
 
 
 var nbcats=tabSR.length
@@ -1488,9 +1703,9 @@ for(var icat=0;icat<nbcats;icat++)
 
 	var nbline = tab.rows.length
 	var OVelem=[];
-	for(var i=0;i<nbline;i++)
+	for(var i=1;i<nbline;i++)
 		{
-		if(tab.rows[i].cells[0].innerText.trim()==txtcat)
+		if(tab.rows[i].cells[1].querySelector('select').value==txtcat)
 			OVelem.push(tab.rows[i])
 		}
 	
@@ -1500,7 +1715,7 @@ for(var icat=0;icat<nbcats;icat++)
 		if(OVelem[i].querySelector('.checkboxsrov').checked)
 			color = "#FF3824"
 		
-		var OVtxt = OVelem[i].cells[2].innerText
+		var OVtxt = OVelem[i].cells[3].querySelector('select').value
 		
 		var distance = 250 - 50 * OVelem[i].dataset.pertinence*1.333
 
@@ -1553,6 +1768,7 @@ if(input.checked)
 else
 	input.checked=true
 at2b_redraw_graph()
+at2c_redraw();
 }
 
 
@@ -1564,7 +1780,19 @@ function at2b_redraw_svg2()
 var tab = document.querySelector('#at2b_srovlist')
 
 
-var nbcats=tab.rows.length-1
+var nbline = tab.rows.length 
+
+var tabOV=[]
+for(var i=1;i<nbline;i++)
+	{
+	var txt = tab.rows[i].cells[3].querySelector('select').value
+	if(txt)tabOV.push(txt)
+	}
+tabOV = [...new Set(tabOV)]; // filter unique
+
+
+
+var nbcats=tabOV.length
 
 
 for(var icat=0;icat<nbcats;icat++)
@@ -1612,47 +1840,7 @@ document.getElementById("at2b_svg2").insertBefore(newLine,at2b_svg2_bluecircle);
 
 
 
-//circle
-
-var colortxt = "#89C06D"
-if(tab.rows[icat+1].querySelector('.checkboxsrov').checked)
-	colortxt = "#FF3824"
-
-var SRtxt = tab.rows[icat+1].cells[0].innerText
-var OVtxt = tab.rows[icat+1].cells[2].innerText
-
-var distance = 250 - 50 * tab.rows[icat+1].dataset.pertinence*1.333
-
-var angler = middle4circle / 180 * Math.PI;
-var posx=Math.cos(angler) * distance
-var posy=Math.sin(angler) * distance
-
-var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
-newLine.setAttribute('class',"svgaddedclick");
-newLine.setAttribute('onclick',"at2b_clickcircle(this)");
-newLine.dataset.idsrov=tab.rows[icat+1].dataset.idsrov
-newLine.setAttribute('cx',posx);
-newLine.setAttribute('cy',posy);
-newLine.setAttribute('fill',colortxt);
-newLine.setAttribute('r',24);
-document.getElementById("at2b_svg2").append(newLine);
-
-var newLine = document.createElementNS('http://www.w3.org/2000/svg','text');
-newLine.setAttribute('class',"svgaddedclick");
-newLine.setAttribute('onclick',"at2b_clickcircle(this)");
-newLine.dataset.idsrov=tab.rows[icat+1].dataset.idsrov
-newLine.setAttribute('x',posx);
-newLine.setAttribute('y',posy+8);
-newLine.setAttribute('text-anchor',"middle");
-newLine.setAttribute('style',"fill:#fff");
-newLine.setAttribute('font-size',"18");
-newLine.setAttribute('font-weight',"bold");
-
-newLine.appendChild(document.createTextNode(SRtxt))
-
-document.getElementById("at2b_svg2").append(newLine);
-
-
+var txtcat=tabOV[icat]
 
 
 var angler = middle4circle / 180 * Math.PI;
@@ -1668,21 +1856,83 @@ newLine.setAttribute('style',"fill:"+color);
 newLine.setAttribute('font-size',"20");
 newLine.setAttribute('font-weight',"bold");
 
-newLine.appendChild(document.createTextNode(OVtxt))
+newLine.appendChild(document.createTextNode(txtcat))
 
 document.getElementById("at2b_svg2").append(newLine);
+
+// circle
+var anglestart = -35+icat*angle_p_cat
+var anglestop = -blockstart-angle_p_cat
+
+var txtcat=tabOV[icat]
+
+var nbline = tab.rows.length
+var SRelem=[];
+for(var i=1;i<nbline;i++)
+	{
+	if(tab.rows[i].cells[3].querySelector('select').value==txtcat)
+		SRelem.push(tab.rows[i])
+	}
+
+
+
+for(var i=0;i<SRelem.length;i++)
+	{
+	var color = "#89C06D"
+	if(SRelem[i].querySelector('.checkboxsrov').checked)
+		color = "#FF3824"
+	
+
+	var SRtxt = SRelem[i].cells[1].querySelector('select').value
+	var distance = 250 - 50 * SRelem[i].dataset.pertinence*1.333
+
+	var space_between_pp=(-anglestop-anglestart)/(SRelem.length+1)
+	
+	var angler = (-space_between_pp-anglestart-space_between_pp*i) / 180 * Math.PI;
+	var posx=Math.cos(angler) * distance
+	var posy=Math.sin(angler) * distance
+
+	var newLine = document.createElementNS('http://www.w3.org/2000/svg','circle');
+	newLine.setAttribute('class',"svgaddedclick");
+	newLine.setAttribute('onclick',"at2b_clickcircle(this)");
+	newLine.dataset.idsrov=SRelem[i].dataset.idsrov
+	newLine.setAttribute('cx',posx);
+	newLine.setAttribute('cy',posy);
+	newLine.setAttribute('fill',color);
+	newLine.setAttribute('r',24);
+	document.getElementById("at2b_svg2").append(newLine);
+	
+	var newLine = document.createElementNS('http://www.w3.org/2000/svg','text');
+	newLine.setAttribute('class',"svgaddedclick");
+	newLine.setAttribute('onclick',"at2b_clickcircle(this)");
+	newLine.dataset.idsrov=SRelem[i].dataset.idsrov
+	newLine.setAttribute('x',posx);
+	newLine.setAttribute('y',posy+8);
+	newLine.setAttribute('text-anchor',"middle");
+	newLine.setAttribute('style',"fill:#fff");
+	newLine.setAttribute('font-size',"18");
+	newLine.setAttribute('font-weight',"bold");
+	
+	var textNode = document.createTextNode(SRtxt);
+	newLine.appendChild(textNode)
+	
+	document.getElementById("at2b_svg2").append(newLine);
+	}
+
+
+
 }
 }
 
+/*
 function at2a_option(elem)
 {
 show_divmenuover(elem)
 
 divmenuover.innerHTML="<div onclick='at2a_chsr()'><div style='padding:0 0 0 4px;display: inline-block;font-size: 20px;'>&#x270E;</div> Changer SR</div>"
 divmenuover.innerHTML+="<div onclick='at2a_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
-
 }
-
+*/
 function at3b_option(elem)
 {
 show_divmenuover(elem)
@@ -1717,7 +1967,7 @@ divmenuover.style.display="none"
 document.removeEventListener("click", divmenuover_clickev); // Fails
 }
 
-
+/*
 function at2a_delete()
 {
 var ds = at2a_srovlist.querySelectorAll('input[type="checkbox"]:checked');
@@ -1735,7 +1985,9 @@ for(var i=0;i<todelete.length;i++)
 
 divmenuover_clickev(false)
 }
+*/
 
+/*
 function at2a_chsr()
 {
 divmenuover_clickev(false)
@@ -1758,7 +2010,7 @@ for(var i=0;i<ds.length;i++)
 	at2b_srovlist.querySelector("[data-idsrov='"+idsrov+"']").cells[0].innerText=newsr;
 	}
 }
-
+*/
 function at1c_newsmetier()
 {
 var row = at1c_table.insertRow();
@@ -1777,7 +2029,7 @@ at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
 
 function at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
 {
-cellA.innerHTML = "<input type='checkbox' />";
+cellA.innerHTML = "<span class='tabledeleicon' onclick='at1c_deleteline(this)'>X</span>";
 cellA.className = "optioncolumn";
 cellA.style.backgroundColor = "transparent";
 cell1.innerHTML = "Perte ou destruction des informations d’études et recherches conduisant à un fort impact, notamment sur les futures autorisations de mises sur le marché de l’entreprise";cell1.contentEditable=true
@@ -2427,13 +2679,6 @@ cell5.innerHTML = tr.cells[2].innerText
 
 }
 
-function at1c_option(elem)
-{
-show_divmenuover(elem)
-
-divmenuover.innerHTML="<div onclick='at1c_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
-}
-
 function at3c_option(elem)
 {
 show_divmenuover(elem)
@@ -2450,21 +2695,12 @@ divmenuover.style.display="block"
 }
 
 
-function at1c_delete()
+
+
+function at1c_deleteline(elm)
 {
 
-var lst = at1c_table.querySelectorAll('input[type="checkbox"]:checked')
-for(var i=lst.length;i>0;i--) // deleting last one first
-	{
-	at1c_deleteline(lst[i-1].closest('tr'))
-	}
-
-divmenuover_clickev(false)
-}
-
-function at1c_deleteline(tr)
-{
-
+var tr=elm.closest('tr')
 var nb_cell_full = at1c_table.querySelector('tr').cells.length
 
 var is_first = (tr.cells.length==nb_cell_full)
@@ -2596,6 +2832,9 @@ document.querySelectorAll('.scenarcont').forEach(el => {
 	});
 
 release_arrow()
+
+at4a_select(false)
+at4a_showarrow();
 }
 
 
@@ -2604,7 +2843,7 @@ release_arrow()
 function click_bulledot(elm,e)
 {
 
-  
+at4b_clean_overpath()
 
 var arrowTool = installArrowCanvasFollowMouse();
 arrowTool.startFromElement(e.currentTarget);
@@ -2644,14 +2883,16 @@ if(startEl.closest('.col')==endEl.closest('.col')) // is in same column ?
 
 	}
 
-var path = {from:startEl.parentElement.id,to:endEl.id,frompos:frompos,topos:topos,fromposxy:"",toposxy:"",col:at4a_arrow_col()}
+var path = {from:startEl.parentElement.id,to:endEl.id,frompos:frompos,topos:topos,fromposxy:"",toposxy:"",col:at4a_arrow_col(),over:0}
 
 
 at4a_arrowlist.push(path)
 
 last_selected_arrowid = at4a_arrowlist.length-1;
 
+at4a_save_arrows()
 at4a_showarrow()
+at4a_refresh_path_at4b()
 }
 
 function at4a_showarrow()
@@ -2682,43 +2923,61 @@ if(!at4a_canvas)
 const ctx = at4a_canvas.getContext('2d');
 ctx.clearRect(0, 0, at4a_canvas.width, at4a_canvas.height);
 
+var selected_line=0;
 // at4a_arrowlist
 for(var i=0;i<at4a_arrowlist.length;i++)
 	{
 	
+	if(selected_line)
+		{
+		selected_line=0;
+		}
+	else if(at4a_selectELM===i) // DRAW LINE TWICE
+		{
+		selected_line=1;
+		}
+	
+
+
 	var AnArrow = at4a_arrowlist[i]
 	
 
-	  var elmStart=	getpos(document.querySelector('#'+AnArrow.from),AnArrow.frompos,AnArrow.fromposxy,0)
-	  var elmStop=	getpos(document.querySelector('#'+AnArrow.to),AnArrow.topos,AnArrow.toposxy,0)
+	var elmStart=	getpos(document.querySelector('#'+AnArrow.from),AnArrow.frompos,AnArrow.fromposxy,0)
+	var elmStop=	getpos(document.querySelector('#'+AnArrow.to),AnArrow.topos,AnArrow.toposxy,0)
 
 
-	  var startX = elmStart.x
-	  var startY = elmStart.y
-	  var endX = elmStop.x
-	  var endY = elmStop.y
+	var startX = elmStart.x
+	var startY = elmStart.y
+	var endX = elmStop.x
+	var endY = elmStop.y
 	  
 	  
-	  ctx.strokeStyle = AnArrow.col;
-	  ctx.lineWidth = 3;
-	  ctx.beginPath();
+	ctx.strokeStyle = AnArrow.col;
+	ctx.lineWidth = 3;
+	if(selected_line)
+		{
+		ctx.strokeStyle = "#dd0000";
+		ctx.lineWidth = 6;
+		}
+		
+	ctx.beginPath();
 
-	  // Tracé orthogonal (L)
-		// trouver le centre de la ligne vertical-align
-		var colinfo =document.querySelector('#'+AnArrow.from).closest('.col').getBoundingClientRect();
-		var midX = colinfo.left+ colinfo.width+10
+	// Tracé orthogonal (L)
+	// trouver le centre de la ligne vertical-align
+	var colinfo =document.querySelector('#'+AnArrow.from).closest('.col').getBoundingClientRect();
+	var midX = colinfo.left+ colinfo.width+10
 
 
 	//midX+=.5
 
-   // meme col
-   var endxpath = endX
-   var endypath = endY
-   
-   if(AnArrow.topos=="left")	endxpath-=5;
-   if(AnArrow.topos=="right")	endxpath+=5;
-   if(AnArrow.topos=="top")		endypath-=5;
-   if(AnArrow.topos=="bottom")	endypath+=5;
+	// meme col
+	var endxpath = endX
+	var endypath = endY
+
+	if(AnArrow.topos=="left")	endxpath-=5;
+	if(AnArrow.topos=="right")	endxpath+=5;
+	if(AnArrow.topos=="top")	endypath-=5;
+	if(AnArrow.topos=="bottom")	endypath+=5;
    
   if(document.querySelector('#'+AnArrow.from).closest('.col')==document.querySelector('#'+AnArrow.to).closest('.col')) // meme block
 	{
@@ -2800,7 +3059,7 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	  ctx.fill();
 	  
 	  
-	  //begin point
+	 //begin point
 	var elmStart=	getpos(document.querySelector('#'+AnArrow.from),AnArrow.frompos,AnArrow.fromposxy,1)
 	
 	elmStart=mod_arrowdot(elmStart,AnArrow.frompos)
@@ -2826,7 +3085,10 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	NEWdiv.dataset.arrowid  = i
 	NEWdiv.dataset.arrowtype  = "end"
 	NEWdiv.setAttribute("onmousedown", "click_arrowdot(this,event)");
-	document.querySelector('#'+AnArrow.to).appendChild(NEWdiv);	
+	document.querySelector('#'+AnArrow.to).appendChild(NEWdiv);
+	
+	if(selected_line)
+		i--; // to redraw line
 	}
 
 }
@@ -2958,14 +3220,17 @@ function click_arrowdot(dot, event) {
 	
 	//var path = {from:startEl.parentElement.id,to:endEl.id,frompos:frompos,topos:topos,fromposxy:"",toposxy:""}
 
-	var arrowid = dot.dataset.arrowid
+	var arrowid = parseInt(dot.dataset.arrowid)
 	var arrowtype = dot.dataset.arrowtype
 	if(arrowtype=="start"){at4a_arrowlist[arrowid].frompos=arrowpos;at4a_arrowlist[arrowid].fromposxy=MODposxy;}
 	if(arrowtype=="end"){at4a_arrowlist[arrowid].topos=arrowpos;at4a_arrowlist[arrowid].toposxy=MODposxy;}
 	
 	at4a_col_2_picker(at4a_arrowlist[arrowid].col)
 	last_selected_arrowid = arrowid;
-	delete_arrow_icon.style.visibility="visible"
+	
+	at4a_select(last_selected_arrowid)
+	
+	//delete_arrow_icon.style.visibility="visible"
 	
 	
 	at4a_showarrow()
@@ -2983,6 +3248,7 @@ function click_arrowdot(dot, event) {
   function onUp() {
     document.removeEventListener("mousemove", onMove);
     document.removeEventListener("mouseup", onUp);
+	at4a_save_arrows()
   }
 
   document.addEventListener("mousemove", onMove);
@@ -3217,6 +3483,7 @@ if(last_selected_arrowid !== false)
 	{
 	last_selected_arrowid=parseInt(last_selected_arrowid)
 	at4a_arrowlist[last_selected_arrowid].col=at4a_arrow_col()
+	at4a_save_arrows()
 	at4a_showarrow()
 	}
 }
@@ -3224,7 +3491,7 @@ if(last_selected_arrowid !== false)
 function release_arrow()
 {
 last_selected_arrowid = false;
-delete_arrow_icon.style.visibility="hidden"
+//delete_arrow_icon.style.visibility="hidden"
 }
 
 
@@ -3348,7 +3615,9 @@ function dragdropresize(elem, e) {
 
 function dragdropbulle(elem, e) {
 
+at4b_clean_overpath()
 if(!document.querySelector('.at4a_scenar_mod')) return; // not Modify mod
+
 
 	if(!elem.classList.contains('newbulle'))
 		bulle_edit(elem);
@@ -3357,6 +3626,7 @@ if(!document.querySelector('.at4a_scenar_mod')) return; // not Modify mod
   elem.classList.add('bulledrag')
 
 release_arrow();
+at4a_showarrow()
 
   const parent = elem.offsetParent;
   if (!parent) return;
@@ -3415,6 +3685,7 @@ release_arrow();
 
 		var NEWdiv = document.createElement("div");
 		NEWdiv.className = "bulle";
+		if(containerRect.closest("#col4")) NEWdiv.className = "bulle at4a_target";
 		NEWdiv.style.position = "absolute";
 		NEWdiv.style.left = elem.style.left
 		NEWdiv.style.top  = elem.style.top
@@ -3441,7 +3712,9 @@ release_arrow();
 		
 		bulle_edit(NEWdiv);
 		}
-		redraw_newbulle()
+  
+  at4a_save_arrows()
+  redraw_newbulle()
   }
 
   document.addEventListener("mousemove", onMouseMove);
@@ -3450,7 +3723,18 @@ release_arrow();
 
 
 
+var at4a_selectELM=false;
 
+function at4a_select(elm)
+{
+at4a_selectELM=elm
+
+document.querySelectorAll('.bulleselected').forEach(e => e.classList.remove('bulleselected'));
+
+
+if(typeof elm==="object" && elm.classList.contains("bulle"))
+	at4a_bull_sel.classList.add("bulleselected")
+}
 
 var at4a_bull_sel=false;
 
@@ -3462,7 +3746,11 @@ event.stopPropagation();
 if(!document.querySelector('.at4a_scenar_mod')) return; // not Modify mod
 
 
+
 at4a_bull_sel = elm.closest('.bulle')
+
+at4a_select(at4a_bull_sel)
+
 at4a_bulleinfo.style.visibility="visible"
 
 at4a_bulleinfotexte.value = at4a_bull_sel.querySelector('.bulletxt').innerText
@@ -3488,6 +3776,8 @@ if(v==4)i="💥"
 
 at4a_bull_sel.querySelector('.probaicon').innerHTML=i
 at4a_bull_sel.querySelector('.probaicon').dataset.value=v
+
+at4a_refresh_path_at4b()
 }
 
 function at4a_texte_change(elm)
@@ -3499,6 +3789,13 @@ at4a_bull_sel.querySelector('.bulletxt').innerText=elm.value
 function at4a_delete()
 {
 
+if(typeof at4a_selectELM==="number")//bulle
+	{
+	delete_arrow()
+	return
+	}
+
+//arrow
 var idbulle = at4a_bull_sel.id
 
 at4a_arrowlist = at4a_arrowlist.filter(item =>  item.from !== idbulle && item.to !== idbulle);
@@ -3507,7 +3804,18 @@ at4a_bull_sel.remove()
 at4a_bull_sel=false;
 at4a_bulleinfo.style.visibility="hidden"
 at4a_but_click_target.style.visibility="hidden"
+
+at4a_save_arrows()
 at4a_showarrow()
+at4a_refresh_path_at4b()
+}
+
+
+function at4a_save_arrows()
+{
+var txt = JSON.stringify(at4a_arrowlist)
+
+at4a_scenar.dataset.arrow=txt
 }
 
 function at4a_find_text(elm)
@@ -3524,7 +3832,10 @@ function delete_arrow()
 {
 at4a_arrowlist.splice(last_selected_arrowid, 1);
 release_arrow()
+
+at4a_save_arrows()
 at4a_showarrow()
+at4a_refresh_path_at4b()
 }
 
 function at4a_click_target()
@@ -3540,6 +3851,8 @@ else
 	divC.add('at4a_target')
 	at4a_but_click_target.classList.add('at4a_target_clicked')
 	}
+	
+at4a_refresh_path_at4b()
 }
 
 function at4a_exploit_list()
@@ -3723,6 +4036,204 @@ hide_divcenter()
 }
 
 
+
+function allPaths(links, options = {}) {
+  const {
+    start = null,
+    end = null,
+    simple = true,
+    maxDepth = Infinity,
+  } = options;
+
+  // adjacency: from -> [edge, edge, ...]
+  const adj = new Map();
+  const inDeg = new Map();
+  const outDeg = new Map();
+  const nodesSet = new Set();
+
+  for (const e of links) {
+    nodesSet.add(e.from);
+    nodesSet.add(e.to);
+
+    if (!adj.has(e.from)) adj.set(e.from, []);
+    adj.get(e.from).push(e);
+
+    inDeg.set(e.to, (inDeg.get(e.to) || 0) + 1);
+    outDeg.set(e.from, (outDeg.get(e.from) || 0) + 1);
+
+    // init deg for missing keys
+    if (!inDeg.has(e.from)) inDeg.set(e.from, inDeg.get(e.from) || 0);
+    if (!outDeg.has(e.to)) outDeg.set(e.to, outDeg.get(e.to) || 0);
+  }
+
+  const nodes = [...nodesSet];
+
+  // Si start/end non fournis: on prend sources -> puits
+  const sources = start ? [start] : nodes.filter(n => (inDeg.get(n) || 0) === 0);
+  const sinks   = end   ? new Set([end]) : new Set(nodes.filter(n => (outDeg.get(n) || 0) === 0));
+
+  const results = [];
+
+  function dfs(current, pathNodes, pathEdges, visited) {
+    if (pathNodes.length > maxDepth) return;
+
+    // Si on est sur un puits (ou end)
+    if (sinks.has(current)) {
+      results.push({ nodes: [...pathNodes], edges: [...pathEdges] });
+      // note: si tu veux aussi continuer au-delà d'un sink, enlève ce return
+      return;
+    }
+
+    const nextEdges = adj.get(current) || [];
+    for (const edge of nextEdges) {
+      const nxt = edge.to;
+
+      if (simple && visited.has(nxt)) continue; // évite cycles
+
+      pathNodes.push(nxt);
+      pathEdges.push(edge);
+      if (simple) visited.add(nxt);
+
+      dfs(nxt, pathNodes, pathEdges, visited);
+
+      if (simple) visited.delete(nxt);
+      pathNodes.pop();
+      pathEdges.pop();
+    }
+  }
+
+  for (const s of sources) {
+    const visited = new Set([s]);
+    dfs(s, [s], [], visited);
+  }
+
+  return results;
+}
+
+
+
+
+
+
+function at4a_refresh_path_at4b()
+{
+
+var lst_target = document.querySelectorAll(".at4a_target")
+at4b_div.innerHTML = "";
+
+
+for(var i=0;i<lst_target.length;i++)
+	{
+	at4b_pathbulleID(lst_target[i].id)
+	}
+
+at4b_clean_overpath()
+}
+
+function at4b_clean_overpath()
+{
+at4a_arrowlist.forEach(e => e.over=0);
+document.querySelectorAll('.bulle').forEach(e => e.classList.remove('pathover'));
+}
+
+function overpath(elm)
+{
+
+at4b_clean_overpath()
+
+var pathinfo = JSON.parse(elm.dataset.pathfound)
+
+
+
+
+
+
+
+pathinfo.nodes.forEach(e => document.querySelector('#'+e).classList.add('pathover'));
+
+
+
+log(pathinfo)
+
+}
+
+
+function at4b_pathbulleID(bulleID)
+{
+
+log('BULLE ID'+bulleID)
+var pathinfo = allPaths(at4a_arrowlist,{end:bulleID})
+
+
+
+for(var i=0;i<pathinfo.length;i++)
+	{
+	var Pnodes = pathinfo[i].nodes;
+	log(pathinfo)
+	//at4b_div.innerHTML += "<span onmouseover='overpath(this)' data-pathfound='"+JSON.stringify(pathinfo[i])+"'>Chemin"+(i+1)+" : "
+	var vmax = -1;
+	for(var n=0;n<Pnodes.length-1;n++)
+		{
+		//at4b_div.innerHTML += Pnodes[n]+ "("+document.querySelector('#'+Pnodes[n]).querySelector('.probaicon').dataset.value+")"+"&gt;"
+		var VelemPath = document.querySelector('#'+Pnodes[n]).querySelector('.probaicon').dataset.value
+		if(VelemPath>vmax) vmaxSTD = VelemPath;
+		}
+	pathinfo[i].vraisemblanceSTD = vmaxSTD
+	//pathinfo[i].Ipathinfo = i
+	//at4b_div.innerHTML += "Objectif, vraisemblance chemin : "+vmaxSTD+"</span><br/>"
+	}
+	
+	
+
+//const pathinfoMAX = pathinfo.filter(obj => obj.vraisemblanceSTD === vmaxSTD);
+const pathinfoMAX = [...pathinfo].sort((a, b) => b.vraisemblanceSTD - a.vraisemblanceSTD);
+
+//at4b_div.innerHTML += "Scénario le plus vraisemblable ("+at4a_proba_succes.options[vmaxSTD].innerText +")<br/>"
+
+at4b_div.innerHTML += "Scénario classé par vraisemblance<br/>"
+
+var HTML="<table style='border-collapse:collapse;margin: 20px;'>"
+for(var i=0;i<pathinfoMAX.length;i++)
+	{
+	var path = pathinfoMAX[i]
+	var Vinfo = at4b_vraisemble_to_txtcol(path.vraisemblanceSTD)
+	HTML += "<tr style=background-color:#"+Vinfo.c+" onmouseover='overpath(this)' data-pathfound='"+JSON.stringify( path)+"'>"
+	HTML += "<td style='text-align: center;'><span style='font-weight:bold;'>V"+path.vraisemblanceSTD+"</span><br/>"+Vinfo.txt+"</td>"
+
+	HTML += "<td>"
+	for(var n=0;n<path.nodes.length-1;n++)
+		{
+		HTML += path.nodes[n]+"&gt;"
+		}
+
+	HTML += "</td>"
+	
+	HTML += "</tr>"
+	}
+
+at4b_div.innerHTML = HTML
+
+}
+
+function at4b_vraisemble_to_txtcol(x)
+{
+
+var c = "C5A900"
+var t = "Quasi certain"
+if (x==3){c="DCCB66";t = "Très vraisemblable"}
+if (x==2){c="EEE5B2";t = "Vraisemblable"}
+if (x<=1){c="F9F6E5";t = "Peu vraisemblable"}
+
+return {c:c,txt:t}
+}
+
+
+
+
+
+
+
+
 </script>
 </head>
 <body onload="go()">
@@ -3751,9 +4262,9 @@ hide_divcenter()
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
 
 <div id="atelier2" onmousedown="clickmenu(this)"><div class="mini at2bg">2</div>Source de risque</div>
-<div class="atelier2open submenu" onmousedown="showatt('at2a',this)"><div class="mini at2bg">A</div>Identification</div>
-<div class="atelier2open submenu" onmousedown="showatt('at2b',this)"><div class="mini at2bg">B</div>Pertinence</div>
-<div class="atelier2open submenu" onmousedown="showatt('at2c',this)"><div class="mini at2bg">C</div>Rétention</div>
+<div class="atelier2open submenu startscript" onmousedown="showatt('at2abc',this)"><div class="mini at2bg">A</div>Identification</div>
+<div class="atelier2open submenu" onmousedown="showatt('at2abc',this)"><div class="mini at2bg">B</div>Pertinence</div>
+<div class="atelier2open submenu" onmousedown="showatt('at2abc',this)"><div class="mini at2bg">C</div>Rétention</div>
 
 <div id="atelier3" onmousedown="clickmenu(this)"><div class="mini at3bg">3</div>Scénarios stratégiques</div>
 <div class="atelier3open submenu" onmousedown="showatt('at3a',this)"><div class="mini at3bg">A</div>Cartographie</div>
@@ -3762,8 +4273,8 @@ hide_divcenter()
 
 
 <div id="atelier4" onmousedown="clickmenu(this)"><div class="mini at4bg">4</div>Scénarios opérationnels</div>
-<div class="atelier4open submenu startscript" onmousedown="showatt('at4a',this)"><div class="mini at4bg">A</div>Scénarios</div>
-<div class="atelier4open submenu disabled" onmousedown="showatt('at4b',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
+<div class="atelier4open submenu" onmousedown="showatt('at4a',this)"><div class="mini at4bg">A</div>Scénarios</div>
+<div class="atelier4open submenu" onmousedown="showatt('at4a',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
 
 <div id="atelier5" onmousedown="clickmenu(this)"><div class="mini at5bg">5</div>Traitement du risque</div>
 <div class="atelier5open submenu disabled" onmousedown="showatt('at5a',this)"><div class="mini at5bg">A</div>Synthèse</div>
@@ -3780,14 +4291,14 @@ hide_divcenter()
 
 <br/>
 
-<span style="border-bottom:#FED6EB solid 3px;margin-left:20px;">Identification des événements redoutés</span>
+<span class="big at1bg">1.C</span><span style="border-bottom:#FED6EB solid 3px;">Identification des événements redoutés</span>
 <br/><br/><br/>
 <button onclick="at1c_newsmetier()" style="padding:8px 16px;margin: 16px;">Ajouter valeur métier</button><br/>
 
 <div id="at21c_maindiv" style="width:800px">
 
 <table id='at1c_table' style="width:100%;display: inline-block;"><tr style='color:#FB45A3'>
-<td class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;background-color:transparent;" onmousedown="at1c_option(this)"><b>...</b></td>
+<td style="background:#fff;"></td>
 <td class='at1c_tableheader'>Valeur métier</td>
 <td class='at1c_tableheader'>Evènement redouté</td>
 <td class='at1c_tableheader'>Impacts</td>
@@ -3797,33 +4308,25 @@ hide_divcenter()
 </div>
 
 </div>
-<div id="at2a">
 
+
+
+<div id="at2abc">
+<br/>
 <br/>
 
-<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Identification des SR/OV : <b>S</b>ources de <b>R</b>isque et <b>O</b>bjectifs <b>V</b>isés</span>
+<span class="big at2bg">2.A</span><span style="border-bottom:#E2D3E0 solid 3px;">Identification des SR/OV : <b>S</b>ources de <b>R</b>isque et <b>O</b>bjectifs <b>V</b>isés</span>
 <br/><br/><br/>
 <button onclick="at2a_newsrov()" style="padding:8px 16px;margin: 16px;">Ajouter SR/OV</button><br/>
 
-<table id="at2a_srovlist" style="width:600px;border-collapse: collapse;margin: 8px;border: 2px solid #E2D3E0;">
-<tr style='background-color:#E2D3E0'><td class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;" onmousedown="at2a_option(this)"><b>...</b></td><td></td><td width="130px">Source de risque</td><td width="40px"></td><td>Objectif visés</td></tr>
-</table>
-
-</div>
-
-
-<div id="at2b">
 <br/>
-<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Évaluation de la pertinence des SR/OV</span>
-<br/><br/><br/>
+<span class="big at2bg">2.B</span><span style="border-bottom:#E2D3E0 solid 3px;">Évaluation de la pertinence des SR/OV</span>
+<br/><br/>
 
 <table id="at2b_srovlist" style="width:1200px;border: 2px solid #E2D3E0;border-collapse:collapse;margin: 8px;">
-<tr style='background-color:#E2D3E0'><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td>Cotation</td><td>Pertinence</td><td>Pertinence retenue</td><td>Retenue</td><td>Justification</td></tr>
+<tr style='background-color:#E2D3E0'><td></td><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td>Cotation</td><td>Pertinence</td><td>Retenu</td><td>Justification</td></tr>
 </table>
 
-
-<br/>
-<div id="at2b_nosrov" style='text-align:center;'>Aucun SR/OV créer dans l'atelier 2-A</div>
 
 <br/>
 <div style="text-align:center;">
@@ -3884,20 +4387,16 @@ hide_divcenter()
 
 </svg>
 </div>
-</div>
 
-
-
-<div id="at2c">
 <br/>
-<span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">SR/OV retenus pour la suite de l’analyse</span>
-<br/><br/><br/>
+<br/>
+<span class="big at2bg">2.C</span><span style="border-bottom:#E2D3E0 solid 3px;">SR/OV retenus pour la suite de l’analyse</span>
 <br/>
 <br/>
 <table id="at2c_srovlist" class="tabletype" style="width:800px">
-<tr style="color:#000;font-weight:500"><td style="width:130px;text-align:left">Source de Risque</td><td>Objectif Visés</td></tr>
+<tr style="color:#000;font-weight:500"><td style="width:130px;text-align:left">Source de Risque</td><td style="text-align:left;">Objectif Visés</td></tr>
 </table>
-<div id="at2c_nosrov">Aucun SR/OV retenu dans l'atelier 2-B</div>
+<div id="at2c_nosrov">Aucun SR/OV retenu dans l'atelier 2.B</div>
 
 <br/>
 <br/>
@@ -3909,7 +4408,7 @@ hide_divcenter()
 
 <div id="at3a">
 <br/>
-<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Cartographie de dangerosité de l’écosystème et identification des parties prenantes critiques</span>
+<span class="big at3bg">3.A</span><span style="border-bottom:#CCEDEC solid 3px;">Cartographie de dangerosité de l’écosystème et identification des parties prenantes critiques</span>
 <br/><br/><br/>
 
 
@@ -4108,7 +4607,7 @@ Maturité cyber x Confiance
 
 <div id="at3b">
 <br/>
-<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Élaboration des scénarios stratégiques</span>
+<span class="big at3bg">3.B</span><span style="border-bottom:#CCEDEC solid 3px;">Élaboration des scénarios stratégiques</span>
 <br/><br/><br/>
 <button onclick="at3b_new()" style="padding:8px 16px;margin: 16px;">Nouveau scénario</button>
 <br/>
@@ -4135,7 +4634,7 @@ Maturité cyber x Confiance
 
 <div id="at3c">
 <br/>
-<span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Définition des mesures de sécurité sur l'écosystème</span>
+<span class="big at3bg">3.C</span><span style="border-bottom:#CCEDEC solid 3px;">Définition des mesures de sécurité sur l'écosystème</span>
 <br/><br/><br/>
 <button onclick="at3c_newsec()" style="padding:8px 16px;margin: 16px;">Ajouter</button><br/>
 <table id='at3c_table' class='tabletype'><tr>
@@ -4164,7 +4663,7 @@ Maturité cyber x Confiance
 
 <div id="at4a">
 <br/>
-<span style="border-bottom:#F4EECC solid 3px;margin-left:20px;">Élaboration des scénarios opérationnels</span>
+<span class="big at4bg">4.A</span><span style="border-bottom:#F4EECC solid 3px;">Élaboration des scénarios opérationnels</span>
 <br/><br/><br/>
 <table style="min-width:800px">
 <tr><td>
@@ -4176,7 +4675,6 @@ Méthode  : Standard
 <div style='background-color:#00AEAB' onclick="click_pick_col(this)"></div>
 <div style='background-color:#AE3A63' onclick="click_pick_col(this)"></div>
 <div style='background-color:#F19502' onclick="click_pick_col(this)"></div>
-&nbsp; <div id="delete_arrow_icon" style='visibility:hidden;transform: translateY(-4px);' onclick="delete_arrow(this)"> X </div>
 </span>
 </td></tr/>
 </table>
@@ -4194,7 +4692,7 @@ Probabilité de succès :
 <option value='1'>1 - Faible</option>
 <option value='2'>2 - Significative</option>
 <option value='3'>3 - Très élevée</option>
-<option value='4'>4 - Quasi-certaine</option>
+<option value='4'>4 - Quasi-certain</option>
 </select>
 
 <button id="at4a_but_click_target" style="margin-left: 20px;" onclick="at4a_click_target()">🎯</button>
@@ -4230,7 +4728,14 @@ Probabilité de succès :
 </div>
 
 
+<br/>
+<br/>
 
+<span class="big at4bg">4.B</span><span style="border-bottom:#F4EECC solid 3px;">Vraisemblance des scénarios opértionnels</span>
+<br/><br/>
+<div id="at4b_div"></div>
+<br/>
+<br/>
 
 </div>
 
@@ -4304,7 +4809,7 @@ Objectifs Visés<br/>
 <div id="at3b_newsscnear" style="width:700px">
 <br/><span style="border-bottom:#CCEDEC solid 3px;margin-left:20px;">Nouveau scénario stratégiques</span><br/><br/>
 <br/>
-<div id="at3b_nosrov">Aucun SR/OV retenu dans l'atelier 2-B</div>
+<div id="at3b_nosrov">Aucun SR/OV retenu dans l'atelier 2.B</div>
 <div id="at3b_1"></div>
 <br/>
 <div id="at3b_2"></div>
@@ -4370,7 +4875,7 @@ Description<br/>
 </tr>
 </table>
 <br/>
-<div id="at3c_nopp">Aucune partie prenante dans les scénarios de l'atelier 3-B.<br/><br/></div>
+<div id="at3c_nopp">Aucune partie prenante dans les scénarios de l'atelier 3.B.<br/><br/></div>
 <br/>
 <center><button onclick="at3c_newsec_add()" style="padding:8px 16px;">Ajouter</button></center>
 <br/>
