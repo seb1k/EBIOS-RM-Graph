@@ -14,10 +14,10 @@ EBIOS RM graph est un outil aidant à compléter les ateliers 2 et 3 en créant 
 Les graphiques peuvent être utilisés pour compléter des templates ou en tant qu'exemple.
 
 ## Creation de graph pour les ateliers
-- 1.C <br />
-- 2 <br />
-- 3 <br />
-- 4.A <br />
+- 1.C - Cadrage/Événements redoutés <br />
+- 2 - Source de risque<br />
+- 3 - Scénarios stratégiques<br />
+- 4 - Scénarios opérationnels <br />
 
 # Info
 - Basé sur le guide de l'ANSSI EBIOS RM V1.5
