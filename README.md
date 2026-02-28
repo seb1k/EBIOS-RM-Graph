@@ -13,11 +13,11 @@ Aide à créer des graphiques et schémas pour la méthode EBIOS Risk Manager
 
 ## Screenshot :
 
-### 2b
+### Pertinence des SR/OV
 <img src="https://raw.githubusercontent.com/seb1k/EBIOS-RM-Graph/refs/heads/main/img/2b-ebios-evaluation-pertinence-sources-de-risque-objectifs-visés.png" 
      alt="EBIOS RM 2b ebios-evaluation pertinence sources de risque objectifs visés" 
      width="300">
-### 3a
+### Cartographie de dangerosité
 <img src="https://raw.githubusercontent.com/seb1k/EBIOS-RM-Graph/refs/heads/main/img/3a-ebios-rm-scenarios-strategique-evaluation.png"
      alt="EBIOS RM scenarios-strategique-evaluation" 
      width="300">
@@ -27,13 +27,13 @@ Aide à créer des graphiques et schémas pour la méthode EBIOS Risk Manager
      
 
 
-### 4a
+### Scénarios opérationnels
 <img src="https://raw.githubusercontent.com/seb1k/EBIOS-RM-Graph/refs/heads/main/img/4a-ebios-scenarios-operationnels.png" 
      alt="EBIOS RM scenarios operationnels" 
      width="600">
 
 
-## Aide pour les ateliers
+## Assistance pour les ateliers
 - 1.C - Cadrage/Événements redoutés <br />
 - 2 - Source de risque<br />
 - 3 - Scénarios stratégiques<br />
