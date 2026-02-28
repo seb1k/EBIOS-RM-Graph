@@ -277,14 +277,16 @@ width:300px;
 overflow:auto;
 }
 
-.at2b_mra{
-height:90px;
-}
 .at2b_mra div{
-height:50%;
-line-height:45px;
+padding:4px;
+border-radius:4px;
 cursor:pointer;
 user-select: none;
+min-width:126px;
+}
+
+.at2b_mra div:not(:first-child) {
+margin-top:8px;
 }
 
 
@@ -1064,10 +1066,11 @@ col2.style.width=savedata.at4a.col2w+"px"
 col3.style.width=savedata.at4a.col3w+"px"
 col4.style.width=savedata.at4a.col4w+"px"
 
-stop_at4amod()
 
-at4a_showarrow()
+
+
 at4a_refresh_path_at4b()
+
 }
 
 
@@ -1841,7 +1844,7 @@ function load_att(att)
 if(att=="at2abc") at2b_redraw_graph()
 if(att=="at3a") at3a_redraw_graph()
 if(att=="at3b") at3b_redraw()
-if(att=="at4a") at4a_load()
+if(att=="at4a") {at4a_load()}
 
 }
 
@@ -1866,6 +1869,7 @@ at4a_arrowlist=JSON.parse(JSONarrows)
 
 at4a_showarrow()
 at4a_refresh_path_at4b()
+stop_at4amod()
 }
 
 
@@ -2450,7 +2454,7 @@ at3b_newsscnear.style.display="block"
 var toshow=[]
 at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
 
-var HTML="<table id='at3b_1table' class='tabletype'>"
+var HTML="<table id='at3b_1table' class='tabletype' style='min-width:680px'>"
 HTML+="<tr><td>Source de Risque</td><td>Objectif Visés</td></tr>"
 for(var i=0;i<toshow.length;i++)
 	{
@@ -4179,6 +4183,7 @@ function at4a_newbulle(id,parentelement,x,y,txt,proba,classname)
 	NEWdivedit.className = "probaicon";
 	NEWdivedit.dataset.value = proba;
 	NEWdivedit.innerHTML=at4a_iconproba(proba)
+	NEWdivedit.title=at4a_proba_succes.options[proba].innerText;
 	NEWdivedit.setAttribute("onmousedown", "bulle_edit(this)");
 	NEWdiv.appendChild(NEWdivedit);
 	return NEWdiv;
@@ -4230,7 +4235,6 @@ else at4a_but_click_target.classList.remove('at4a_target_clicked')
 
 
 
-
 function at4a_iconproba(v)
 {
 if(v==0)return "🟢"
@@ -4243,10 +4247,11 @@ if(v==4)return "💥"
 function at4a_proba_succes_change(v)
 {
 
+var icon = at4a_bull_sel.querySelector('.probaicon')
 
-at4a_bull_sel.querySelector('.probaicon').innerHTML=at4a_iconproba(v)
-at4a_bull_sel.querySelector('.probaicon').dataset.value=v
-
+icon.innerHTML=at4a_iconproba(v.value)
+icon.title=v.selectedOptions[0].innerText
+icon.dataset.value=v.value
 at4a_refresh_path_at4b()
 }
 
@@ -4671,11 +4676,13 @@ for(var i=0;i<pathinfoMAX.length;i++)
 	HTML += "<td style='text-align: center;'><span style='font-weight:bold;'>V"+path.vraisemblanceSTD+"</span><br/>"+Vinfo.txt+"</td>"
 
 	HTML += "<td>"
+	HTML += Vinfo.d
+	/*
 	for(var n=0;n<path.nodes.length-1;n++)
 		{
 		HTML += path.nodes[n]+"&gt;"
 		}
-
+	*/
 	HTML += "</td>"
 	
 	HTML += "</tr>"
@@ -4690,11 +4697,12 @@ function at4b_vraisemble_to_txtcol(x)
 
 var c = "C5A900"
 var t = "Quasi certain"
-if (x==3){c="DCCB66";t = "Très vraisemblable"}
-if (x==2){c="EEE5B2";t = "Vraisemblable"}
-if (x<=1){c="F9F6E5";t = "Peu vraisemblable"}
+var d="La source de risque va certainement atteindre son objectif visé selon l’un des modes opératoires envisagés.<br/>La vraisemblance du scénario est très élevée."
+if (x==3){c="DCCB66";t = "Très vraisemblable";d="La source de risque va probablement atteindre son objectif visé selon l’un des modes opératoires envisagés.<br/>La vraisemblance du scénario est élevée."}
+if (x==2){c="EEE5B2";t = "Vraisemblable";d="La source de risque est susceptible d’atteindre son objectif visé selon l’un des modes opératoires envisagés.<br/>La vraisemblance du scénario est significative."}
+if (x<=1){c="F9F6E5";t = "Peu vraisemblable";d="La source de risque a peu de chance d’atteindre son objectif visé selon l’un des modes opératoires envisagés.<br/>La vraisemblance du scénario est faible."}
 
-return {c:c,txt:t}
+return {c:c,txt:t,d:d}
 }
 
 
@@ -4794,7 +4802,7 @@ return {c:c,txt:t}
 <br/><br/>
 
 <table id="at2b_srovlist" style="width:1200px;border: 2px solid #E2D3E0;border-collapse:collapse;margin: 8px;">
-<tr style='background-color:#E2D3E0'><td></td><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td>Cotation</td><td>Pertinence</td><td>Retenu</td><td>Justification</td></tr>
+<tr style='background-color:#E2D3E0'><td></td><td></td><td width="130px">Source de Risque</td><td></td><td>Objectif Visés</td><td style="width:180px;">Cotation</td><td>Pertinence</td><td>Retenu</td><td>Justification</td></tr>
 </table>
 
 
@@ -5151,13 +5159,13 @@ Méthode  : Standard
 
 <div id="at4a_bulleinfo" style="width:1000px;display:inline-block;margin-left:20px;visibility:hidden;">
 
-<div id="at4a_bookexploit" onclick="at4a_exploit_list()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="30" height="30" fill="#000000" style="position:absolute;margin-top: -4px;  margin-left: -4px;"><path  d="M192 576h320c17.7 0 32-14.3 32-32s-14.3-32-32-32v-66.7c18.6-6.6 32-24.4 32-45.3V112c0-26.5-21.5-48-48-48H192c-53 0-96 43-96 96v320c0 53 43 96 96 96m-32-96c0-17.7 14.3-32 32-32h256v64H192c-17.7 0-32-14.3-32-32m208-252.8V240c0 8.8-7.2 16-16 16h-64c-8.8 0-16-7.2-16-16v-12.8c-19.4-11.7-32-30.3-32-51.2c0-35.3 35.8-64 80-64s80 28.7 80 64c0 20.9-12.6 39.5-32 51.2M304 176c0-8.8-7.2-16-16-16s-16 7.2-16 16s7.2 16 16 16s16-7.2 16-16m48 16c8.8 0 16-7.2 16-16s-7.2-16-16-16s-16 7.2-16 16s7.2 16 16 16m74.2 95.7c4.6 10.1.1 21.9-9.9 26.5L368.4 336l47.9 21.8c10.1 4.6 14.5 16.4 9.9 26.5s-16.4 14.5-26.5 9.9L320 358l-79.7 36.2c-10.1 4.6-21.9.1-26.5-9.9s-.1-21.9 9.9-26.5l47.9-21.8l-47.9-21.8c-10.1-4.6-14.5-16.4-9.9-26.5s16.4-14.5 26.5-9.9L320 314l79.7-36.2c10.1-4.6 21.9-.1 26.5 9.9"/></svg></div> <input id="at4a_bulleinfotexte" type="text" style="width:400px" onchange="at4a_texte_change(this)" onkeyup="at4a_texte_change(this)"/>
+<div id="at4a_bookexploit" onclick="at4a_exploit_list()" title="MITRE Exploit Database"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="30" height="30" fill="#000000" style="position:absolute;margin-top: -4px;  margin-left: -4px;"><path  d="M192 576h320c17.7 0 32-14.3 32-32s-14.3-32-32-32v-66.7c18.6-6.6 32-24.4 32-45.3V112c0-26.5-21.5-48-48-48H192c-53 0-96 43-96 96v320c0 53 43 96 96 96m-32-96c0-17.7 14.3-32 32-32h256v64H192c-17.7 0-32-14.3-32-32m208-252.8V240c0 8.8-7.2 16-16 16h-64c-8.8 0-16-7.2-16-16v-12.8c-19.4-11.7-32-30.3-32-51.2c0-35.3 35.8-64 80-64s80 28.7 80 64c0 20.9-12.6 39.5-32 51.2M304 176c0-8.8-7.2-16-16-16s-16 7.2-16 16s7.2 16 16 16s16-7.2 16-16m48 16c8.8 0 16-7.2 16-16s-7.2-16-16-16s-16 7.2-16 16s7.2 16 16 16m74.2 95.7c4.6 10.1.1 21.9-9.9 26.5L368.4 336l47.9 21.8c10.1 4.6 14.5 16.4 9.9 26.5s-16.4 14.5-26.5 9.9L320 358l-79.7 36.2c-10.1 4.6-21.9.1-26.5-9.9s-.1-21.9 9.9-26.5l47.9-21.8l-47.9-21.8c-10.1-4.6-14.5-16.4-9.9-26.5s16.4-14.5 26.5-9.9L320 314l79.7-36.2c10.1-4.6 21.9-.1 26.5 9.9"/></svg></div> <input id="at4a_bulleinfotexte" type="text" style="width:400px" onchange="at4a_texte_change(this)" onkeyup="at4a_texte_change(this)"/>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 
 Probabilité de succès :
-<select id="at4a_proba_succes" onchange="at4a_proba_succes_change(this.value)">
+<select id="at4a_proba_succes" onchange="at4a_proba_succes_change(this)">
 <option value='0'>0 - Très faible</option>
 <option value='1'>1 - Faible</option>
 <option value='2'>2 - Significative</option>
@@ -5201,7 +5209,7 @@ Probabilité de succès :
 <br/>
 <br/>
 
-<span class="big at4bg">4.B</span><span style="border-bottom:#F4EECC solid 3px;">Vraisemblance des scénarios opértionnels</span>
+<span class="big at4bg">4.B</span><span style="border-bottom:#F4EECC solid 3px;">Vraisemblance des scénarios opérationnels</span>
 <br/><br/>
 <div id="at4b_div"></div>
 <br/>
@@ -5388,6 +5396,10 @@ Description<br/>
 <div id="at4a_exploitlist" style="width:700px;">
 
 <div style="width:180px;display:inline-block;margin-top:8px">
+
+<img style="margin: 6px 12px;" src="data:image/png;base64,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"/>
+
+<br/>
 <div onclick="loadmitre(1)" class='mitreblock mitreblock1'>
 <span>&nbsp;Connaitre<span><br/>
 <span class='mitrename'>MITRE Reconnaissance</span><br/>
