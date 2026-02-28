@@ -19,6 +19,15 @@ Les graphiques peuvent être utilisés pour compléter des templates ou en tant 
 - 3 - Scénarios stratégiques<br />
 - 4 - Scénarios opérationnels <br />
 
+
+## Fonctionnalités
+- Interface claire et intuitive permettant une prise en main rapide.
+- Création des scénarios à la souris : construction visuelle des scénarios par glisser-déposer.
+- Aide à la création des scénarios opérationnels : intégration de la base MITRE traduite et adaptée à EBIOS RM pour guider l’analyse.
+- Sélection automatique du scénario opérationnel le plus vraisemblable : identification algorithmique du scénario le plus vraisemblable.
+- Mise à jour automatique des graphes
+
+
 # Info
 - Basé sur le guide de l'ANSSI EBIOS RM V1.5
 
