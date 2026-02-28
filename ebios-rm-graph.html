@@ -709,6 +709,17 @@ outline-color: #dd0000;
 outline-style: groove;
 }
 
+.at3b_sc:hover .editicon::after{
+content : '✎';
+position:absolute;
+right:0px;
+opacity:.7;
+transform: scaleX(-1);
+}
+
+.at3b_sc .editicon:hover{
+background-color:#aaa5;
+}
 </style>
 
 
@@ -716,13 +727,13 @@ outline-style: groove;
 <script>
 var ipp = 0;
 var icat = 0;
-var version = 260117;
+//var version = 260117;
 
 log = function() {    return Function.prototype.bind.call(console.log, console);}();
 warn = function() {    return Function.prototype.bind.call(console.warn, console);}();
 error = function() {    return Function.prototype.bind.call(console.error, console);}();
 
-
+/*
 function saveHTML(){localStorage.setItem("savetest", document.body.innerHTML);}
 
 function loadHTML(){
@@ -736,18 +747,355 @@ if(x[1] != ""+version)
 
 document.body.innerHTML = x;
 }
+*/
 
-function newpp(elem)
+
+
+function saveJSON(infile){
+
+
+
+
+var savedata = {}
+
+// AT1C
+savedata.at1c=[]
+for(var i=1;i<at1c_table.rows.length;i++)
+	{
+	var tr=at1c_table.rows[i];
+	var tabtr=[]
+
+	if(tr.cells.length==5)
+		{
+		tabtr.push(tr.cells[1].querySelector('p').innerText)
+		tabtr.push(tr.cells[2].innerText)
+		tabtr.push(tr.cells[3].innerText)
+		}
+	else
+		{
+		tabtr.push("")
+		tabtr.push(tr.cells[1].innerText)
+		tabtr.push(tr.cells[2].innerText)
+		}
+	
+
+	tabtr.push(tr.querySelector('.gravitespan').innerText)
+	
+	savedata.at1c.push(tabtr)
+	}
+
+// AT2B
+savedata.at2b=[]
+for(var i=1;i<at2b_srovlist.rows.length;i++)
+	{
+	var tr=at2b_srovlist.rows[i];
+	var tabtr=[]
+
+	tabtr.push(tr.cells[1].querySelector('select').value)
+	tabtr.push(tr.cells[2].innerText)
+	tabtr.push(tr.cells[3].querySelector('select').value)
+	tabtr.push(tr.cells[4].innerText)
+	tabtr.push(tr.cells[5].querySelector('.at2b_mra').dataset.m+'|'+tr.cells[5].querySelector('.at2b_mra').dataset.r)
+	tabtr.push(tr.cells[7].querySelector('input').checked)
+	tabtr.push(tr.cells[8].querySelector('textarea').value)
+	
+	savedata.at2b.push(tabtr)
+	}
+
+// AT3A
+savedata.at3a={seuil1:seuil1.value,seuil2:seuil2.value,seuil3:seuil3.value}
+
+var at3_cat=[]
+
+var lstcat = cont_at3a.querySelectorAll('.at3_cat')
+
+for(var i=0;i<lstcat.length;i++)
+	{
+	var c = lstcat[i];
+	var bloccat={name:c.querySelector('input').value}
+	var pp=[]
+	
+	c.querySelectorAll('.at3_pp').forEach(e => pp.push([e.dataset.ppuid,e.querySelector('input').value,parseInt(e.dataset.dep),parseInt(e.dataset.pen),parseInt(e.dataset.mat),parseInt(e.dataset.conf)]));
+	bloccat['pp']=pp
+	at3_cat.push(bloccat)
+	}
+savedata.at3a['cat']=at3_cat
+
+// AT3B
+
+savedata.at3b={}
+
+var lst=[]
+at3b_list.querySelectorAll('.at3b_sc').forEach(e => lst.push(e.dataset.attackinfo));
+savedata.at3b=lst
+
+
+// AT3C
+savedata.at3c=at3c_table.innerHTML
+
+
+// AT4A
+savedata.at4a={}
+
+
+var tabbulles=[]
+document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
+			tabbulles.push({id:el.id,
+							col:el.closest(".col").id,
+							x:el.offsetLeft,
+							y:el.offsetTop,
+							txt:el.querySelector('.bulletxt').innerText,
+							proba:parseInt(el.querySelector('.probaicon').dataset.value),
+							classname:el.className
+							})
+			})
+
+	
+	
+savedata.at4a={arrow:JSON.parse(at4a_scenar.dataset.arrow),tabbulles:tabbulles,col1w:col1.offsetWidth,col2w:col2.offsetWidth,col3w:col3.offsetWidth,col4w:col4.offsetWidth}
+
+if(infile)
+	{
+	const contenu = JSON.stringify(savedata, null, 2);
+	const blob = new Blob([contenu], { type: "text/plain;charset=utf-8;" });
+	const url = URL.createObjectURL(blob);
+
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = "backup.json";
+	document.body.appendChild(a);
+	a.click();
+
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+	}
+else
+	{
+	localStorage.setItem("saveJSON", JSON.stringify(savedata));
+	}
+
+
+}
+
+
+
+
+
+
+function demanderEtLireJSON() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json,.json";
+
+  input.onchange = function (event) {
+    const fichier = event.target.files[0];
+    if (!fichier) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function () {
+      try {
+		loadJSON(2,reader.result)
+
+      } catch (e) {
+        console.error("Fichier JSON invalide");
+      }
+    };
+
+    reader.readAsText(fichier, "utf-8");
+  };
+
+  input.click();
+}
+
+
+
+
+
+function loadJSON(infile,data){
+
+
+if(infile==1)
+	{
+	demanderEtLireJSON();
+	return;
+	}
+else if(infile==2)
+	{
+	var dataLS=data;
+	}
+else
+	{
+	if(!localStorage.getItem("saveJSON"))return;
+	var dataLS=localStorage.getItem("saveJSON")
+
+	}
+var savedata = JSON.parse(dataLS);
+
+
+
+// AT1C
+while(at1c_table.rows[1])at1c_table.rows[1].remove()
+
+
+var at1c = savedata.at1c
+
+	
+var ROWmain=false
+savedata.at1c.forEach(LineData => {
+	
+		if(LineData[0]!="")
+			{
+			var row = at1c_newsmetier()
+			row.cells[1].querySelector('p').innerText=LineData[0];
+			ROWmain=row;
+			var diff=0;
+			}
+		else 	
+			{
+			var row = at1c_newsevent(ROWmain)
+			var diff=1;
+			}
+
+	
+	row.cells[2-diff].innerText=LineData[1]
+	row.cells[3-diff].innerText=LineData[2]
+	var ig =parseInt(LineData[3])-1
+	
+	for (var i=0;i<ig;i++)
+		chtdgravite(row.cells[4-diff])
+	
+	});
+
+
+// AT2B
+while(at2b_srovlist.rows[1])at2b_srovlist.rows[1].remove()
+while(at2c_srovlist.rows[1])at2c_srovlist.rows[1].remove()
+
+
+var rowX=1;
+savedata.at2b.forEach(LineData => {
+
+	var tr = at2a_newsrovok("","")
+	
+	
+	tr.cells[1].querySelector('select').value=LineData[0]
+	tr.cells[2].innerText=LineData[1]
+	tr.cells[3].querySelector('select').value=LineData[2]
+	tr.cells[4].innerText=LineData[3]
+
+	var s=tr.cells[5].querySelector('.select_mra_m')
+	s.value="m"+LineData[4].split('|')[0]
+	at2b_selectmrachange(s)
+	var s=tr.cells[5].querySelector('.select_mra_r')
+	s.value="r"+LineData[4].split('|')[1]
+	at2b_selectmrachange(s)
+	
+	tr.cells[7].querySelector('input').checked=LineData[5] ;
+	tr.cells[8].querySelector('textarea').value=LineData[6]
+	
+	// AT2C
+	at2c_srovlist.rows[rowX].cells[0].innerText=LineData[1]
+	at2c_srovlist.rows[rowX].cells[1].querySelector('.td_reducetext').innerText=LineData[3]
+	rowX++;
+	})
+
+
+
+at2b_redraw_graph();at2c_redraw();
+
+
+
+// AT3A
+seuil1.value=savedata.at3a.seuil1
+seuil2.value=savedata.at3a.seuil2
+seuil3.value=savedata.at3a.seuil3
+
+while(cont_at3a.querySelector('.at3_cat'))cont_at3a.querySelector('.at3_cat').remove()
+
+savedata.at3a.cat.forEach(LineData => {
+	at3a_newcat(LineData.name)
+	
+	var but = cont_at3a.querySelectorAll('button')
+	var lastbut = but[but.length-1];
+	LineData.pp.forEach(pp => {
+							newpp(lastbut,pp[1])
+							var elm = cont_at3a.querySelectorAll('.at3_pp')
+							var lastelm = elm[elm.length-1];
+							lastelm.dataset.ppuid=pp[0]
+							clickmenace=lastelm;
+							dep.value=pp[2]
+							pen.value=pp[3]
+							mat.value=pp[4]
+							conf.value=pp[5]
+							menaceok()
+							})
+	})
+
+
+
+
+// AT3B
+at3b_list.querySelectorAll('.at3b_sc').forEach(e => e.remove());
+savedata.at3b.forEach(e => at3b_add(e));
+at3b_redraw()
+
+// AT3C
+at3c_table.innerHTML = savedata.at3c // yes, i'm lazy, but it works
+
+
+
+
+// AT4A
+at4a_scenar.querySelectorAll('.bulle:not(.newbulle)').forEach(e => e.remove());
+
+
+at4a_arrowlist=savedata.at4a.arrow
+at4a_scenar.dataset.arrow=JSON.stringify(savedata.at4a.arrow)
+
+
+
+savedata.at4a.tabbulles.forEach(e => {
+									at4a_newbulle(e.id,at4a_scenar.querySelector('#'+e.col+' .scenarcont'),e.x+"px",e.y+"px",e.txt,e.proba,e.classname)
+									});
+
+col1.style.width=savedata.at4a.col1w+"px"
+col2.style.width=savedata.at4a.col2w+"px"
+col3.style.width=savedata.at4a.col3w+"px"
+col4.style.width=savedata.at4a.col4w+"px"
+
+stop_at4amod()
+
+at4a_showarrow()
+at4a_refresh_path_at4b()
+}
+
+
+
+
+
+
+
+
+
+
+
+function newpp(elem,name)
 {
-if(!elem)	var inblock = document.querySelector('.at3_cat').querySelector('.listpp');
-else		var inblock= elem.closest('.at3_cat').querySelector('.listpp');
+var inblock= elem.closest('.at3_cat').querySelector('.listpp');
 
 ipp++
 
-var HTML ="<div class='at3_pp' data-expo='9' data-fiab='4' data-menace='2.25' data-dep='3' data-pen='3' data-mat='2' data-conf='2'>"
+var UID = Math.random().toString(36).slice(2)//self.crypto.randomUUID();
 
+var HTML ="<div class='at3_pp' data-expo='9' data-fiab='4' data-menace='2.25' data-dep='3' data-pen='3' data-mat='2' data-conf='2' data-ppuid='"+UID+"'>"
 
-HTML+="<input type=text value='Partie p. "+ipp+"'  onchange='chinput(this)'></input><br/>"
+if(!name)
+	{
+	ipp++
+	name="Partie p. "+ipp
+	}
+HTML+="<input type=text value='"+name+"'  onchange='chinput(this)'></input><br/>"
 
 HTML+="<div class='close' onclick=deletepp(this)>X</div>"
 
@@ -756,7 +1104,7 @@ HTML+="<span class='menacelvl' onclick='chmenace(this)'>Menace <div class='menac
 
 
 HTML+="</div>"
-inblock.innerHTML=inblock.innerHTML+HTML
+inblock.innerHTML+=HTML
 
 at3a_redraw_graph()
 }
@@ -841,7 +1189,7 @@ function get_menacecolor(m)
 if(m>=seuil3.value)return "#E3394AAA"
 if(m>=seuil2.value)return "#F6E742AA"
 if(m>=seuil1.value)return "#00A7A2AA"
-return "#8BCCCA"
+return "#DBF2FF"
 
 }
 
@@ -859,7 +1207,7 @@ clickmenacediv.dataset.menace = m
 
 
 
-function at3a_newcat()
+function at3a_newcat(name)
 {
 
 var listblock = document.querySelector('.listblock')
@@ -867,12 +1215,15 @@ icat++
 var HTML ="<div class='at3_cat'>"
 HTML+="<div class='close' onclick=deletecat(this)>X</div>"
 
-var txt = "Clients"
-if(icat==2)txt = "Partenaires"
-if(icat==3)txt = "Prestataires"
-if(icat==4)txt = "Interne"
-if(icat>4) txt = "Cat. "+icat
-HTML+="<input type=text value='"+txt+"' onchange='chinput(this)'></input> "
+if(!name)
+	{
+	var name = "Clients"
+	if(icat==2)name = "Partenaires"
+	if(icat==3)name = "Prestataires"
+	if(icat==4)name = "Interne"
+	if(icat>4) name = "Cat. "+icat
+	}
+HTML+="<input type=text value='"+name+"' onchange='chinput(this)'></input> "
 HTML+='<button onclick="newpp(this)" style="height:24px;cursor:pointer"> + Partie prenante </button><br/>'
 
 
@@ -885,7 +1236,7 @@ HTML+='<div class="listpp"></div>'
 
 
 HTML+="</div>"
-listblock.innerHTML=listblock.innerHTML+HTML
+listblock.innerHTML+=HTML
 
 at3a_redraw_graph()
 }
@@ -999,8 +1350,7 @@ for(var icat=0;icat<cats.length;icat++)
 		if(expo<3)rsize = "10"
 		newLine.setAttribute('r',rsize);
 		
-		newLine.setAttribute('stroke',"#aaa");
-		newLine.setAttribute('stroke-width',1);	
+
 
 		document.getElementById("at3a_svg").append(newLine);
 		}
@@ -1154,7 +1504,6 @@ at3a_redraw_graph()
 
 function go()
 {
-divversion.innerText="__divversion__"+version+"__divversion__"
 at3a_newcat()
 at3a_newcat()
 
@@ -1201,6 +1550,7 @@ if(isclose)
 document.querySelectorAll("."+id+"open").forEach(e => e.style.display=todo);
 }
 
+
 function at2a_newsrov()
 {
 show_divcenter()
@@ -1209,13 +1559,21 @@ at2a_text_sr.value=""
 at2a_text_ov.value=""
 }
 
-function at2a_newsrovok()
+function at2a_newsrovok_from_tab()
 {
 hide_divgrey()
 if(at2a_text_ov.value=="")
 	{
 	return;
 	}
+	
+	
+at2a_newsrovok(at2a_text_sr.value,at2a_text_ov.value)
+}
+
+function at2a_newsrovok(srtxt,ovtxt)
+{
+
 
 var srlist=[]
 var ovlist=[]
@@ -1236,10 +1594,10 @@ for(var i=1;i<nbline;i++)
 	srlist.push(at2b_srovlist.rows[i].cells[1].querySelector('select').value)
 	ovlist.push(at2b_srovlist.rows[i].cells[3].querySelector('select').value)
 	
-	if(!SRfound && at2b_srovlist.rows[i].cells[2].innerText==at2a_text_sr.value)
+	if(!SRfound && at2b_srovlist.rows[i].cells[2].innerText==srtxt)
 		SRfound = srlist.pop()
 		
-	if(!OVfound && at2b_srovlist.rows[i].cells[4].innerText==at2a_text_ov.value)
+	if(!OVfound && at2b_srovlist.rows[i].cells[4].innerText==ovtxt)
 		OVfound = ovlist.pop()
 	}
 
@@ -1293,9 +1651,9 @@ var cell9 = row.insertCell();
 cell0.innerHTML = "<span onclick='at2b_deleterow(this)'>X</span>"
 cell0.className = "at2b_deleterow";
 cell1.innerHTML = at2b_selectsrov("SR",SRfound)
-cell2.innerHTML = at2a_text_sr.value;
+cell2.innerHTML = srtxt;
 cell3.innerHTML = at2b_selectsrov("OV",OVfound)
-cell4.innerHTML = "<div class='td_reducetext'>"+at2a_text_ov.value+"</div>"
+cell4.innerHTML = "<div class='td_reducetext'>"+ovtxt+"</div>"
 cell5.innerHTML = "<div class='mra2do'></div>";
 cell6.className = "at2b_pertinence";
 //cell7.className = "at2b_center";
@@ -1306,18 +1664,19 @@ cell9.innerHTML = "<textarea style='width:200px;height:90px' onchange='textreea_
 
 
 
-var row = at2c_srovlist.insertRow();
-row.dataset.idsrov=idsrov
-row.style.display="none"
-var cell1 = row.insertCell(0);
-var cell2 = row.insertCell(1);
+var row2c = at2c_srovlist.insertRow();
+row2c.dataset.idsrov=idsrov
+row2c.style.display="none"
+var cell1 = row2c.insertCell(0);
+var cell2 = row2c.insertCell(1);
 
-cell1.innerHTML = at2a_text_sr.value;
-cell2.innerHTML = "<div class='td_reducetext'>"+at2a_text_ov.value+"</div>"
+cell1.innerHTML = srtxt;
+cell2.innerHTML = "<div class='td_reducetext'>"+ovtxt+"</div>"
 
 
 document.querySelectorAll(".mra2do").forEach(e => createmradiv(e));
 at2b_redraw_graph()
+return row
 }
 
 function at2b_deleterow(elm)
@@ -1346,7 +1705,7 @@ return HTML+"</select>"
 
 function at2b_selectmra(type,id)
 {
-var HTML="<div style='display:inline-block'><select onchange='at2b_selectmrachange(this)'>"
+var HTML="<div style='display:inline-block'><select class='select_mra_"+type+"' onchange='at2b_selectmrachange(this)'>"
 
 for(var i=1;i<=3;i++)
 	{
@@ -2025,6 +2384,7 @@ var cell3 = row.insertCell();
 
 cell0.innerHTML = "<p contenteditable='true'>R&D</p><div onclick='at1c_newsevent(this)' class='iconplus'>+</div>"; cell0.rowSpan=1; cell0.className="tdmetier";
 at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
+return row
 }
 
 function at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
@@ -2064,7 +2424,8 @@ return "#aaa"
 
 function at1c_newsevent(elem)
 {
-var td = elem.closest('tr').querySelectorAll('td')[1];
+if(elem.nodeName=="TD") var td = elem
+else var td = elem.closest('tr').querySelectorAll('td')[1];
 var rowIndex = elem.closest('tr').rowIndex
 
 var row = at1c_table.insertRow(rowIndex+td.rowSpan);
@@ -2076,6 +2437,7 @@ var cell2 = row.insertCell();
 var cell3 = row.insertCell();
 
 at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
+return row;
 }
 
 
@@ -2094,7 +2456,7 @@ for(var i=0;i<toshow.length;i++)
 	{
 	var rowscenar = document.querySelector('#at2b_srovlist').querySelector("[data-idsrov='"+toshow[i]+"']")
 
-	HTML+="<tr onclick='at3b_clickscenar(this)' style='cursor:pointer'><td>"+rowscenar.cells[1].innerText+"</td><td>"+rowscenar.cells[3].innerText+"</td></tr>"
+	HTML+="<tr onclick='at3b_clickscenar(this)' style='cursor:pointer'><td>"+rowscenar.cells[2].innerText+"</td><td>"+rowscenar.cells[4].innerText+"</td></tr>"
 	}
 HTML+="</table>"
 
@@ -2127,13 +2489,16 @@ elem.classList.add('selected')
 elem.style.backgroundColor="#ACC8C7"
 }
 
-function at3b_add()
+function at3b_add(from_save)
 {
 var txt1 ="Attaquant"
 var txt2 ="Production des vaccins"
-
+var txtOV = "SOCIÉTÉ"
+var icon1 = "testSR"
+var icon2 = "OVOV"
+var gravite = 1
+var attackpath=[]
 document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
-
 
 var row = at3b_1.querySelector('.selected')
 if(row)
@@ -2142,7 +2507,20 @@ if(row)
 	txt2 = row.cells[1].innerText
 	}
 
-var HTML = "<div class='at3b_sc scenarselected' style='position:relative' data-attackinfo='"+JSON.stringify({icon1:"testSR",txt1:txt1,txt2:txt2,ov:"SOCIÉTÉ",gravite:1, icon2:"OVOV", attackpath:[]})+"'>"
+if(from_save)
+	{
+	var fs = JSON.parse(from_save)
+	txt1 =	fs.txt1
+	txt2 =	fs.txt2
+	txtOV=	fs.ov
+	icon1=	fs.icon1
+	icon2=	fs.icon2
+	gravite=	fs.gravite
+	attackpath=	fs.attackpath
+	}
+
+
+var HTML = "<div class='at3b_sc scenarselected' style='position:relative' data-attackinfo='"+JSON.stringify({icon1:icon1,txt1:txt1,txt2:txt2,ov:txtOV,gravite:gravite, icon2:icon2, attackpath:attackpath})+"'>"
 HTML+="<div class='optioncolumn' style='transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;position:absolute;left:20px;top:10px' onmousedown='at3b_option(this)'><b>...</b></div>"
 HTML+="<div class='at3b_sc_left'> </div>"
 HTML+="<div class='at3b_sc_center'> </div>"
@@ -2150,10 +2528,13 @@ HTML+="<div class='at3b_sc_right'> </div>"
 HTML+="</div>"
 
 at3b_list.innerHTML+=HTML
+
+if(from_save) // from backup, we dont need the rest
+	return
+	
 hide_divgrey()
-
-
 at3b_add_attackpath(1)
+
 }
 
 function at3b_add_attackpath(x)
@@ -2309,23 +2690,23 @@ var scenarobj = JSON.parse(divsc.dataset.attackinfo)
 
 
 //text center
-divsc.querySelector('.at3b_sc_center').innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>ÉCOSYSTÈME</div>"
+divsc.querySelector('.at3b_sc_center').innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>ÉCOSYSTÈME</div>"
 
 //text right
-divsc.querySelector('.at3b_sc_right').innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>"+scenarobj.ov+"</div>"
+divsc.querySelector('.at3b_sc_right').innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>"+scenarobj.ov+"</div>"
 
 //SOURCE
 divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;border-radius:100px;width:76px;height:76px;left:59px;top:161px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 80px;'>SR</div>"
 divsc.innerHTML +="<div class='scadded' style='width:105px;height:140px;left:57px;top:140px;position: absolute;z-index:40;background-color:#fff'></div>"
 //SOURCE txt
-divsc.innerHTML +="<div class='scadded' style='font-weight:bold;color:#002742;left:20px;top:250px;width:160px;position: absolute;z-index:60;text-align:center;'>"+scenarobj.txt1+"</div>"
+divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;left:20px;top:250px;width:160px;position: absolute;z-index:60;text-align:center;'>"+scenarobj.txt1+"</div>"
 
 
 //Objectif
 divsc.innerHTML +="<div class='scadded' style='border:4px solid #E3394A;border-radius:100px;width:100px;height:100px;left:725px;top:148px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 100px;'>OV</div>"
 divsc.innerHTML +="<div class='scadded' style='width:120px;height:170px;left:695px;top:118px;position: absolute;z-index:40;background-color:#99DCDA'></div>"
 //Objectif txt
-divsc.innerHTML +="<div class='scadded' style='font-weight:bold;color:#E3394A;left:792px;bottom:260px;width:134px;position: absolute;z-index:60;text-align:center;font-size:12px'>"+scenarobj.txt2+"</div>"
+divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#E3394A;left:792px;bottom:260px;width:134px;position: absolute;z-index:60;text-align:center;font-size:12px'>"+scenarobj.txt2+"</div>"
 
 // 4 blocs cible
 divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:0;height:25px;left:777px;top:136px;position: absolute;z-index:60;'></div>"
@@ -2405,7 +2786,7 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 
 	if(sc.pp1!="")
 		{
-		var HTMLpp = "<div class='scadded' style='left:"+145+"px;top:"+(toptext-20)+"px;width:120px;height:40px;z-index:60;position:absolute;background-color:#CCEDEC;line-height: 100px;text-align: center;white-space: nowrap;'>"
+		var HTMLpp = "<div class='scadded' data-ppuid='SCPPUID' style='left:"+145+"px;top:"+(toptext-20)+"px;width:120px;height:40px;z-index:60;position:absolute;background-color:#CCEDEC;line-height: 100px;text-align: center;white-space: nowrap;'>"
 		HTMLpp +="<div class='scadded' style='left:25px;top:0px;width:70px;height:40px;position:absolute;background-color:#fff'>"
 
 		
@@ -2419,12 +2800,12 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 	divsc.querySelector('.at3b_sc_left').innerHTML+="<div class='optioncolumn scadded autohide' style='position:absolute;transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;right:0;top:"+(toptext-25)+"px;z-index:200' onmousedown='at3b_chpath(this,"+iatt+")'><b>...</b></div>"
 	
 	if(!sc.pp1)
-		divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:250px;top:"+(toptext-18)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:300px;text-align:center;'>"+sc.text+"</div>"
+		divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-size:14px;left:250px;top:"+(toptext-18)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:300px;text-align:center;'>"+sc.text+"</div>"
 	else
 		{
-		divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:205px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text+"</div>"
+		divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-size:14px;left:205px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text+"</div>"
 		if(sc.text2)
-			divsc.innerHTML +="<div class='scadded' style='font-size:14px;left:475px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text2+"</div>"
+			divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-size:14px;left:475px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text2+"</div>"
 		}
 	}
 }
@@ -2519,22 +2900,22 @@ var tabpps=[]
 for(var i=0;i<pps.length;i++)
 	{
 	var pp=pps[i]
-	tabpps.push([parseFloat(pp.dataset.menace),pp.querySelector('input').value ]);
+	tabpps.push([parseFloat(pp.dataset.menace),pp.querySelector('input').value,pp.dataset.ppuid ]);
 	}
 
 tabpps.sort(function(a,b) {return b[0]-a[0]}) // sort by menace
 
-at2c_nosrov.style.display="none"
+at3b_nosrov2.style.display="none"
 if(!tabpps.length) //demo Pp
 	{
-	at2c_nosrov.style.display="block"
-	tabpps=[[6,"Prestataire informatsique"],[4,"Fournisseurs"],[2,"Laboratoires"],[2,"Pharmacies"],[2,"Établissements de santé"]]
+	at3b_nosrov2.style.display="block"
+	tabpps=[[6,"Prestataire informatsique",0],[4,"Fournisseurs",0],[2,"Laboratoires",0],[2,"Pharmacies",0],[2,"Établissements de santé",0]]
 	}
 
-var HTML="<table style='border-collapse: collapse;'><tr><td>Pp.</td><td>Menace<td></tr>"
+var HTML="<table style='border-collapse: collapse;'><tr><td>Partie prenante</td><td>Menace<td></tr>"
 for(var i=0;i<tabpps.length;i++)
 	{
-	HTML+="<tr onmousedown='at3b_clickscenar(this)' data-idpath='"+idpath+"'style='cursor:pointer'><td>"+tabpps[i][1]+"</td><td> "+tabpps[i][0]+"</td></tr>"
+	HTML+="<tr onmousedown='at3b_clickscenar(this)' data-idpath='"+idpath+"' data-ppuid='"+tabpps[i][2]+"'style='cursor:pointer'><td>"+tabpps[i][1]+"</td><td> "+tabpps[i][0]+"</td></tr>"
 	}
 HTML+="</table>"
 
@@ -2546,6 +2927,7 @@ function at3b_addppok()
 {
 var divsc = document.querySelector('.scenarselected')
 var idpath = parseInt(at3b_addpp_1.querySelector('.selected').dataset.idpath)
+var ppuid = at3b_addpp_1.querySelector('.selected').dataset.ppuid
 var tr = at3b_addpp_1.querySelector('.selected')
 var txtPP = tr.querySelector('td').innerText
 var risk = tr.querySelectorAll('td')[1].innerText
@@ -2554,6 +2936,7 @@ var scenarobj = JSON.parse(divsc.dataset.attackinfo)
 if(!txtPP)txtPP="";
 scenarobj.attackpath[idpath].pp1 = txtPP
 scenarobj.attackpath[idpath].risk = risk
+scenarobj.attackpath[idpath].ppuid = ppuid
 
 divsc.dataset.attackinfo = JSON.stringify(scenarobj)
 
@@ -2612,6 +2995,7 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 		at3c_nopp_show=1;
 		var row = at3c_table_before.insertRow();
 		row.className="trdata"
+		row.dataset.ppuid=sc.ppuid
 		row.setAttribute('onclick','clickrow_at3c_table_before(this)');
 		
 		if(selectfirst){row.className+=" selected";selectfirst=false;}
@@ -2653,6 +3037,7 @@ function at3c_newsec_add()
 {
 var row = at3c_table.insertRow();
 row.className="trdata"
+
 row.setAttribute('onclick','at3c_edit(this)');
 var cell0 = row.insertCell();
 var cell1 = row.insertCell();
@@ -2667,16 +3052,29 @@ cell3.innerHTML = "<b></b><span></span>";cell3.dataset.detail = ""
 hide_divcenter()
 
 
-var tr = at3c_table_before.querySelector('.selected').closest('tr')
+var trselected = at3c_table_before.querySelector('.selected')
 
+if(trselected)
+	{
+	var tr=trselected.closest('tr')
+	row.dataset.ppuid=tr.dataset.ppuid
 
-cell1.innerHTML = tr.cells[0].innerText
-cell2.innerHTML = tr.cells[1].innerText
+	cell1.innerHTML = tr.cells[0].innerText
+	cell2.innerHTML = tr.cells[1].innerText
 
-cell4.innerHTML = tr.cells[2].innerText
-cell5.innerHTML = tr.cells[2].innerText
+	cell4.innerHTML = tr.cells[2].innerText
+	cell5.innerHTML = tr.cells[2].innerText
+	}
+else
+	{
+	row.dataset.ppuid=0
 
+	cell1.innerHTML = ""
+	cell2.innerHTML = ""
 
+	cell4.innerHTML = ""
+	cell5.innerHTML = ""
+	}
 }
 
 function at3c_option(elem)
@@ -2760,29 +3158,82 @@ at3c_table.querySelectorAll('.trselected').forEach(e => e.classList.remove('trse
 tr.classList.add('trselected');
 
 
-at3b_new_pp.value		=	tr.cells[1].innerText
+
 at3b_new_path.value		=	tr.cells[2].innerText
 
+at3b_new_descr.value	= tr.querySelector('.at3c_desc')		? tr.querySelector('.at3c_desc').innerText : "";
+at3b_new_detail.value	= tr.querySelector('.at3b_new_detail')	? tr.querySelector('.at3b_new_detail').innerText : "";
 
-at3b_new_mes.value		=	tr.cells[3].querySelector('b').innerText
-at3b_new_detail.innerHTML	=	tr.cells[3].querySelector('span').innerHTML
+// DATA FROM at 3.A
+var ppuid = tr.dataset.ppuid
+var PP = document.querySelector("[data-ppuid='"+ppuid+"']")
 
-at3b_new_menace.value	=	tr.cells[4].innerText
-at3b_new_menaceres.value=	tr.cells[5].innerText
 
+var PPname	=	PP ?	PP.querySelector('input').value	: tr.cells[2].innerText
+
+var d = PP ? PP.dataset.dep		:	2
+var p = PP ? PP.dataset.pen		:	2
+var m = PP ? PP.dataset.mat		:	2
+var c = PP ? PP.dataset.conf	:	2
+
+at3b_new_pp.value = PPname
+
+at3b_old_d.innerText=d
+at3b_old_p.innerText=p
+at3b_old_m.innerText=m
+at3b_old_c.innerText=c
+
+
+at3b_new_d.value=tr.dataset.new_d??d
+at3b_new_p.value=tr.dataset.new_p??p
+at3b_new_m.value=tr.dataset.new_m??m
+at3b_new_c.value=tr.dataset.new_c??c
+
+var vfinal = (d*p)/(m*c)
+at3b_old_calc.innerText=Math.round(vfinal*100)/100
+at3c_recalc()
 }
+
+
+function at3c_recalc()
+{
+var vfinal = (at3b_new_d.value*at3b_new_p.value)/(at3b_new_m.value*at3b_new_c.value)
+at3b_new_calc.innerText=Math.round(vfinal*100)/100
+}
+
+
 
 function at3c_edit_ok()
 {
 var tr = at3c_table.querySelector('.trselected')
 
+var new_d=at3b_new_d.value
+var new_p=at3b_new_p.value
+var new_m=at3b_new_m.value
+var new_c=at3b_new_c.value
+
+tr.dataset.new_d=new_d
+tr.dataset.new_p=new_p
+tr.dataset.new_m=new_m
+tr.dataset.new_c=new_c
+
+
+var txtresult = ""
+
+if(at3b_old_d.innerText!=new_d) txtresult +="("+at3b_old_d.innerText+"➜"+new_d+")"
+if(at3b_old_p.innerText!=new_p) txtresult +="("+at3b_old_p.innerText+"➜"+new_p+")"
+if(at3b_old_m.innerText!=new_m) txtresult +="("+at3b_old_m.innerText+"➜"+new_m+")"
+if(at3b_old_c.innerText!=new_c) txtresult +="("+at3b_old_c.innerText+"➜"+new_c+")"
+
+
 tr.cells[1].innerText	=	at3b_new_pp.value
 tr.cells[2].innerText	=	at3b_new_path.value
 
-tr.cells[3].innerHTML	=	"<b>"+at3b_new_mes.value+"</b><br/><span>"+at3b_new_detail.innerHTML+"</span>"
+tr.cells[3].innerHTML	=	"<span style='font-weight:bold;' class='at3c_desc'>"+at3b_new_descr.value+"</span><span style='font-weight:bold;'> "+txtresult+"</span><br/><span class='at3c_detail'>"+at3b_new_detail.innerHTML+"</span>"
 
-tr.cells[4].innerText	=	at3b_new_menace.value
-tr.cells[5].innerText	=	at3b_new_menaceres.value
+
+tr.cells[4].innerText	=	at3b_old_calc.innerText
+tr.cells[5].innerText	=	at3b_new_calc.innerText//at3b_new_menaceres.value
 
 
 hide_divcenter()
@@ -2820,7 +3271,6 @@ at4a_tdmod.style.visibility="hidden"
 
 document.querySelectorAll('.bulledot').forEach(e => e.remove('bulledot'));
 
-
 var maxY = 200;
 document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 	  const y = el.offsetTop+el.offsetHeight
@@ -2830,6 +3280,7 @@ document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 document.querySelectorAll('.scenarcont').forEach(el => {
 	  el.style.height = maxY-20+"px"
 	});
+
 
 release_arrow()
 
@@ -3675,37 +4126,23 @@ at4a_showarrow()
 		{
 		
 		//create a new one based on actual place
-		var actualplace = elem.getBoundingClientRect();
+		//var actualplace = elem.getBoundingClientRect();
 		
 		const containerRect = elem.parentElement;
 
 		// position souris → repère du container
-		const x = e.clientX - containerRect.left;
-		const y = e.clientY - containerRect.top;
+		//const x = e.clientX - containerRect.left;
+		//const y = e.clientY - containerRect.top;
 
-		var NEWdiv = document.createElement("div");
-		NEWdiv.className = "bulle";
-		if(containerRect.closest("#col4")) NEWdiv.className = "bulle at4a_target";
-		NEWdiv.style.position = "absolute";
-		NEWdiv.style.left = elem.style.left
-		NEWdiv.style.top  = elem.style.top
-		
 		var i=1;
 		while(document.querySelector('#bulle'+i))
 			{i++}
-		NEWdiv.id  = 'bulle'+i
-		
-		
-		NEWdiv.innerHTML = "<span style='width: 100%;' class='bulletxt'>"+at4a_find_text(parent)+"</span>"
-		NEWdiv.setAttribute("onmousedown", "dragdropbulle(this,event)");
-		containerRect.appendChild(NEWdiv);
 
-		var NEWdivedit = document.createElement("div");
-		NEWdivedit.className = "probaicon";
-		NEWdivedit.dataset.value = 3;
-		NEWdivedit.innerText="⚠️"
-		NEWdivedit.setAttribute("onmousedown", "bulle_edit(this)");
-		NEWdiv.appendChild(NEWdivedit);
+		
+		var classname ="bulle"
+		if(containerRect.closest("#col4")) classname = "bulle at4a_target";
+		
+		var NEWdiv = at4a_newbulle('bulle'+i,containerRect,elem.style.left,elem.style.top,at4a_find_text(parent),3,classname)
 
 //		//back to place
 		elem.style.left = 20+"px";
@@ -3719,6 +4156,32 @@ at4a_showarrow()
 
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("mouseup", onMouseUp);
+}
+
+
+
+
+function at4a_newbulle(id,parentelement,x,y,txt,proba,classname)
+{
+
+	var NEWdiv = document.createElement("div");
+	NEWdiv.className = classname;
+	NEWdiv.style.position = "absolute";
+	NEWdiv.style.left = x
+	NEWdiv.style.top  = y
+	NEWdiv.id  = id
+
+	NEWdiv.innerHTML = "<span style='width: 100%;' class='bulletxt'>"+txt+"</span>"
+	NEWdiv.setAttribute("onmousedown", "dragdropbulle(this,event)");
+	parentelement.appendChild(NEWdiv);
+
+	var NEWdivedit = document.createElement("div");
+	NEWdivedit.className = "probaicon";
+	NEWdivedit.dataset.value = proba;
+	NEWdivedit.innerHTML=at4a_iconproba(proba)
+	NEWdivedit.setAttribute("onmousedown", "bulle_edit(this)");
+	NEWdiv.appendChild(NEWdivedit);
+	return NEWdiv;
 }
 
 
@@ -3766,15 +4229,22 @@ else at4a_but_click_target.classList.remove('at4a_target_clicked')
 }
 
 
+
+
+function at4a_iconproba(v)
+{
+if(v==0)return "🟢"
+if(v==1)return "🟡"
+if(v==2)return "⚠️"
+if(v==3)return "<span style='filter: hue-rotate(-45deg) saturate(5) brightness(0.9);'>⚠️</span>"
+if(v==4)return "💥"
+}
+
 function at4a_proba_succes_change(v)
 {
-var i="🟢"
-if(v==1)i="🟡"
-if(v==2)i="⚠️"
-if(v==3)i="<span style='filter: hue-rotate(-45deg) saturate(5) brightness(0.9);'>⚠️</span>"
-if(v==4)i="💥"
 
-at4a_bull_sel.querySelector('.probaicon').innerHTML=i
+
+at4a_bull_sel.querySelector('.probaicon').innerHTML=at4a_iconproba(v)
 at4a_bull_sel.querySelector('.probaicon').dataset.value=v
 
 at4a_refresh_path_at4b()
@@ -4237,7 +4707,7 @@ return {c:c,txt:t}
 </script>
 </head>
 <body onload="go()">
-<div id="divversion"style="display:none"></div>
+
 <div id="divgrey" onclick="hide_divgrey()"></div>
 <div id="divover">divover</div>
 <div id="divmenuover"></div>
@@ -4249,8 +4719,8 @@ return {c:c,txt:t}
 <br/>
 
 
-<span onclick="saveHTML()"><div class="mini" style='background-color:#aaa;width:auto;padding: 1px 6px;color:#000;margin:4px;'>&#128427;</div> Save</span><br/>
-<span onclick="loadHTML()"><div class="mini" style='background-color:#aaa;width:auto;padding: 1px 6px;color:#000;margin:4px;'>&#128427;</div> Load</span>
+&nbsp; <button onclick="saveJSON(1)" type="button"> &#128427; Save </button><br/>
+&nbsp; <button onclick="loadJSON(1)" type="button"> &#128427; Load </button><br/>
 
 <br/>
 <br/>
@@ -4574,29 +5044,29 @@ Maturité cyber x Confiance
   
   
   <line x1="-280" y1="406" x2="280" y2="406" stroke="#4A6679" stroke-width="1"/>
-  <text x="-30" y="450" text-anchor="end" font-size="14">Exposition</text>
+  <text x="-70" y="450" text-anchor="end" font-size="14">Exposition</text>
   
-  <circle cx="0" cy="442" r="10" fill="none" stroke="#aaa" stroke-width="2"/>
-  <circle cx="40" cy="440" r="13" fill="none" stroke="#aaa" stroke-width="2"/> 
-  <circle cx="80" cy="438" r="16" fill="none" stroke="#aaa" stroke-width="2"/>
-  <circle cx="120" cy="435" r="20" fill="none" stroke="#aaa" stroke-width="2"/>
+  <circle cx="-40" cy="442" r="10" fill="#ddd"/>
+  <circle cx="0" cy="440" r="13" fill="#ddd"/> 
+  <circle cx="40" cy="438" r="16" fill="#ddd"/>
+  <circle cx="85" cy="435" r="20" fill="#ddd"/>
   
-  <text x="0" y="467" text-anchor="middle" font-size="14"><3</text>
-  <text x="40" y="467" text-anchor="middle" font-size="14">3-6</text>
-  <text x="80" y="467" text-anchor="middle" font-size="14">7-9</text>
-  <text x="120" y="467" text-anchor="middle" font-size="14">>9</text>
+  <text x="-40" y="467" text-anchor="middle" font-size="14"><3</text>
+  <text x="0" y="467" text-anchor="middle" font-size="14">3-6</text>
+  <text x="40" y="467" text-anchor="middle" font-size="14">7-9</text>
+  <text x="85" y="467" text-anchor="middle" font-size="14">>9</text>
   
-  <text x="-30" y="496" text-anchor="end" font-size="14">Fiabilité</text>
+  <text x="-70" y="496" text-anchor="end" font-size="14">Fiabilité</text>
   
-  <circle cx="0" cy="490" r="12" fill="#E3394A" stroke="none" />
-  <circle cx="40" cy="490" r="12" fill="#D97E8F" stroke="none" /> 
-  <circle cx="80" cy="490" r="12" fill="#B1D4E9" stroke="none" />
-  <circle cx="120" cy="490" r="12" fill="#9B9C9F" stroke="none" />
+  <circle cx="-40" cy="490" r="12" fill="#E3394A" stroke="none" />
+  <circle cx="0" cy="490" r="12" fill="#D97E8F" stroke="none" /> 
+  <circle cx="40" cy="490" r="12" fill="#B1D4E9" stroke="none" />
+  <circle cx="80" cy="490" r="12" fill="#9B9C9F" stroke="none" />
   
-  <text x="0" y="517" text-anchor="middle" font-size="14"><4</text>
-  <text x="40" y="517" text-anchor="middle" font-size="14">4-5</text>
-  <text x="80" y="517" text-anchor="middle" font-size="14">6-7</text>
-  <text x="120" y="517" text-anchor="middle" font-size="14">>7</text>
+  <text x="-40" y="517" text-anchor="middle" font-size="14"><4</text>
+  <text x="0" y="517" text-anchor="middle" font-size="14">4-5</text>
+  <text x="40" y="517" text-anchor="middle" font-size="14">6-7</text>
+  <text x="80" y="517" text-anchor="middle" font-size="14">>7</text>
   
   <!-- Données -->
 </svg>
@@ -4704,7 +5174,7 @@ Probabilité de succès :
 <br/>
 <br/>
 
-<div id='at4a_scenar'>
+<div id='at4a_scenar' data-arrow="[]">
 
 <div class='col' id='col1'>
 <div class='resize' onmousedown="dragdropresize(this,event)">&lt;&gt;</div>
@@ -4802,7 +5272,7 @@ Objectifs Visés<br/>
 <br/>
 <br/>
 
-<center><button onclick="at2a_newsrovok()" style="padding:8px 16px">Ajouter</button></center>
+<center><button onclick="at2a_newsrovok_from_tab()" style="padding:8px 16px">Ajouter</button></center>
 
 <br/>
 </div>
@@ -4824,7 +5294,7 @@ Objectifs Visés<br/>
 <br/>
 Partie prenante<br/>
 <br/>
-<div id="at2c_nosrov">Pas de PP dans l'atelier 3-A, exemple de PP :<br/><br/></div> 
+<div id="at3b_nosrov2">Pas de PP dans l'atelier 3.A, exemple de PP :<br/><br/></div> 
 <div id="at3b_addpp_1"></div>
 
 <center><button onclick="at3b_addppok()" style="padding:8px 16px">Modifier</button></center>
@@ -4875,7 +5345,7 @@ Description<br/>
 </tr>
 </table>
 <br/>
-<div id="at3c_nopp">Aucune partie prenante dans les scénarios de l'atelier 3.B.<br/><br/></div>
+<div id="at3c_nopp">Aucune partie prenante dans les scénarios de l'atelier 3.B<br/><br/></div>
 <br/>
 <center><button onclick="at3c_newsec_add()" style="padding:8px 16px;">Ajouter</button></center>
 <br/>
@@ -4885,13 +5355,29 @@ Description<br/>
 <br/>
 <br/>
 <table>
-<tr><td>Partie prenante</td><td><input id="at3b_new_pp" /></td></tr>
+<tr style="display:none"><td>Partie prenante</td><td><input id="at3b_new_pp" /></td></tr>
 <tr><td>Chemins d’attaque stratégiques</td><td><input id="at3b_new_path" /></td></tr>
-<tr><td>Mesures de sécurité</td><td><input id="at3b_new_mes" /></td></tr>
-<tr><td colspan="2">Détail des mesures<br/>
+<tr><td></td><td></td></tr>
+
+<tr><td><b>Mesures de sécurité :</b></td><td></td></tr>
+
+<tr><td>Déscription</td><td><input id="at3b_new_descr" style="border:1px solid grey" contenteditable='true'></td></tr>
+
+<tr><td colspan="2">Effet :<br/>
+
+<table>
+<tr><td>Dépendance</td><td id="at3b_old_d"></td><td>➜</td><td><select id="at3b_new_d" onchange="at3c_recalc()"><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></td></tr>
+<tr><td>Pénétration</td><td id="at3b_old_p"></td><td>➜</td><td><select id="at3b_new_p" onchange="at3c_recalc()"><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></td></tr>
+<tr><td>Maturité</td><td id="at3b_old_m"></td><td>➜</td><td><select id="at3b_new_m" onchange="at3c_recalc()"><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></td></tr>
+<tr><td>Confiance</td><td id="at3b_old_c"></td><td>➜</td><td><select id="at3b_new_c" onchange="at3c_recalc()"><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option></select></td></tr>
+<tr><td colspan=2>Menace initiale</td><td></td><td>menace résiduelle</td></tr>
+<tr><td colspan=2 id="at3b_old_calc" style="text-align: right;"></td><td></td><td id="at3b_new_calc"></td></tr>
+<tr><td></td><td></td><td></td></tr>
+</table>
+</td></tr>
+
+<tr><td colspan="2">Détail<br/>
 <div id="at3b_new_detail" style="width:390px;min-height:100px;border:1px solid grey" contenteditable='true'></div></td></tr>
-<tr><td>Menace initiale</td><td><input id="at3b_new_menace" style="width:30px"/></td></tr>
-<tr><td>Menace résiduelles</td><td><input id="at3b_new_menaceres" style="width:30px"/></td></tr>
 </table>
 <br/>
 <br/>
