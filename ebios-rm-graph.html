@@ -45,8 +45,8 @@ background-color:#E3394A;
 }
 
 .at2{
---color: #E2D3E0;
---colorlight: #fff;
+--color: #6D2163;
+--colorlight: #FFB9F6;
 }
 
 .at3{
@@ -56,12 +56,12 @@ background-color:#E3394A;
 
 .at4{
 --color: #BFA100;
---colorlight: #E2D3E0;
+--colorlight: #F4EECC;
 }
 
 .at5{
---color: #00A7A2;
---colorlight: #CCEDEC;
+--color: #E3394A;
+--colorlight: #FFC1C8;
 }
 
 
@@ -722,6 +722,90 @@ transform: scaleX(-1);
 .at3b_sc .editicon:hover{
 background-color:#aaa5;
 }
+
+#at1a_raci{
+border-collapse:collapse;
+}
+#at1a_raci tr{
+height:42px;
+}
+
+
+#at1a_raci td:first-child,#at1a_raci tr:first-child{
+text-align:center;
+cursor:normal;
+}
+
+#at1a_raci tr:not(:first-child) td:first-child{
+font-weight: bold;
+color: #fff;
+border-radius:8px
+}
+
+
+#at1a_raci tr:not(:first-child) td:not(:first-child):hover{
+box-shadow: 0px 0px 1px 1px #888;
+position: relative;
+}
+
+
+#at1a_listppltbl{
+border-collapse:collapse;
+}
+#at1a_listppltbl tr:hover{
+background-color:#ddd;
+cursor:pointer;
+}
+
+#at1a_listppltbl td:first-child {
+width: 50px;
+text-align: center;
+vertical-align: middle;
+font-size:18px;
+}
+
+.divppl{
+display:inline-block;
+width:200px;
+height:36px;
+border-radius:36px;
+background-color:#fafafa;
+font-size: 14px;
+line-height:18px;
+margin: 2px;
+}
+
+.divppl div{
+display:inline-block;
+}
+
+.divppl .todelete{
+float:right;
+display:none;
+width: 30px;
+vertical-align: middle;
+height: 40px;
+text-align: center;
+line-height: 36px;
+cursor:pointer;
+}
+
+.divppl:hover .todelete{
+display:inline-block;
+}
+
+.todelete:hover{
+font-weight:bold;
+}
+
+.divppl div:first-child
+{
+width: 40px;
+vertical-align: middle;
+height: 40px;
+text-align: center;
+}
+
 </style>
 
 
@@ -759,6 +843,25 @@ function saveJSON(infile){
 
 
 var savedata = {}
+
+// AT1A
+savedata.at1a={}
+
+savedata.at1a.at1a_org	=	at1a_org.value
+savedata.at1a.at1a_nom	=	at1a_nom.value
+savedata.at1a.at1a_date	=	at1a_date.value
+savedata.at1a.at1a_ver	=	at1a_ver.value
+savedata.at1a.at1a_notes=	at1a_notes.value
+
+
+if(at1a_raci.dataset.ppl)
+	savedata.at1a.ppl	=	at1a_raci.dataset.ppl
+
+savedata.at1a.divppl=[]
+at1a_raci.querySelectorAll(".divppl").forEach(el => {
+			savedata.at1a.divppl.push({uid:el.dataset.uid,tr:el.closest('tr').rowIndex,td:el.closest('td').cellIndex})
+			})
+
 
 // AT1C
 savedata.at1c=[]
@@ -824,7 +927,6 @@ for(var i=0;i<lstcat.length;i++)
 savedata.at3a['cat']=at3_cat
 
 // AT3B
-
 savedata.at3b={}
 
 var lst=[]
@@ -855,6 +957,8 @@ document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 	
 	
 savedata.at4a={arrow:JSON.parse(at4a_scenar.dataset.arrow),tabbulles:tabbulles,col1w:col1.offsetWidth,col2w:col2.offsetWidth,col3w:col3.offsetWidth,col4w:col4.offsetWidth}
+
+
 
 if(infile)
 	{
@@ -934,7 +1038,24 @@ else
 	}
 var savedata = JSON.parse(dataLS);
 
+//AT1A
+at1a_raci.querySelectorAll('.divppl').forEach(e => e.remove());
 
+
+at1a_org.value	=	savedata.at1a.at1a_org
+at1a_nom.value	=	savedata.at1a.at1a_nom
+at1a_date.value	=	savedata.at1a.at1a_date
+at1a_ver.value	=	savedata.at1a.at1a_ver
+at1a_notes.value=	savedata.at1a.at1a_notes
+
+
+if(savedata.at1a.ppl)
+	at1a_raci.dataset.ppl	=savedata.at1a.ppl
+
+savedata.at1a.divppl.forEach(el => {
+			at1a_clickTD = at1a_raci.rows[el.tr].cells[el.td]
+			at1a_chooseppl(el.uid)
+			})
 
 // AT1C
 while(at1c_table.rows[1])at1c_table.rows[1].remove()
@@ -1510,7 +1631,7 @@ function go()
 at3a_newcat()
 at3a_newcat()
 
-showatt('at2abc',document.querySelector('.startscript'))
+showatt('at1a',document.querySelector('.startscript'))
 }
 
 
@@ -1841,15 +1962,30 @@ load_att(att)
 
 function load_att(att)
 {
-if(att=="at2abc") at2b_redraw_graph()
+if(att=="at1a") at1a_load()
+if(att=="at2abc") at2abc_load()
 if(att=="at3a") at3a_redraw_graph()
 if(att=="at3b") at3b_redraw()
-if(att=="at4a") {at4a_load()}
-
+if(att=="at4ab") {at4ab_load()}
 }
 
-function at4a_load()
+
+function at2abc_load()
 {
+document.querySelectorAll('.atelier2open').forEach(e => e.classList.add('submenu_activ'));
+at2b_redraw_graph()
+}
+
+function at1a_load()
+{
+if(at1a_date.value=="")
+	at1a_date.value=new Date().toISOString().split('T')[0];
+}
+
+function at4ab_load()
+{
+document.querySelectorAll('.atelier4open').forEach(e => e.classList.add('submenu_activ'));
+document.querySelectorAll("#at4a").forEach(e => e.style.display="block");
 
 if(document.querySelector('#at4a_canvas'))
 	at4a_canvas.remove(); // prevent bug
@@ -4708,9 +4844,131 @@ return {c:c,txt:t,d:d}
 
 
 
+var at1a_clickTD=false;
+
+function at1a_RACIclick(event)
+{
+var td = event.target.closest('td')
+
+if(!td)return
+
+if(td.classList.contains('noclick'))return;
+if(td.parentElement.classList.contains('noclick'))return;
+
+
+at1a_clickTD = td
+
+
+show_divgrey()
+show_divcenter()
+at1a_addppl.style.display="block"
+
+at1a_drappltable()
+}
+
+
+function at1a_drappltable()
+{
+
+
+if(!at1a_raci.dataset.ppl)
+	{
+	var ppl=[{name:"M. Example",titre:"RSSI",uid:"aaaaaaaa1"},{name:"Jane Doe",titre:"Consultante",uid:"aaaaaaaa2"}]
+	at1a_raci.dataset.ppl=JSON.stringify(ppl)
+	}
 
 
 
+var ppl = JSON.parse(at1a_raci.dataset.ppl)
+
+at1a_listppl.style.disabled="block"
+
+
+while(at1a_listppltbl.rows[0])at1a_listppltbl.rows[0].remove()
+
+
+ppl.sort(function(a,b) {return b.name-a.name}) // sort by menace
+
+for(var i=0;i<ppl.length;i++)
+	{
+
+	var p = ppl[i]
+	
+	var row = at1a_listppltbl.insertRow();
+	row.setAttribute('onclick',"at1a_chooseppl('"+p.uid+"')");
+	
+	var cell0 = row.insertCell();
+	var cell1 = row.insertCell();
+	var cell2 = row.insertCell();
+
+	cell0.innerHTML = "&#128100;"
+	cell1.innerHTML = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
+	cell2.innerHTML = "X"
+	cell2.setAttribute('onclick',"at1a_removeppl(this,event)");
+	}
+}
+
+function at1a_removeppl(elm,event)
+{
+event.stopPropagation(); // event.stopPropagation();
+var uid = elm.parentElement.dataset.uid
+
+var ppl = JSON.parse(at1a_raci.dataset.ppl)
+
+const newArray = ppl.filter(obj => obj.uid !== uid);
+
+
+at1a_raci.dataset.ppl=JSON.stringify(newArray)
+at1a_drappltable()
+}
+
+function at1a_chooseppl(uid)
+{
+
+var ppl = JSON.parse(at1a_raci.dataset.ppl)
+const p = ppl.filter(obj => obj.uid == uid)[0];
+
+var HTMLtd = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
+
+var HTML = "<div class='divppl' data-uid='"+uid+"'><div style='width:30px'>👤</div><div>"+HTMLtd+"</div><div class='todelete' onclick='at1a_deleteppl(event)'>X</div></div>"
+
+at1a_clickTD.innerHTML += HTML
+hide_divgrey()
+}
+
+
+function at1a_deleteppl(e)
+{
+e.target.closest('.divppl').remove();
+event.stopPropagation();
+}
+function at1a_newppl()
+{
+
+if(at1a_raci.dataset.ppl)
+	var ppl = JSON.parse(at1a_raci.dataset.ppl)
+else
+	ppl = []
+
+var newname = at1a_name.value.trim()
+
+if(!newname) return;
+
+
+var uid = Math.random().toString(36).slice(2)//self.crypto.randomUUID();
+
+
+
+ppl.push({name:newname,titre:at1a_fonc.value,uid:uid})
+
+at1a_name.value=""
+at1a_fonc.value=""
+
+
+at1a_raci.dataset.ppl=JSON.stringify(ppl)
+
+at1a_drappltable()
+}
 
 </script>
 </head>
@@ -4734,13 +4992,13 @@ return {c:c,txt:t,d:d}
 <br/>
 
 <div id="atelier1" onmousedown="clickmenu(this)"><div class="mini at1bg disabled">1</div>Cadrage</div>
-<div class="atelier1open submenu disabled" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
+<div class="atelier1open submenu startscript" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1b',this)"><div class="mini at1bg">B</div>Périmètre</div>
 <div class="atelier1open submenu" onmousedown="showatt('at1c',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
 
 <div id="atelier2" onmousedown="clickmenu(this)"><div class="mini at2bg">2</div>Source de risque</div>
-<div class="atelier2open submenu startscript" onmousedown="showatt('at2abc',this)"><div class="mini at2bg">A</div>Identification</div>
+<div class="atelier2open submenu" onmousedown="showatt('at2abc',this)"><div class="mini at2bg">A</div>Identification</div>
 <div class="atelier2open submenu" onmousedown="showatt('at2abc',this)"><div class="mini at2bg">B</div>Pertinence</div>
 <div class="atelier2open submenu" onmousedown="showatt('at2abc',this)"><div class="mini at2bg">C</div>Rétention</div>
 
@@ -4751,8 +5009,8 @@ return {c:c,txt:t,d:d}
 
 
 <div id="atelier4" onmousedown="clickmenu(this)"><div class="mini at4bg">4</div>Scénarios opérationnels</div>
-<div class="atelier4open submenu" onmousedown="showatt('at4a',this)"><div class="mini at4bg">A</div>Scénarios</div>
-<div class="atelier4open submenu" onmousedown="showatt('at4a',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
+<div class="atelier4open submenu" onmousedown="showatt('at4ab',this)"><div class="mini at4bg">A</div>Scénarios</div>
+<div class="atelier4open submenu" onmousedown="showatt('at4ab',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
 
 <div id="atelier5" onmousedown="clickmenu(this)"><div class="mini at5bg">5</div>Traitement du risque</div>
 <div class="atelier5open submenu disabled" onmousedown="showatt('at5a',this)"><div class="mini at5bg">A</div>Synthèse</div>
@@ -4764,6 +5022,40 @@ return {c:c,txt:t,d:d}
 </div>
 
 <div id="layout_content" style="margin-left:220px;width: 100vw;">
+
+<div id="at1a">
+
+<br/>
+
+<span class="big at1bg">1.A</span><span style="border-bottom:#FED6EB solid 3px;">Cadrage de l'étude</span>
+<br/><br/><br/>
+
+
+<div id="at1a_maindiv" >
+
+<table style="width:600px">
+<tr><td>Organisation</td><td><input id="at1a_org" type="text" style="width: 300px;float:right;"/></td></tr>
+<tr><td>Nom de l'etude</td><td><input id="at1a_nom"  type="text" style="width: 300px;float:right;"/></td></tr>
+<tr><td>Date</td><td><input id="at1a_date" type="date" style="float:right;"/></td></tr>
+<tr><td>Version</td><td><input id="at1a_ver" type="text" style="width: 50px;float:right;"/></td></tr>
+<tr><td>Notes</td><td></td></tr>
+<tr><td colspan="2"><textarea id="at1a_notes" style="width: 100%;height:100px;"></textarea></td></tr>
+</table>
+
+
+<br/>Participants :<br/><br/>
+<table id="at1a_raci" style="" onclick="at1a_RACIclick(event)">
+
+<tr  class="noclick"><td style="">Atelier</td><td style="width:210px">Réalisateur</td><td style="width:210px">Approbateur</td><td style="width:210px">Consulté</td><td style="width:210px">Informé</td></tr>
+<tr class="at1" style="background-color:var(--colorlight)"><td class="at1bg noclick">1</td><td></td><td></td><td></td><td></td></tr>
+<tr class="at2" style="background-color:var(--colorlight)"><td class="at2bg noclick">2</td><td></td><td></td><td></td><td></td></tr>
+<tr class="at3" style="background-color:var(--colorlight)"><td class="at3bg noclick">3</td><td></td><td></td><td></td><td></td></tr>
+<tr class="at4" style="background-color:var(--colorlight)"><td class="at4bg noclick">4</td><td></td><td></td><td></td><td></td></tr>
+<tr class="at5" style="background-color:var(--colorlight)"><td class="at5bg noclick">5</td><td></td><td></td><td></td><td></td></tr>
+</table>
+</div>
+
+</div>
 
 <div id="at1c">
 
@@ -4793,7 +5085,7 @@ return {c:c,txt:t,d:d}
 <br/>
 <br/>
 
-<span class="big at2bg">2.A</span><span style="border-bottom:#E2D3E0 solid 3px;">Identification des SR/OV : <b>S</b>ources de <b>R</b>isque et <b>O</b>bjectifs <b>V</b>isés</span>
+<span class="big at2bg">2.A</span><span style="border-bottom:var(--colorlight) solid 3px;">Identification des SR/OV : <b>S</b>ources de <b>R</b>isque et <b>O</b>bjectifs <b>V</b>isés</span>
 <br/><br/><br/>
 <button onclick="at2a_newsrov()" style="padding:8px 16px;margin: 16px;">Ajouter SR/OV</button><br/>
 
@@ -4871,8 +5163,8 @@ return {c:c,txt:t,d:d}
 <span class="big at2bg">2.C</span><span style="border-bottom:#E2D3E0 solid 3px;">SR/OV retenus pour la suite de l’analyse</span>
 <br/>
 <br/>
-<table id="at2c_srovlist" class="tabletype" style="width:800px">
-<tr style="color:#000;font-weight:500"><td style="width:130px;text-align:left">Source de Risque</td><td style="text-align:left;">Objectif Visés</td></tr>
+<table id="at2c_srovlist" class="" style="width:1200px;border: 2px solid #E2D3E0;border-collapse:collapse;margin: 8px;">
+<tr style="background-color:#E2D3E0"><td style="width:130px;text-align:left">Source de Risque</td><td style="text-align:left;">Objectif Visés</td></tr>
 </table>
 <div id="at2c_nosrov">Aucun SR/OV retenu dans l'atelier 2.B</div>
 
@@ -5245,6 +5537,32 @@ Probabilité de succès :
 </div>
 </div>
 <div id="divcenter">
+
+<div id="at1a_addppl" style="width:700px;padding: 8px;">
+<br/>
+
+
+
+
+
+<table>
+<tr><td>Nom</td><td><input id="at1a_name" type="text"/></td></tr>
+<tr><td>Fonction</td><td><input id="at1a_fonc" type="text"/></td></tr>
+</table>
+<br/>
+<button onclick="at1a_newppl()" style="padding:4px 8px;margin-left:50px;">Ajouter</button>
+<br/>
+<div id="at1a_listppl">
+<br/>
+<br/>
+<table id="at1a_listppltbl" style="width:300px">
+
+</table>
+<br/>
+</div>
+<br/>
+
+</div>
 
 <div id="at2a_newsrovdiv" style="width:700px;padding: 8px;">
 <br/>
