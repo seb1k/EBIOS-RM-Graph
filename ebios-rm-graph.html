@@ -18,9 +18,7 @@ overflow:hidden;
 }
 
 svg{
-
 user-select: none;
-
 }
 
 .at1bg{
@@ -196,13 +194,28 @@ border-radius:4px;
 padding:4px 8px;
 }
 
+#divover_risk{
+position:absolute;
+background-color:#fff;
+z-index:100;
+display:none;
+border:1px solid #aaa;
+}
+
+#divover_risk div{
+cursor:pointer;
+}
+#divover_risk div:hover{
+background-color:#eee;
+}
+
 #divmenuover{
 position:absolute;
 background-color:#fff;
 z-index:100;
 display:none;
-box-shadow: 0 4px 16px 0 #aaa;
-border-radius:4px;
+box-shadow: 0px 0px 1px 1px #888;
+border-radius:1px;
 z-index:500;
 }
 
@@ -305,6 +318,10 @@ text-indent:6px;
 width:24px;
 text-align:center;
 z-index:10;
+}
+
+.aligncenter{
+text-align:center;
 }
 
 #at1c_table td{
@@ -664,7 +681,7 @@ background-color: rgb(246, 231, 66, 0.66);
 margin-top:2px;
 }
 
-#at2b_srovlist select{
+#at2b_srovlist select, #at5c_table select{
 background:transparent;
 border:0;
 border-bottom:1px solid transparent;
@@ -674,30 +691,12 @@ padding-right: 18px;
 }
 
 
-#at2b_srovlist tr:hover select{
+#at2b_srovlist tr:hover select, #at5c_table tr:hover select{
 border-bottom:1px solid #ccc;
 appearance: auto;
 padding-right: 0px;
 }
 
-
-#at2b_srovlist tr:hover .at2b_deleterow span{
-visibility:visible;
-}
-.at2b_deleterow span{
-visibility:hidden;
-cursor:pointer;
-}
-
-
-.tabledeleicon{
-visibility:hidden;
-cursor:pointer;
-}
-
-table:hover .tabledeleicon{
-visibility:visible;
-}
 
 .pathover{
 outline-width: 2px;
@@ -806,6 +805,126 @@ height: 40px;
 text-align: center;
 }
 
+
+
+.at5_risk span{
+font-weight:bold;
+color:#fff;
+padding:10px;
+}
+
+
+.at5_risk{
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+
+.at5_risk td {
+    width: 140px;
+    height: 100px;
+    border: 1px solid #cccccc;
+    vertical-align: middle;
+  }
+
+.at5_risk th {
+    width: 30px;
+    height: 30px;
+    font-weight: normal;
+    color: #000;
+  }
+  
+ .at5_risk tr th {
+  	border-right:2px solid #cccccc;
+	}
+	
+.at5_risk tr:first-child td {
+  	height:20px !important;
+	border:0px;
+	}
+	
+.at5_risk tr:last-child td {
+	border:0px;
+	height:20px !important;
+	border-top:2px solid #cccccc;
+	}
+  
+  
+ .at5b_table td{
+ padding:0 20px;
+ height:90px;
+ }
+.at5_risk .green,.at5b_table .green{
+    background: #08a391;
+  }
+
+.at5_risk  .orange,.at5b_table .orange{
+    background: #ff982f;
+  }
+
+.at5_risk  .red,.at5b_table .red{
+    background: #eb334c;
+  }
+
+
+#at5c_table{
+min-width:1000px;
+border-collapse: collapse;
+}
+
+#at5c_table tr{
+height:45px;
+}
+
+.tr_deleteicon td:first-child{
+text-align:center;
+font-size:24px;
+}
+
+.tr_deleteicon td:first-child span{
+padding:5px;
+visibility:hidden;
+color:#888;
+}
+.tr_deleteicon td:first-child span:hover{
+cursor:pointer;
+font-weight:bold;
+color:#000;
+}
+
+
+
+.tr_deleteicon:hover td:first-child span{
+visibility:visible;
+}
+
+
+
+
+#at5c_table tr td:not(:first-child){
+background-color:var(--colorlight);
+border-top:1px solid #fff;
+}
+
+.tag {
+
+  align-items: center;
+  gap: 6px;
+  background: #eee;
+  padding: 6px 8px;
+  border-radius: 16px;
+  font-size: 14px;
+  width:40px;
+  display:inline-block;
+}
+
+  .tag button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+  }
 </style>
 
 
@@ -837,7 +956,7 @@ document.body.innerHTML = x;
 
 
 
-function saveJSON(infile){
+function saveJSON(){
 
 
 
@@ -958,27 +1077,42 @@ document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 	
 savedata.at4a={arrow:JSON.parse(at4a_scenar.dataset.arrow),tabbulles:tabbulles,col1w:col1.offsetWidth,col2w:col2.offsetWidth,col3w:col3.offsetWidth,col4w:col4.offsetWidth}
 
+//AT5A
+savedata.at5abcd=at5abcd.dataset.data
 
-
-if(infile)
+//AT5C
+savedata.at5c_timeoption=at5c_table.dataset.timeoption
+savedata.at5c_table=[]
+for(var i=1;i<at5c_table.rows.length;i++)
 	{
-	const contenu = JSON.stringify(savedata, null, 2);
-	const blob = new Blob([contenu], { type: "text/plain;charset=utf-8;" });
-	const url = URL.createObjectURL(blob);
+	var tr=at5c_table.rows[i];
+	var tabtr=[]
 
-	const a = document.createElement("a");
-	a.href = url;
-	a.download = "backup.json";
-	document.body.appendChild(a);
-	a.click();
+	tabtr.push(tr.cells[1].innerText)
+	tabtr.push(Array.from(tr.cells[2].querySelectorAll("span[data-id]")).map(el => el.getAttribute('data-id')).join(','))
+	tabtr.push(Array.from(tr.cells[3].querySelectorAll("div[data-uid]")).map(el => el.getAttribute('data-uid')).join(','))
+	tabtr.push(tr.cells[4].querySelector('select').value)
+	tabtr.push(tr.cells[5].querySelector('select').value)
+	
+	savedata.at5c_table.push(tabtr)
+	}
 
-	document.body.removeChild(a);
-	URL.revokeObjectURL(url);
-	}
-else
-	{
-	localStorage.setItem("saveJSON", JSON.stringify(savedata));
-	}
+
+
+//DOWNLOAD FILE
+const contenu = JSON.stringify(savedata, null, 2);
+const blob = new Blob([contenu], { type: "text/plain;charset=utf-8;" });
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+a.href = url;
+a.download = "backup.json";
+document.body.appendChild(a);
+a.click();
+
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+
 
 
 }
@@ -1020,7 +1154,6 @@ function demanderEtLireJSON() {
 
 function loadJSON(infile,data){
 
-
 if(infile==1)
 	{
 	demanderEtLireJSON();
@@ -1032,10 +1165,13 @@ else if(infile==2)
 	}
 else
 	{
-	if(!localStorage.getItem("saveJSON"))return;
-	var dataLS=localStorage.getItem("saveJSON")
-
+	console.error('error function loadJSON')
+	return;
+	//if(!localStorage.getItem("saveJSON"))return;
+	//var dataLS=localStorage.getItem("saveJSON")
 	}
+	
+
 var savedata = JSON.parse(dataLS);
 
 //AT1A
@@ -1191,6 +1327,28 @@ col4.style.width=savedata.at4a.col4w+"px"
 
 
 at4a_refresh_path_at4b()
+
+
+//AT5A
+at5a_risktable.querySelectorAll('span').forEach(e => e.remove());
+while(at5a_tablerisk.rows[0])at5a_tablerisk.rows[0].remove()
+
+at5abcd.dataset.data=savedata.at5abcd
+JSON.parse(savedata.at5abcd).risk.forEach(e=>{if(e)at5a_writerisk(e.id,e.txt,e.vra,e.gra)})
+
+
+//AT5C
+at5c_table.dataset.timeoption = savedata.at5c_timeoption
+while(at5c_table.rows[1])at5c_table.rows[1].remove();
+
+savedata.at5c_table.forEach(e => {
+									var tr = at5c_add()
+									tr.cells[1].innerText=e[0]
+									PPL_clickTD=tr.cells[2];	e[1].split(',').map(Number).forEach(id => at5c_addrisk(id));
+									//COLONNE ppl
+									tr.cells[4].querySelector('select').value=e[3]
+									tr.cells[5].querySelector('select').value=e[4]
+									});
 
 }
 
@@ -1631,7 +1789,7 @@ function go()
 at3a_newcat()
 at3a_newcat()
 
-showatt('at1a',document.querySelector('.startscript'))
+showatt('at5abcd',document.querySelector('.startscript'))
 }
 
 
@@ -1760,6 +1918,7 @@ while(at2b_srovlist.querySelector("[data-idsrov='"+idsrov+"']"))
 var row = at2b_srovlist.insertRow();
 row.dataset.idsrov=idsrov
 row.dataset.pertinence=1
+row.className="tr_deleteicon"
 
 var cell0 = row.insertCell();
 var cell1 = row.insertCell();
@@ -1772,8 +1931,8 @@ var cell6 = row.insertCell();
 var cell8 = row.insertCell();
 var cell9 = row.insertCell();
 
-cell0.innerHTML = "<span onclick='at2b_deleterow(this)'>X</span>"
-cell0.className = "at2b_deleterow";
+cell0.innerHTML = "<span onclick='at2b_deleterow(this)'>×</span>"
+
 cell1.innerHTML = at2b_selectsrov("SR",SRfound)
 cell2.innerHTML = srtxt;
 cell3.innerHTML = at2b_selectsrov("OV",OVfound)
@@ -1967,6 +2126,8 @@ if(att=="at2abc") at2abc_load()
 if(att=="at3a") at3a_redraw_graph()
 if(att=="at3b") at3b_redraw()
 if(att=="at4ab") {at4ab_load()}
+if(att=="at5abcd") {at5abcd_load()}
+if(att=="at5ef") {at5ef_load()}
 }
 
 
@@ -2008,6 +2169,15 @@ at4a_refresh_path_at4b()
 stop_at4amod()
 }
 
+function at5abcd_load()
+{
+document.querySelectorAll('.at5abcd').forEach(e => e.classList.add('submenu_activ'));
+}
+
+function at5ef_load()
+{
+document.querySelectorAll('.at5ef').forEach(e => e.classList.add('submenu_activ'));
+}
 
 function isValidJson(json) {
     try {
@@ -2513,7 +2683,7 @@ for(var i=0;i<ds.length;i++)
 function at1c_newsmetier()
 {
 var row = at1c_table.insertRow();
-
+row.className="tr_deleteicon"
 var cellA = row.insertCell();
 var cell0 = row.insertCell();
 var cell1 = row.insertCell();
@@ -2529,8 +2699,9 @@ return row
 
 function at21c_cell_A_1_2_3(cellA,cell1,cell2,cell3)
 {
-cellA.innerHTML = "<span class='tabledeleicon' onclick='at1c_deleteline(this)'>X</span>";
-cellA.className = "optioncolumn";
+cellA.innerHTML = "<span onclick='at1c_deleteline(this)'>×</span>";
+
+
 cellA.style.backgroundColor = "transparent";
 cell1.innerHTML = "Perte ou destruction des informations d’études et recherches conduisant à un fort impact, notamment sur les futures autorisations de mises sur le marché de l’entreprise";cell1.contentEditable=true
 cell2.innerHTML = "- Missions et services de l’organisme<br/>- Coûts de développement<br/>- Gouvernance de l’organisme";cell2.contentEditable=true
@@ -2569,7 +2740,7 @@ else var td = elem.closest('tr').querySelectorAll('td')[1];
 var rowIndex = elem.closest('tr').rowIndex
 
 var row = at1c_table.insertRow(rowIndex+td.rowSpan);
-
+row.className="tr_deleteicon"
 td.rowSpan++
 var cellA = row.insertCell();
 var cell1 = row.insertCell();
@@ -3176,7 +3347,7 @@ elem.closest('tr').classList.add('selected')
 function at3c_newsec_add()
 {
 var row = at3c_table.insertRow();
-row.className="trdata"
+row.className="trdata tr_deleteicon"
 
 row.setAttribute('onclick','at3c_edit(this)');
 var cell0 = row.insertCell();
@@ -3187,7 +3358,13 @@ var cell4 = row.insertCell();
 var cell5 = row.insertCell();
 
 
-cell0.innerHTML = "<input type='checkbox' onclick='event.stopPropagation();' />";cell0.className = "optioncolumn";
+//cell0.innerHTML = "<input type='checkbox' onclick='event.stopPropagation();' />";
+//cell0.className = "optioncolumn";
+cell0.innerHTML="<span onclick=\"this.closest('tr').remove();event.stopPropagation();\">×</span>"
+
+
+
+
 cell3.innerHTML = "<b></b><span></span>";cell3.dataset.detail = ""
 hide_divcenter()
 
@@ -3216,13 +3393,13 @@ else
 	cell5.innerHTML = ""
 	}
 }
-
+/*
 function at3c_option(elem)
 {
 show_divmenuover(elem)
-divmenuover.innerHTML="<div onclick='at3c_delete()'><span style='padding:0 10px'>X</span>Supprimer</div>"
+divmenuover.innerHTML="<div onclick='at3c_delete()'><span style='padding:0 10px'>×</span>Supprimer</div>"
 }
-
+*/
 function show_divmenuover(elem)
 {
 document.addEventListener("click", divmenuover_clickev);
@@ -3281,13 +3458,13 @@ if( !is_first )  // a line in block
 	}
 }
 
-
+/*
 function at3c_delete()
 {
 at3c_table.querySelectorAll('input[type="checkbox"]:checked').forEach(e => e.closest('tr').remove())
 divmenuover_clickev(false)
 }
-
+*/
 function at3c_edit(tr)
 {
 
@@ -4843,8 +5020,8 @@ return {c:c,txt:t,d:d}
 
 
 
-
-var at1a_clickTD=false;
+//at1a_clickTD
+var PPL_clickTD=false;
 
 function at1a_RACIclick(event)
 {
@@ -4856,14 +5033,17 @@ if(td.classList.contains('noclick'))return;
 if(td.parentElement.classList.contains('noclick'))return;
 
 
-at1a_clickTD = td
+PPL_clickTD = td
 
 
 show_divgrey()
 show_divcenter()
-at1a_addppl.style.display="block"
 
+
+at1a_addppl.style.display="block"
 at1a_drappltable()
+
+
 }
 
 
@@ -4887,7 +5067,7 @@ at1a_listppl.style.disabled="block"
 while(at1a_listppltbl.rows[0])at1a_listppltbl.rows[0].remove()
 
 
-ppl.sort(function(a,b) {return b.name-a.name}) // sort by menace
+ppl.sort(function(a,b) {return b.name-a.name})
 
 for(var i=0;i<ppl.length;i++)
 	{
@@ -4895,7 +5075,7 @@ for(var i=0;i<ppl.length;i++)
 	var p = ppl[i]
 	
 	var row = at1a_listppltbl.insertRow();
-	row.setAttribute('onclick',"at1a_chooseppl('"+p.uid+"')");
+	row.setAttribute('onclick',"chooseppl('"+p.uid+"')");
 	
 	var cell0 = row.insertCell();
 	var cell1 = row.insertCell();
@@ -4905,26 +5085,37 @@ for(var i=0;i<ppl.length;i++)
 	cell1.innerHTML = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
 	cell2.innerHTML = "X"
 	cell2.setAttribute('onclick',"at1a_removeppl(this,event)");
+	cell2.dataset.uid = p.uid
 	}
 }
 
-function at1a_removeppl(elm,event)
+function at1a_removeppl(elm,e)
 {
-event.stopPropagation(); // event.stopPropagation();
-var uid = elm.parentElement.dataset.uid
+e.stopPropagation();
+var uid = elm.dataset.uid
 
 var ppl = JSON.parse(at1a_raci.dataset.ppl)
 
 const newArray = ppl.filter(obj => obj.uid !== uid);
-
-
 at1a_raci.dataset.ppl=JSON.stringify(newArray)
+
 at1a_drappltable()
+}
+
+
+function chooseppl(uid)
+{
+
+
+if(PPL_clickTD.closest('#at1a_raci'))
+	at1a_chooseppl(uid)
+else if(PPL_clickTD.closest('#at5c_table'))
+	at5a_chooseppl(uid)
+else error('table not found')
 }
 
 function at1a_chooseppl(uid)
 {
-
 var ppl = JSON.parse(at1a_raci.dataset.ppl)
 const p = ppl.filter(obj => obj.uid == uid)[0];
 
@@ -4932,7 +5123,20 @@ var HTMLtd = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
 
 var HTML = "<div class='divppl' data-uid='"+uid+"'><div style='width:30px'>👤</div><div>"+HTMLtd+"</div><div class='todelete' onclick='at1a_deleteppl(event)'>X</div></div>"
 
-at1a_clickTD.innerHTML += HTML
+PPL_clickTD.innerHTML += HTML
+hide_divgrey()
+}
+
+function at5a_chooseppl(uid)
+{
+var ppl = JSON.parse(at1a_raci.dataset.ppl)
+const p = ppl.filter(obj => obj.uid == uid)[0];
+
+var HTMLtd = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
+
+var HTML = "<div class='divppl' data-uid='"+uid+"'><div style='width:30px'>👤</div><div>"+HTMLtd+"</div><div class='todelete' onclick='at1a_deleteppl(event)'>X</div></div>"
+
+PPL_clickTD.innerHTML += HTML
 hide_divgrey()
 }
 
@@ -4970,12 +5174,344 @@ at1a_raci.dataset.ppl=JSON.stringify(ppl)
 at1a_drappltable()
 }
 
+
+
+
+
+
+
+
+function at5a_addrisk()
+{
+show_divcenter()
+at5a_divnewrisk.style.display="block"
+at5a_risk_txt.value=""
+at5a_risk_txt.focus()
+}
+
+
+function at5a_addriskok()
+{
+
+var vra	=	at5a_vra.value
+var gra	=	at5a_gra.value
+var txt =	at5a_risk_txt.value
+var obj={risk:[]}
+if(at5abcd.dataset.data)
+	obj = JSON.parse(at5abcd.dataset.data)
+
+
+const firstFreeId = [...Array(obj.risk.length + 2).keys()]
+  .slice(1)
+  .find(id => !obj.risk.some(x => x?.id === id));	
+	
+var newrisk = {id:firstFreeId,vra:vra,gra:gra,txt:txt}
+
+
+obj.risk[firstFreeId]=newrisk
+	
+	
+
+
+at5abcd.dataset.data=JSON.stringify(obj)
+
+
+hide_divcenter()
+
+at5a_writerisk(firstFreeId,txt,vra,gra)
+}
+
+
+function at5a_writerisk(firstFreeId,txt,vra,gra)
+{
+var row = at5a_tablerisk.insertRow();
+row.className="tr_deleteicon"
+
+var cell0 = row.insertCell();
+var cell1 =	row.insertCell();
+var cell2 =	row.insertCell();
+
+cell0.innerHTML="<span onclick=\"at5a_deleterisk("+firstFreeId+");this.closest('tr').remove();\">×</span>"
+cell1.innerHTML="<span style='color:var(--color);font-weight:bold;'>R"+firstFreeId+"</span> :"
+cell2.innerText=txt;cell2.contentEditable=true;cell2.dataset.riskid=firstFreeId;cell2.addEventListener('input', function(){editRISKtext(this)});
+
+
+document.querySelector('#at5a_'+vra+gra).innerHTML+="<span>R"+firstFreeId+"</span>"
+}
+
+
+function editRISKtext(elm)
+{
+var txt = elm.innerText;
+var id = parseInt(elm.dataset.riskid);
+
+const obj = JSON.parse(at5abcd.dataset.data);
+
+// trouver et modifier
+obj.risk.forEach(item => {
+  if (item && item.id === id) {
+    item.txt = txt;
+  }
+});
+
+at5abcd.dataset.data=JSON.stringify(obj)
+}
+
+function at5a_deleterisk(id)
+{
+at5c_table.querySelectorAll('.tagr'+id).forEach(e => e.remove());
+at5a_risktable.querySelectorAll("span").forEach(el => {
+  if (el.textContent.trim() === "R"+id) {
+    el.remove();
+  }
+});
+
+var obj = JSON.parse(at5abcd.dataset.data)
+obj.risk = obj.risk.filter(e => e && e.id != id);
+
+at5abcd.dataset.data=JSON.stringify(obj)
+}
+
+
+function at5c_add(){
+
+var row = at5c_table.insertRow();
+row.className="tr_deleteicon"
+var cell0 = row.insertCell();
+var cell1 = row.insertCell();
+var cell2 = row.insertCell();
+var cell3 = row.insertCell();
+var cell4 = row.insertCell();
+var cell5 = row.insertCell();
+
+cell0.innerHTML="<span onclick=\"this.closest('tr').remove();\">×</span>"
+cell1.innerText="Renforcement de la sécurité";cell1.contentEditable=true
+cell2.setAttribute('onclick',"at5c_chooserisk(event)");
+cell3.setAttribute('onclick',"at1a_RACIclick(event)");
+cell4.innerHTML=at5c_getComplexity();cell4.className="aligncenter"
+cell5.innerHTML=at5c_getHTMLtime()
+
+return row;
+}
+
+function at5c_getComplexity()
+{
+var HTML="<select class='at5c_select_time' onchange='at5c_selecttime_change(this)'>"
+HTML+="<option value=''></option>"
+HTML+="<option value='+'>+</option>"
+HTML+="<option value='++'>++</option>"
+HTML+="<option value='+++'>+++</option>"
+return HTML;
+}
+
+function at5c_getHTMLtime()
+{
+var HTML="<select class='at5c_select_time' onchange='at5c_selecttime_change(this)'>"
+HTML+="<option value=''></option>"
+
+var Tmois = JSON.parse(at5c_table.dataset.timeoption)
+
+Tmois.forEach(el => {
+				var txt = el.label
+				var mois = el.mois
+				HTML+="<option value='"+mois+"'>"+txt+"</option>"
+				})
+
+
+HTML+="<option value='other'>...</option></select>"
+return HTML;
+}
+
+
+
+function at5c_selecttime_change(elm)
+{
+
+if(elm!=="showdiv"&&elm.value!="other")return;
+
+show_divcenter()
+at5c_chtime.style.display="block"
+
+
+var Tmois = JSON.parse(at5c_table.dataset.timeoption)
+
+at5c_chtime_table.innerHTML =""
+
+var i=0;
+Tmois.forEach(el => {
+
+				var row = at5c_chtime_table.insertRow();
+				var cell0 = row.insertCell();
+				var cell1 = row.insertCell();
+				
+				cell0.innerHTML="x"
+				cell1.innerHTML=el.label
+				
+				cell0.setAttribute('onclick',"at5c_chtime_remove("+i+")");
+				i++;
+				})
+}
+
+
+
+function at5c_chooserisk(event)
+{
+var td = event.target.closest('td')
+if(!td)return
+
+
+divchoice_close()
+
+PPL_clickTD = td
+at5c_drawchooserisk(td)
+}
+
+function at5c_drawchooserisk(td)
+{
+
+var HTML=""
+
+if(at5abcd.dataset.data == undefined)
+	{
+	HTML = "Aucun risque en 5.A";
+	}
+else
+	{
+	obj = JSON.parse(at5abcd.dataset.data)
+
+	const datasetIds = Array.from(td.querySelectorAll('span')).map(span => parseInt(span.dataset.id));
+	
+	log(datasetIds)
+	obj.risk.forEach(el => {
+
+			if(el && !datasetIds.includes(el.id))
+				{
+				log(el.id)
+					HTML += "<div onclick='at5c_clickaddrisk("+el.id+")'>R"+el.id+"</div>"
+				}
+				}
+			)
+	}
+
+divchoice_open(PPL_clickTD,HTML)
+}
+
+
+
+
+function divchoice_open(elm,HTML)
+{
+
+const tdRect = elm.getBoundingClientRect();
+
+divover_risk.style.display="block"
+
+
+divover_risk.style.left=tdRect.x+"px"
+divover_risk.style.top=window.scrollY+tdRect.y+tdRect.height-2+"px"
+divover_risk.style.width=tdRect.width-2+"px"
+
+divover_risk.innerHTML = HTML
+
+setTimeout(function () {
+	document.addEventListener("click", divchoice_autoclose);
+	}, 0);
+}
+
+function divchoice_autoclose(event)
+{
+log(event.target)
+
+if(event.target.closest('#divover_risk')||event.target.id=='divover_risk')return;
+
+divchoice_close()
+
+}
+
+
+function divchoice_close()
+{
+divover_risk.style.display="none"
+document.removeEventListener("click", divchoice_autoclose);
+}
+
+function at5c_clickaddrisk(id)
+{
+divchoice_close()
+at5c_addrisk(id)
+at5c_drawchooserisk(PPL_clickTD)
+}
+
+
+function at5c_addrisk(id)
+{
+if(!id)return;
+const tag = document.createElement("div");
+tag.className = "tag tagr"+id;
+	  
+      tag.innerHTML = `
+        <span data-id='${id}'>R${id}</span>
+        <button type="button" onclick='this.parentElement.remove()'>×</button>
+      `;
+PPL_clickTD.appendChild(tag);
+}
+
+
+function at5c_chtime_add()
+{
+
+var timeint = at5c_newtime_int.value
+var timetype = at5c_newtime_jsma.value
+var timemonth=0
+
+if(timetype=="j")timemonth=timeint/30
+if(timetype=="s")timemonth=timeint/4
+if(timetype=="m")timemonth=parseInt(timeint)
+if(timetype=="a")timemonth=timeint*12
+
+
+
+
+
+
+var Tmois = JSON.parse(at5c_table.dataset.timeoption)
+var labelselect = at5c_newtime_jsma.options[at5c_newtime_jsma.selectedIndex].text
+
+if(timeint>1 && (timetype=="j"||timetype=="s"||timetype=="a")) labelselect+="s"
+
+Tmois.push({"mois":timemonth,"label":timeint+" "+labelselect})
+
+
+Tmois.sort((a, b) => Number(a.mois) - Number(b.mois));
+
+at5c_table.dataset.timeoption=JSON.stringify(Tmois);
+
+
+
+
+
+
+at5c_selecttime_change("showdiv")
+}
+
+function at5c_chtime_remove(index)
+{
+var Tmois = JSON.parse(at5c_table.dataset.timeoption)
+
+Tmois.splice(index, 1);
+
+at5c_table.dataset.timeoption=JSON.stringify(Tmois);
+
+
+at5c_selecttime_change("showdiv")
+}
 </script>
 </head>
 <body onload="go()">
 
 <div id="divgrey" onclick="hide_divgrey()"></div>
 <div id="divover">divover</div>
+<div id="divover_risk">divover</div>
 <div id="divmenuover"></div>
 
 <div id="layout" style="display: flex;  width: 100%;">
@@ -4985,14 +5521,14 @@ at1a_drappltable()
 <br/>
 
 
-&nbsp; <button onclick="saveJSON(1)" type="button"> &#128427; Save </button><br/>
+&nbsp; <button onclick="saveJSON()" type="button"> &#128427; Save </button><br/>
 &nbsp; <button onclick="loadJSON(1)" type="button"> &#128427; Load </button><br/>
 
 <br/>
 <br/>
 
 <div id="atelier1" onmousedown="clickmenu(this)"><div class="mini at1bg disabled">1</div>Cadrage</div>
-<div class="atelier1open submenu startscript" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
+<div class="atelier1open submenu" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1b',this)"><div class="mini at1bg">B</div>Périmètre</div>
 <div class="atelier1open submenu" onmousedown="showatt('at1c',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
@@ -5013,15 +5549,15 @@ at1a_drappltable()
 <div class="atelier4open submenu" onmousedown="showatt('at4ab',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
 
 <div id="atelier5" onmousedown="clickmenu(this)"><div class="mini at5bg">5</div>Traitement du risque</div>
-<div class="atelier5open submenu disabled" onmousedown="showatt('at5a',this)"><div class="mini at5bg">A</div>Synthèse</div>
-<div class="atelier5open submenu disabled" onmousedown="showatt('at5b',this)"><div class="mini at5bg">B</div>Stratégie</div>
-<div class="atelier5open submenu disabled" onmousedown="showatt('at5c',this)"><div class="mini at5bg">C</div>Mesures de sécurité</div>
-<div class="atelier5open submenu disabled" onmousedown="showatt('at5d',this)"><div class="mini at5bg">D</div>Risques résiduels</div>
-<div class="atelier5open submenu disabled" onmousedown="showatt('at5e',this)"><div class="mini at5bg">E</div>Suivi</div>
-<div class="atelier5open submenu disabled" onmousedown="showatt('at5f',this)"><div class="mini at5bg">F</div>Surveillance</div>
+<div class="at5abcd submenu startscript" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">A</div>Synthèse</div>
+<div class="at5abcd submenu" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">B</div>Stratégie</div>
+<div class="at5abcd submenu" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">C</div>Mesures de sécurité</div>
+<div class="at5abcd submenu" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">D</div>Risques résiduels</div>
+<div class="at5ef submenu disabled" onmousedown="showatt('at5ef',this)"><div class="mini at5bg">E</div>Suivi</div>
+<div class="at5ef submenu disabled" onmousedown="showatt('at5ef',this)"><div class="mini at5bg">F</div>Surveillance</div>
 </div>
 
-<div id="layout_content" style="margin-left:220px;width: 100vw;">
+<div id="layout_content" style="margin-left:220px;width: 100vw;padding-left: 20px;">
 
 <div id="at1a">
 
@@ -5408,7 +5944,7 @@ Maturité cyber x Confiance
 <br/><br/><br/>
 <button onclick="at3c_newsec()" style="padding:8px 16px;margin: 16px;">Ajouter</button><br/>
 <table id='at3c_table' class='tabletype'><tr>
-<td><div class='optioncolumn' style="transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;" onmousedown="at3c_option(this)"><b>...</b></div></td>
+<td></td>
 <td>Partie prenante</td>
 <td>Chemins d’attaque stratégiques</td>
 <td>Mesures de sécurité</td>
@@ -5510,10 +6046,128 @@ Probabilité de succès :
 </div>
 
 
+<div id="at5abcd">
+<br/>
+
+<span class="big at5bg">5.A</span><span style="border-bottom:#FED6EB solid 3px;">Synthèse des scénarios de risque & cartographie du risque initial</span>
+<br/><br/><br/>
+
+<button onclick="at5a_addrisk()" style="padding:4px 8px;margin-left:50px;">Ajouter</button>
+<br/>
+<br/>
+<br/>
+<table id="at5a_risktable" class="at5_risk">
+  <tr style="height:20px">
+    <th></th>
+    <td style="text-align: left;vertical-align:top"><div style="transform: translate(-30px,-20px);display:inline-block;">Gravité</div><div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:14px solid #ccc;transform: translate(-9px,-23px);"></div></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <th>4</th>
+    <td class="orange" id="at5a_14"></td>
+    <td class="orange" id="at5a_24"></td>
+    <td class="red" id="at5a_34"></td>
+    <td class="red" id="at5a_44"></td>
+  </tr>
+  <tr>
+    <th>3</th>
+    <td class="green" id="at5a_13"></td>
+    <td class="orange" id="at5a_23"></td>
+    <td class="red" id="at5a_33"></td>
+    <td class="red" id="at5a_43"></td>
+  </tr>
+  <tr>
+    <th>2</th>
+    <td class="green" id="at5a_12"></td>
+    <td class="green" id="at5a_22"></td>
+    <td class="orange" id="at5a_32"></td>
+    <td class="red" id="at5a_42"></td>
+  </tr>
+  <tr>
+    <th>1</th>
+    <td class="green" id="at5a_11"></td>
+    <td class="green" id="at5a_21"></td>
+    <td class="orange" id="at5a_31"></td>
+    <td class="orange" id="at5a_41"></td>
+  </tr>
+  <tr>
+    <td style="width:20px;border-top:0px;"></td>
+    <td>1</td>
+    <td>2</td>
+    <td>3</td>
+    <td>4</td>
+    <td style="width:20px;text-align: left;vertical-align:top"><div style="transform: translate(-50px);position: absolute;">Vraisemblance</div><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:14px solid #ccc;position: absolute;transform: translate(20px,-9px);"></div></td>
+  </tr>
+</table>
+
+<br/>
+<br/>
+<span>Scénarios de risques :<span>
+<br/>
+<table id="at5a_tablerisk"></table>
+
+<br/>
+<br/>
+<span class="big at5bg">5.B</span><span style="border-bottom:#FED6EB solid 3px;">Choix de stratégie de traitment du risque</span>
+<br/>
+<br/>
+<table class="at5b_table" style="width:700px;margin-left:20px;;border:2px solid var(--colorlight);border-collapse:collapse;">
+  <tr style="background-color:var(--colorlight);text-align:center">
+    <td class="" style="height:40px">Risque</td>
+    <td class="" style="height:40px">Acceptabilité</td>
+    <td class="" style="height:40px">Actions</td>
+  </tr>
+  <tr>
+    <td class="green">Faible</td>
+    <td class="">Acceptable en l’état</td>
+    <td class="">Aucune action n’est à entreprendre.</td>
+  </tr>
+  <tr>
+    <td class="orange">Moyen</td>
+    <td class="">Tolérable sous contrôle</td>
+    <td class="">Un suivi en termes de gestion du risque est à mener
+et des actions sont à mettre en place dans le cadre
+d’une amélioration continue sur le moyen et long terme.</td>
+  </tr>
+  <tr>
+    <td class="red">Élevé</td>
+    <td class="">Inacceptable</td>
+    <td class="">Des mesures de réduction du risque doivent
+impérativement être prises à court terme. Dans le cas contraire, tout ou partie de l’activité sera refusé.</td>
+  </tr>
+
+</table>
 
 
+<br/>
+<br/>
+<span class="big at5bg">5.C</span><span style="border-bottom:#FED6EB solid 3px;">Mesures de sécurité</span>
+<br/>
+<br/>
+<button onclick="at5c_add()" style="padding:4px 8px;margin-left:50px;">Ajouter</button>
+<br/>
+
+<table id="at5c_table" data-timeoption='[{"mois":1,"label":"1 mois"},{"mois":3,"label":"3 mois"},{"mois":6,"label":"6 mois"},{"mois":12,"label":"1 an"}]'>
+  <tr style="height:40px">
+	<td style="width:25px"></td>
+    <td>Mesure</td>
+    <td>Risque associé</td>
+	<td>Responsable</td>
+	<td style="width:140px;">Cout/Complexité</td>
+	<td>Echéance</td>
+  </tr>
+</table>
+
+<br/>
+<br/>
+<span class="big at5bg">5.D</span><span style="border-bottom:#FED6EB solid 3px;">Risques résiduels</span>
+<br/>
+<br/>
 
 
+</div>
 
 
 
@@ -5753,6 +6407,69 @@ Description<br/>
 
 </table>
 </div>
+</div>
+
+
+<div id="at5a_divnewrisk" style="width:700px">
+
+<input type="hidden" id="at5a_risk_id"></input>
+
+<br/>
+<span id="at5a_spanrisk">Nouveau risque</span><br/><br/>
+<br/>
+<textarea id="at5a_risk_txt" style="width: 100%;    height: 120px;     box-sizing: border-box;"></textarea>
+<br/>
+<table>
+<tr>
+<td>Gravité :</td>
+<td>
+<select name="at5a_risk_gra" id="at5a_gra">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+</td>
+</tr>
+<tr>
+<tr>
+<td>Vraisemblance :</td>
+<td>
+
+<select name="at5a_risk_vra" id="at5a_vra">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+</td>
+</tr>
+</table>
+<center><button onclick="at5a_addriskok()" style="padding:8px 16px;">Ok</button></center>
+<br/>
+</div>
+
+
+
+
+<div id="at5c_chtime" style="width:700px">
+
+<br/>
+<input id="at5c_newtime_int" type="number" style="width:50px"/>
+<select id="at5c_newtime_jsma">
+<option value="j">jour</option>
+<option value="s">semaine</option>
+<option value="m" selected>mois</option>
+<option value="a">an</option>
+</select><button onclick="at5c_chtime_add()" style="">+</button>
+<table id="at5c_chtime_table">
+<tr>
+<td>None</td>
+</tr>
+<tr>
+</table>
+<center><button onclick="hide_divgrey()" style="padding:8px 16px;">Fermer</button></center>
+<br/>
 </div>
 
 
