@@ -33,13 +33,6 @@ Aide à créer des graphiques et schémas pour la méthode EBIOS Risk Manager
      width="600">
 
 
-## Assistance pour les ateliers
-- 1.C - Cadrage/Événements redoutés <br />
-- 2 - Source de risque<br />
-- 3 - Scénarios stratégiques<br />
-- 4 - Scénarios opérationnels <br />
-
-
 ## Fonctionnalités
 - Interface claire et intuitive permettant une prise en main rapide.
 - Création des scénarios à la souris : construction visuelle des scénarios par glisser-déposer.
