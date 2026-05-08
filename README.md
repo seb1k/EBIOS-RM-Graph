@@ -2,13 +2,13 @@
 Aide à créer des graphiques et schémas pour la méthode EBIOS Risk Manager
 
 ## Utilisation
-### Téléchargement direct
+### Utilisation en ligne
+  Lien -> [EBIOS-RM-Graph](https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html)
+
+### Téléchargement
 
 1. Téléchargez EBIOS-RM-Graph.html
 2. Utilisation directe dans le navigateur.
-
-### Utilisation en ligne
-  Lien -> [EBIOS-RM-Graph](https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html)
 
 
 ## Screenshot :
