@@ -452,10 +452,6 @@ display:none;
 display:block;
 }
 
-#at3b_addpp_1 td{
-text-indent:16px;
-}
-
 .at2b_pertinence,.at2b_center{
 text-align:center;
 }
@@ -1134,12 +1130,12 @@ function demanderEtLireJSON() {
     const reader = new FileReader();
 
     reader.onload = function () {
-      try {
+     // try {
 		loadJSON(2,reader.result)
 
-      } catch (e) {
-        console.error("Fichier JSON invalide");
-      }
+     // } catch (e) {
+     //   console.error("Fichier JSON invalide");
+    //  }
     };
 
     reader.readAsText(fichier, "utf-8");
@@ -1189,8 +1185,8 @@ if(savedata.at1a.ppl)
 	at1a_raci.dataset.ppl	=savedata.at1a.ppl
 
 savedata.at1a.divppl.forEach(el => {
-			at1a_clickTD = at1a_raci.rows[el.tr].cells[el.td]
-			at1a_chooseppl(el.uid)
+			PPL_clickTD = at1a_raci.rows[el.tr].cells[el.td]
+			add_ppl_inTD(el.uid)
 			})
 
 // AT1C
@@ -1333,8 +1329,10 @@ at4a_refresh_path_at4b()
 at5a_risktable.querySelectorAll('span').forEach(e => e.remove());
 while(at5a_tablerisk.rows[0])at5a_tablerisk.rows[0].remove()
 
-at5abcd.dataset.data=savedata.at5abcd
-JSON.parse(savedata.at5abcd).risk.forEach(e=>{if(e)at5a_writerisk(e.id,e.txt,e.vra,e.gra)})
+if(savedata.at5abcd)
+	at5abcd.dataset.data=savedata.at5abcd
+if(savedata.at5abcd)
+	JSON.parse(savedata.at5abcd).risk.forEach(e=>{if(e)at5a_writerisk(e.id,e.txt,e.vra,e.gra)})
 
 
 //AT5C
@@ -1342,13 +1340,13 @@ at5c_table.dataset.timeoption = savedata.at5c_timeoption
 while(at5c_table.rows[1])at5c_table.rows[1].remove();
 
 savedata.at5c_table.forEach(e => {
-									var tr = at5c_add()
-									tr.cells[1].innerText=e[0]
-									PPL_clickTD=tr.cells[2];	e[1].split(',').map(Number).forEach(id => at5c_addrisk(id));
-									//COLONNE ppl
-									tr.cells[4].querySelector('select').value=e[3]
-									tr.cells[5].querySelector('select').value=e[4]
-									});
+							var tr = at5c_add()
+							tr.cells[1].innerText=e[0]
+							PPL_clickTD=tr.cells[2];	e[1].split(',').map(Number).forEach(id => at5c_addrisk(id));
+							PPL_clickTD=tr.cells[3];	e[2].split(',').map(id => {if(id)add_ppl_inTD(id)});
+							tr.cells[4].querySelector('select').value=e[3]
+							tr.cells[5].querySelector('select').value=e[4]
+							});
 
 }
 
@@ -1557,9 +1555,9 @@ var HTML=""
 
 HTML += "<b>"+ppover.querySelector('input').value+"</b><br/>"
 HTML += "<table>"
-HTML += "<tr><td>Menace</td><td>:</td><td>"+ppover.dataset.menace+"<td/></tr>"
 HTML += "<tr><td>Expo.</td><td>:</td><td>"+ppover.dataset.expo+"<td/></tr>"
 HTML += "<tr><td>Fiabilité</td><td>:</td><td>"+ppover.dataset.fiab+"<td/></tr>"
+HTML += "<tr><td>Menace</td><td>:</td><td>"+ppover.dataset.menace+"<td/></tr>"
 HTML += "</table>"
 divover.innerHTML = HTML
 }
@@ -1789,7 +1787,7 @@ function go()
 at3a_newcat()
 at3a_newcat()
 
-showatt('at5abcd',document.querySelector('.startscript'))
+showatt('at1a',document.querySelector('.startscript'))
 }
 
 
@@ -1939,6 +1937,9 @@ cell3.innerHTML = at2b_selectsrov("OV",OVfound)
 cell4.innerHTML = "<div class='td_reducetext'>"+ovtxt+"</div>"
 cell5.innerHTML = "<div class='mra2do'></div>";
 cell6.className = "at2b_pertinence";
+cell6.innerText = "Faible";
+cell6.style.backgroundColor="rgb(170, 255, 170)"
+
 //cell7.className = "at2b_center";
 //cell7.innerHTML = "<select  onchange='at2c_chinput(this)'><option value='1'>1 - Faible</option><option value='2'>2 - Moyen</option><option value='3'>3 - Elevé</option></select>"
 cell8.className = "at2b_center";
@@ -1957,7 +1958,8 @@ cell1.innerHTML = srtxt;
 cell2.innerHTML = "<div class='td_reducetext'>"+ovtxt+"</div>"
 
 
-document.querySelectorAll(".mra2do").forEach(e => createmradiv(e));
+document.querySelectorAll(".mra2do").forEach(e => createmradiv(e)
+);
 at2b_redraw_graph()
 return row
 }
@@ -1988,7 +1990,7 @@ return HTML+"</select>"
 
 function at2b_selectmra(type,id)
 {
-var HTML="<div style='display:inline-block'><select class='select_mra_"+type+"' onchange='at2b_selectmrachange(this)'>"
+var HTML="<div style='display:inline-block;background-color: rgba(170, 255, 170);'><select class='select_mra_"+type+"' onchange='at2b_selectmrachange(this)'>"
 
 for(var i=1;i<=3;i++)
 	{
@@ -2017,9 +2019,9 @@ var eleminfo=elm.closest(".at2b_mra")
 var t = elm.value.charAt(0)
 var v = parseInt(elm.value.charAt(1));
 
-var c = "rgba(0, 167, 162, 0.667)"
-if(v==2) c="rgb(246, 231, 66, 0.66)"
-if(v==3) c="rgba(227, 57, 74, 0.667)"
+var c = "rgb(170, 255, 170)"
+if(v==2) c="rgb(255, 255, 170)"//c="rgb(246, 231, 66, 0.66)"
+if(v==3) c="rgb(255, 170, 170)"
 elm.parentElement.style.backgroundColor=c
 
 
@@ -2761,13 +2763,13 @@ at3b_newsscnear.style.display="block"
 var toshow=[]
 at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
 
-var HTML="<table id='at3b_1table' class='tabletype' style='min-width:680px'>"
-HTML+="<tr><td>Source de Risque</td><td>Objectif Visés</td></tr>"
+var HTML="<table id='at3b_1table' class='tabletype at2' style='min-width:680px'>"
+HTML+="<tr style='background-color:#FFB9F6'><td></td><td>Source de Risque</td><td>Objectif Visés</td></tr>"
 for(var i=0;i<toshow.length;i++)
 	{
 	var rowscenar = document.querySelector('#at2b_srovlist').querySelector("[data-idsrov='"+toshow[i]+"']")
 
-	HTML+="<tr onclick='at3b_clickscenar(this)' style='cursor:pointer'><td>"+rowscenar.cells[2].innerText+"</td><td>"+rowscenar.cells[4].innerText+"</td></tr>"
+	HTML+="<tr style='background-color:#FFF' onclick='clicktdinputradio(this)' style='cursor:pointer'><td><input type='radio'name='srov' value='' /></td><td>"+rowscenar.cells[2].innerText+"</td><td>"+rowscenar.cells[4].innerText+"</td></tr>"
 	}
 HTML+="</table>"
 
@@ -2785,20 +2787,51 @@ at3b_1.innerHTML=HTML
 
 
 
-at3b_2.innerHTML=""
 
+if(at1c_table.rows.length<2)
+	{
+	at3b_2.innerHTML = "<br/>Aucune VM dans l'atelier 1.C"
+	return
+	}
+
+
+
+var HTML ="<table style='min-width:680px' class='tabletype at1'>"
+
+HTML+="<tr><td></td><td style='text-align:left;'>Valeur métier attaquée</td><td>Gravité</td></tr>"
+
+for(var i=1;i<at1c_table.rows.length;i++)
+	{
+	var tr=at1c_table.rows[i];
+	var tabtr=[]
+
+	if(tr.querySelector('.tdmetier p'))
+		var txt = tr.querySelector('.tdmetier p').innerText
+	var g = parseInt(tr.querySelector('.gravitespan').innerText)
+	
+	HTML +="<tr onclick='clicktdinputradio(this)'><td><input type='radio' name='vmgra' value='' /></td>"
+	HTML += "<td>"+txt+"</td><td style='background-color:"+getcolorfromgravite(g)+";text-align:center;'>"+g+"</td>"
+	HTML +="</tr>"
+
+	}
+HTML +="</table>"
+at3b_2.innerHTML=HTML
+
+select_first_radio(at3b_1table)
+select_first_radio(at3b_2)
 }
 
-function at3b_clickscenar(elem)
+
+function select_first_radio(container)
 {
-var d = elem.closest('table').querySelectorAll('.selected')
-d.forEach(e => e.style.backgroundColor="")
-d.forEach(e => e.classList.remove('selected'))
-
-
-elem.classList.add('selected')
-elem.style.backgroundColor="#ACC8C7"
+container.querySelector('input').checked=true
 }
+
+function clicktdinputradio(tr)
+{
+tr.querySelector('input').checked=true;
+}
+
 
 function at3b_add(from_save)
 {
@@ -2811,12 +2844,25 @@ var gravite = 1
 var attackpath=[]
 document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
 
-var row = at3b_1.querySelector('.selected')
-if(row)
+
+
+if(!from_save)
 	{
-	txt1 = row.cells[0].innerText
-	txt2 = row.cells[1].innerText
-	}
+	if(at3b_1.querySelector('input:checked'))
+		{
+		var row = at3b_1.querySelector('input:checked').closest('tr')
+		txt1 = row.cells[0].innerText
+		txt2 = row.cells[1].innerText
+		}
+	
+	if(at3b_2.querySelector('input:checked'))
+		{
+		gravite=parseInt(at3b_2.querySelector('input:checked').closest('tr').cells[2].innerText);
+		}
+}
+
+
+
 
 if(from_save)
 	{
@@ -3223,10 +3269,10 @@ if(!tabpps.length) //demo Pp
 	tabpps=[[6,"Prestataire informatsique",0],[4,"Fournisseurs",0],[2,"Laboratoires",0],[2,"Pharmacies",0],[2,"Établissements de santé",0]]
 	}
 
-var HTML="<table style='border-collapse: collapse;'><tr><td>Partie prenante</td><td>Menace<td></tr>"
+var HTML="<table class='tabletype' style='border-collapse: collapse;width:400px'><tr><td></td><td style='text-align:left;'>Partie prenante</td><td style='text-align:left;'>Menace</td></tr>"
 for(var i=0;i<tabpps.length;i++)
 	{
-	HTML+="<tr onmousedown='at3b_clickscenar(this)' data-idpath='"+idpath+"' data-ppuid='"+tabpps[i][2]+"'style='cursor:pointer'><td>"+tabpps[i][1]+"</td><td> "+tabpps[i][0]+"</td></tr>"
+	HTML+="<tr onmousedown='clicktdinputradio(this)' data-idpath='"+idpath+"' data-ppuid='"+tabpps[i][2]+"'style='cursor:pointer'><td><input type='radio'name='scenar' value='' /></td><td>"+tabpps[i][1]+"</td><td style='background-color:"+get_menacecolor(parseFloat(tabpps[i][0]))+"'> "+tabpps[i][0]+"</td></tr>"
 	}
 HTML+="</table>"
 
@@ -3234,14 +3280,20 @@ at3b_addpp_1.innerHTML=HTML
 divmenuover_clickev(false)
 }
 
+
+
 function at3b_addppok()
 {
 var divsc = document.querySelector('.scenarselected')
-var idpath = parseInt(at3b_addpp_1.querySelector('.selected').dataset.idpath)
-var ppuid = at3b_addpp_1.querySelector('.selected').dataset.ppuid
-var tr = at3b_addpp_1.querySelector('.selected')
-var txtPP = tr.querySelector('td').innerText
-var risk = tr.querySelectorAll('td')[1].innerText
+
+
+var row = at3b_addpp_1.querySelector('input:checked').closest('tr')
+
+var idpath = row.dataset.idpath
+var ppuid = row.dataset.ppuid
+
+var txtPP = row.cells[1].innerText
+var risk = row.cells[2].innerText
 var scenarobj = JSON.parse(divsc.dataset.attackinfo)
 
 if(!txtPP)txtPP="";
@@ -3254,6 +3306,8 @@ divsc.dataset.attackinfo = JSON.stringify(scenarobj)
 hide_divgrey()
 at3b_redraw()
 }
+
+
 
 
 
@@ -4300,7 +4354,7 @@ document.querySelectorAll('.bulledot').forEach(el => el.remove());
 	// draw DOT for new arrow
 document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 	
-	NEWdiv = document.createElement("div");
+	var NEWdiv = document.createElement("div");
 	NEWdiv.className = "bulledot top";
 	NEWdiv.style.position = "absolute";
 	NEWdiv.style.left = el.offsetWidth/2-6+"px"
@@ -4308,7 +4362,7 @@ document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 	NEWdiv.setAttribute("onmousedown", "click_bulledot(this,event)");
 	el.appendChild(NEWdiv);	
 	
-	var NEWdiv = document.createElement("div");
+	NEWdiv = document.createElement("div");
 	NEWdiv.className = "bulledot left";
 	NEWdiv.style.position = "absolute";
 	NEWdiv.style.left = el.offsetWidth-12+"px"
@@ -5105,39 +5159,20 @@ at1a_drappltable()
 
 function chooseppl(uid)
 {
-
-
-if(PPL_clickTD.closest('#at1a_raci'))
-	at1a_chooseppl(uid)
-else if(PPL_clickTD.closest('#at5c_table'))
-	at5a_chooseppl(uid)
-else error('table not found')
+add_ppl_inTD(uid)
+hide_divgrey()
 }
 
-function at1a_chooseppl(uid)
+function add_ppl_inTD(uid)
 {
 var ppl = JSON.parse(at1a_raci.dataset.ppl)
 const p = ppl.filter(obj => obj.uid == uid)[0];
-
+error(uid)
 var HTMLtd = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
 
 var HTML = "<div class='divppl' data-uid='"+uid+"'><div style='width:30px'>👤</div><div>"+HTMLtd+"</div><div class='todelete' onclick='at1a_deleteppl(event)'>X</div></div>"
 
 PPL_clickTD.innerHTML += HTML
-hide_divgrey()
-}
-
-function at5a_chooseppl(uid)
-{
-var ppl = JSON.parse(at1a_raci.dataset.ppl)
-const p = ppl.filter(obj => obj.uid == uid)[0];
-
-var HTMLtd = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
-
-var HTML = "<div class='divppl' data-uid='"+uid+"'><div style='width:30px'>👤</div><div>"+HTMLtd+"</div><div class='todelete' onclick='at1a_deleteppl(event)'>X</div></div>"
-
-PPL_clickTD.innerHTML += HTML
-hide_divgrey()
 }
 
 
@@ -5197,7 +5232,7 @@ var vra	=	at5a_vra.value
 var gra	=	at5a_gra.value
 var txt =	at5a_risk_txt.value
 var obj={risk:[]}
-if(at5abcd.dataset.data)
+if(at5abcd.dataset.data && at5abcd.dataset.data != undefined)
 	obj = JSON.parse(at5abcd.dataset.data)
 
 
@@ -5528,7 +5563,7 @@ at5c_selecttime_change("showdiv")
 <br/>
 
 <div id="atelier1" onmousedown="clickmenu(this)"><div class="mini at1bg disabled">1</div>Cadrage</div>
-<div class="atelier1open submenu" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
+<div class="atelier1open submenu startscript" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1b',this)"><div class="mini at1bg">B</div>Périmètre</div>
 <div class="atelier1open submenu" onmousedown="showatt('at1c',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
 <div class="atelier1open submenu disabled" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
@@ -5549,7 +5584,7 @@ at5c_selecttime_change("showdiv")
 <div class="atelier4open submenu" onmousedown="showatt('at4ab',this)"><div class="mini at4bg">B</div>Vraisemblance</div>
 
 <div id="atelier5" onmousedown="clickmenu(this)"><div class="mini at5bg">5</div>Traitement du risque</div>
-<div class="at5abcd submenu startscript" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">A</div>Synthèse</div>
+<div class="at5abcd submenu" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">A</div>Synthèse</div>
 <div class="at5abcd submenu" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">B</div>Stratégie</div>
 <div class="at5abcd submenu" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">C</div>Mesures de sécurité</div>
 <div class="at5abcd submenu" onmousedown="showatt('at5abcd',this)"><div class="mini at5bg">D</div>Risques résiduels</div>
@@ -6272,12 +6307,12 @@ Objectifs Visés<br/>
 
 <div id="at3b_addpp" style="width:700px">
 <br/>
-Partie prenante<br/>
-<br/>
-<div id="at3b_nosrov2">Pas de PP dans l'atelier 3.A, exemple de PP :<br/><br/></div> 
+
+
+<div id="at3b_nosrov2">Partie prenante<br/><br/>Pas de PP dans l'atelier 3.A, exemple de PP :<br/><br/></div> 
 <div id="at3b_addpp_1"></div>
 
-<center><button onclick="at3b_addppok()" style="padding:8px 16px">Modifier</button></center>
+<center><button onclick="at3b_addppok()" style="padding:8px 16px">Ok</button></center>
 
 <br/>
 </div>
