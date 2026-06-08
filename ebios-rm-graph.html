@@ -273,12 +273,11 @@ cursor:pointer;
 
 #at2a_tablesrovexemple{
 cursor:pointer;
-background-color:#E2D3E0;
 border-collapse:collapse;
 }
 
 #at2a_tablesrovexemple tr:hover{
-background-color:#d2b3d0;
+background-color:#E2D3E0;
 }
 
 #at2a_tablesrovexemple td, #at2b_srovlist td{
@@ -995,7 +994,7 @@ accent-color: rgb(255, 56, 36);
 font-size: 12px;
 margin: 12px;
 padding-left: 8px;
-height: 300px;
+max-height: 300px;
 overflow: scroll;
 background: #eee;
 }
@@ -1214,18 +1213,26 @@ const url = URL.createObjectURL(blob);
 
 const a = document.createElement("a");
 a.href = url;
-a.download = "backup.json";
+a.download = get_downloadfilename()//"backup.json";
 document.body.appendChild(a);
 a.click();
 
 document.body.removeChild(a);
 URL.revokeObjectURL(url);
-
-
-
 }
 
+function get_downloadfilename()
+{
+var txtorg	=	at1a_org.value;
+var txtnom=	at1a_nom.value;
+var txtver=	at1a_ver.value;
 
+if(!txtorg)return "backup.json"
+if(txtnom)txtnom=" ("+txtnom+")"
+if(txtver)txtver="_v"+txtver
+
+return txtorg+txtnom+txtver+".json"
+}
 
 
 
@@ -1356,7 +1363,7 @@ savedata.at1d_socles.forEach(el => {
 	last.querySelector('.at1c_select_socle').value	=el.soclename
 	last.querySelector('.at1c_select_socle2').value	=el.soclestatut
 	last.querySelector('textarea').value=el.text
-	at1d_appliq_ch(last.querySelector('.at1c_select_socle2'))
+	//at1d_appliq_ch(last.querySelector('.at1c_select_socle2'))
 	})
 
 
@@ -2149,7 +2156,7 @@ for(var i=1;i<at1c_table.rows.length;i++)
 
 if(at1c_table.rows.length<=1)
 	{
-	HTML="<tr><td>Aucun evenement redouté dans l'atelier 1.C</td></tr>";
+	HTML="<tr><td style='background:var(--colorlight);'>Aucun evenement redouté dans l'atelier 1.C</td></tr>";
 	}
 at2c_ch_ERelmTAble.innerHTML=HTML
 }
@@ -2331,6 +2338,7 @@ load_att(att)
 function load_att(att)
 {
 if(att=="at1a") at1a_load()
+if(att=="at1bc") at1bc_load()
 if(att=="at2abc") at2abc_load()
 if(att=="at3a") at3a_redraw_graph()
 if(att=="at3b") at3b_redraw()
@@ -2351,6 +2359,12 @@ function at1a_load()
 if(at1a_date.value=="")
 	at1a_date.value=new Date().toISOString().split('T')[0];
 }
+
+function at1bc_load()
+{
+document.querySelectorAll('.at1bc').forEach(e => e.classList.add('submenu_activ'));
+}
+
 
 function at4ab_load()
 {
@@ -5405,8 +5419,8 @@ at1a_listppl.style.disabled="block"
 
 while(at1a_listppltbl.rows[0])at1a_listppltbl.rows[0].remove()
 
-
-ppl.sort(function(a,b) {return b.name-a.name})
+log(ppl)
+ppl.sort(function(a,b) {return a.name.localeCompare(b.name)})
 
 for(var i=0;i<ppl.length;i++)
 	{
@@ -5423,7 +5437,7 @@ for(var i=0;i<ppl.length;i++)
 	
 	cell0.innerHTML = "&#128100;"
 	cell1.innerHTML = p.name+"<br/><span style='color:#888'>"+p.titre+"</span>"
-	cell2.innerHTML = "X"
+	cell2.innerHTML = "×"
 	cell2.setAttribute('onclick',"at1a_removeppl(this,event)");
 	cell2.dataset.uid = p.uid
 
@@ -5839,20 +5853,23 @@ at1d_soclediv.insertAdjacentHTML("beforeend", HTML);
 
 
 
-
+/*
 function at1d_appliq_ch(elm)
 {
 var v = elm.value
-var c = "rgb(255, 170, 170)"
-if(v==2) c="rgb(255, 255, 170)"//c="rgb(246, 231, 66, 0.66)"
+var c = "#111" // -1
+if(v==0) c="#F87171"
+if(v==1) c="#D1D5DB"
+if(v==2) c="#3B82F6"
+if(v==3) c="#FDE047"
 if(v==4) c="rgb(170, 255, 170)"
 
 elm.parentElement.style.backgroundColor=c
 }
-
+*/
 function at1d_socle()
 {
-var HTML="<select class='at1c_select_socle' onchange='at1d_socle_ch(this)'>"
+var HTML="<select class='at1c_select_socle at1c_select_socle1' onchange='at1d_socle_ch(this)'>"
 
 var Tmois = JSON.parse(at1d.dataset.socles)
 
@@ -5867,11 +5884,14 @@ return HTML;
 
 function at1d_appliq()
 {
-var HTML="<div style='float: right;background:rgb(170, 255, 170);'><select class='at1c_select_socle at1c_select_socle2' style='border:0;background:transparent;' onchange='at1d_appliq_ch(this)'>"
+var HTML="<div style='float: right;'><select class='at1c_select_socle at1c_select_socle2' style='border:0;background:transparent;'>"
 
-HTML+="<option value='4'>Appliqué</option>"
-HTML+="<option value='2'>Partiellement appliqué</option>"
-HTML+="<option value='0'>Non appliqué</option>"
+HTML+="<option value='1'>◻️ A faire</option>"
+HTML+="<option value='2'>🟦 En cours</option>"
+HTML+="<option value='0'>🟥 Non conforme</option>"
+HTML+="<option value='3'>🟨 Partiellement conforme</option>"
+HTML+="<option value='4'>🟩 Conforme</option>"
+HTML+="<option value='-1'>⬛ Non applicable</option>"
 
 HTML+="</select></div>"
 return HTML;
@@ -5885,6 +5905,8 @@ if(elm!=="showdiv"&&elm.value!="other")return;
 show_divcenter()
 at1d_chsocle.style.display="block"
 
+at1d_socle_addinput.value=""
+at1d_socle_addinput.focus();
 
 var obj = JSON.parse(at1d.dataset.socles)
 
@@ -5903,6 +5925,9 @@ obj.forEach(el => {
 				cell0.setAttribute('onclick',"at1d_socle_remove("+i+")");
 				i++;
 				})
+				
+
+
 return false;
 }
 
@@ -5914,7 +5939,7 @@ var TEXTtoremove= obj[index];
 obj.splice(index, 1);
 
 
-document.querySelectorAll('.at1c_select_socle').forEach(select => {
+document.querySelectorAll('.at1c_select_socle1').forEach(select => {
     [...select.options].forEach(option => {
         if (option.text.trim() === TEXTtoremove) {
             option.remove();
@@ -5931,7 +5956,7 @@ function at1d_deletesocle(elm)
 {
 if(confirm('Supprimer le socle ?'))
 	{
-	elm.closest('div').remove();
+	elm.closest('.at1d_divsocle').remove();
 	}
 }
 
@@ -5943,13 +5968,12 @@ var txt = at1d_socle_addinput.value
 var obj = JSON.parse(at1d.dataset.socles)
 obj.push(txt)
 at1d.dataset.socles=JSON.stringify(obj);
-at1d_socle_addinput.value=""
 
 
-document.querySelectorAll('.at1c_select_socle').forEach(select => {
+
+document.querySelectorAll('.at1c_select_socle1').forEach(select => {
 		const option = document.createElement('option');
 		option.text = txt;
-		//select.appendChild(option);
 		const options = select.options;
 		select.insertBefore(option, options[options.length - 1]);
 	});
@@ -5983,8 +6007,8 @@ at1d_socle_ch("showdiv")
 
 <div id="atelier1" onmousedown="clickmenu(this)"><div class="mini at1bg disabled">1</div>Cadrage</div>
 <div class="atelier1open submenu startscript" onmousedown="showatt('at1a',this)"><div class="mini at1bg ">A</div>Cadre de l'étude</div>
-<div class="atelier1open submenu" onmousedown="showatt('at1b',this)"><div class="mini at1bg">B</div>Périmètre</div>
-<div class="atelier1open submenu" onmousedown="showatt('at1c',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
+<div class="at1bc atelier1open submenu" onmousedown="showatt('at1bc',this)"><div class="mini at1bg">B</div>Périmètre</div>
+<div class="at1bc atelier1open submenu" onmousedown="showatt('at1bc',this)"><div class="mini at1bg">C</div>Événements redoutés</div>
 <div class="atelier1open submenu" onmousedown="showatt('at1d',this)"><div class="mini at1bg">D</div>Socle de sécurité</div>
 
 <div id="atelier2" onmousedown="clickmenu(this)"><div class="mini at2bg">2</div>Source de risque</div>
@@ -6047,7 +6071,7 @@ at1d_socle_ch("showdiv")
 
 </div>
 
-<div id="at1b">
+<div id="at1bc">
 
 <br/>
 <br/>
@@ -6055,13 +6079,13 @@ at1d_socle_ch("showdiv")
 <span class="big at1bg">1.B</span><span style="border-bottom:#FED6EB solid 3px;">Périmètre métier et technique</span>
 <br/>
 <br/>
-<div style='margin-left:30px;'class="info-wrapper">
+
+<button onclick="at1b_popupnewsmetier()" style="padding:8px 16px;margin: 16px;">Ajouter valeur métier</button>
+<div class="info-wrapper">
   <span class="info-icon">i</span>
   <div class="info-wrapper-tooltip">5 à 10 valeurs métier constituent généralement une base suffisante.</div>
   </div>
-<br/>
-<br/>
-<button onclick="at1b_popupnewsmetier()" style="padding:8px 16px;margin: 16px;">Ajouter valeur métier</button><br/>
+  <br/>
 <table id='at1b_table' style="min-width:350px;">
 	<tr style='color:#FB45A3'>
 		<td style="background:#fff;width:22px;"></td>
@@ -6069,11 +6093,9 @@ at1d_socle_ch("showdiv")
 	</tr>
 </table>
 
-</div>
-
-
-
-<div id="at1c">
+<br/>
+<br/><br/>
+<br/>
 
 <br/>
 <br/>
@@ -6343,7 +6365,7 @@ Maturité cyber x Confiance
   <circle cx="0" cy="0" r="250" fill="none" stroke="#ccc" />
   <circle cx="0" cy="0" r="300" fill="none" stroke="#ccc" />
   
-  <circle id="bluecircle" cx="0" cy="0" r="20" fill="#39B0F0" />
+  <circle id="bluecircle" cx="0" cy="0" r="15" fill="#39B0F0" />
 	
 	
 	  
@@ -6354,12 +6376,12 @@ Maturité cyber x Confiance
   
   
   <!-- 1,2,3,4,5 -->
-  <text x="55" y="40" text-anchor="middle" font-size="16">5</text>
-  <text x="90" y="75" text-anchor="middle" font-size="16">4</text>
-  <text x="127" y="110" text-anchor="middle" font-size="16">3</text>
-  <text x="162" y="145" text-anchor="middle" font-size="16">2</text>
-  <text x="200" y="182" text-anchor="middle" font-size="16">1</text>
-  <text x="235" y="220" text-anchor="middle" font-size="16">0</text>
+  <text x="53" y="40" text-anchor="middle" font-size="16">5</text>
+  <text x="88" y="75" text-anchor="middle" font-size="16">4</text>
+  <text x="125" y="110" text-anchor="middle" font-size="16">3</text>
+  <text x="160" y="145" text-anchor="middle" font-size="16">2</text>
+  <text x="196" y="182" text-anchor="middle" font-size="16">1</text>
+  <text x="233" y="220" text-anchor="middle" font-size="16">0</text>
   
   
   
@@ -6559,7 +6581,7 @@ Probabilité de succès :
 <div id="at5abcd">
 <br/>
 <br/>
-<span class="big at5bg">5.A</span><span style="border-bottom:#FED6EB solid 3px;">Synthèse des scénarios de risque & cartographie du risque initial</span>
+<span class="big at5bg">5.A</span><span style="border-bottom:#FED6EB solid 3px;">Synthèse des scénarios de risque</span>
 <br/><br/><br/>
 
 <button onclick="at5a_addrisk()" style="padding:4px 8px;margin-left:50px;">Ajouter</button>
@@ -6569,7 +6591,7 @@ Probabilité de succès :
 <table id="at5a_risktable" class="at5_risk">
   <tr style="height:20px">
     <th></th>
-    <td style="text-align: left;vertical-align:top"><div style="transform: translate(-30px,-20px);display:inline-block;">Gravité</div><div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:14px solid #ccc;transform: translate(-9px,-23px);"></div></td>
+    <td style="text-align: left;vertical-align:top"><div style="transform: translate(-25px,-25px);display:inline-block;">Gravité</div><div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:14px solid #ccc;transform: translate(-9px,-23px);"></div></td>
     <td></td>
     <td></td>
     <td></td>
@@ -6608,7 +6630,7 @@ Probabilité de succès :
     <td>2</td>
     <td>3</td>
     <td>4</td>
-    <td style="width:20px;text-align: left;vertical-align:top"><div style="transform: translate(-50px);position: absolute;">Vraisemblance</div><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:14px solid #ccc;position: absolute;transform: translate(20px,-9px);"></div></td>
+    <td style="width:20px;text-align: left;vertical-align:top"><div style="transform:translate(-45px,2px);position: absolute;">Vraisemblance</div><div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:14px solid #ccc;position: absolute;transform: translate(20px,-9px);"></div></td>
   </tr>
 </table>
 
@@ -6620,7 +6642,7 @@ Probabilité de succès :
 
 <br/>
 <br/>
-<span class="big at5bg">5.B</span><span style="border-bottom:#FED6EB solid 3px;">Choix de stratégie de traitment du risque</span>
+<span class="big at5bg">5.B</span><span style="border-bottom:#FED6EB solid 3px;">Stratégie de traitment du risque</span>
 <br/>
 <br/>
 <table class="at5b_table" style="width:700px;margin-left:20px;;border:2px solid var(--colorlight);border-collapse:collapse;">
@@ -6714,15 +6736,17 @@ impérativement être prises à court terme. Dans le cas contraire, tout ou part
 <tr><td>Nom</td><td><input id="at1a_name" type="text"/></td></tr>
 <tr><td>Fonction</td><td><input id="at1a_fonc" type="text"/></td></tr>
 </table>
+<button onclick="at1a_newppl()" style="padding:4px 8px;margin:5px 70px;">Ajouter</button>
 <br/>
-<button onclick="at1a_newppl()" style="padding:4px 8px;margin-left:50px;">Ajouter</button>
+<div>
+
 <br/>
-<div id="at1a_listppl">
 <br/>
-<br/>
-<table id="at1a_listppltbl" style="width:300px">
+<div id="at1a_listppl" style="max-height: calc(100vh - 200px);overflow: scroll;background:#eee">
+<table id="at1a_listppltbl" style="width:300px;margin-left: 20px;">
 
 </table>
+</div>
 <br/>
 </div>
 <br/>
@@ -6797,12 +6821,28 @@ Exemple de valeurs métiers :<br/>
 <span style="border-bottom:#E2D3E0 solid 3px;margin-left:20px;">Ajouter une Source de Risque / Objectif Visé</span>
 <br/>
 <br/>
-<table>
-<tr  style="color:#6D2163"><td width="120px">Src. de Risque</td><td style="text-indent:20px">Objectif Visés</td></tr>
-</table>
+<span style="font-size:smaller">
+<b>Source de Risque</b>: Acteur ou un élément susceptible de provoquer un incident de sécurité sur l'organisation.<br/>
+<b>Objectif Visé</b>: ce que la Source de Risque cherche à atteindre ou compromettre.<br/>
+</span>
 
-<div style="height:300px;overflow: auto;">
-<table id="at2a_tablesrovexemple">
+
+<br/>
+
+<br/>
+Source de Risque &nbsp; <input type="text" id="at2a_text_sr"><br/>
+Objectifs Visés<br/>
+<div style="width:100%;height:120px;display: contents;">
+<textarea id="at2a_text_ov" style="width: 100%;    height: 120px;     box-sizing: border-box;"></textarea>
+</div>
+<br/>
+<br/>
+<center><button onclick="at2a_newsrovok_from_tab()" style="padding:8px 16px">Ajouter</button></center>
+<br/>
+Exemple de SR/OV:
+<div class="exemple">
+<table id="at2a_tablesrovexemple" >
+<tr  style="color:#6D2163"><td>Src. de Risque</td><td style="text-indent:10px">Objectif Visés</td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition des vaccins à des fins d’extorsion d’une rançon.</td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Saboter la campagne nationale de vaccination.</td></tr>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Amateur</td><td>Amusement</td></tr>
@@ -6815,20 +6855,7 @@ Exemple de valeurs métiers :<br/>
 <tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Terroriste</td><td>Arrêts d’un site de production</td></tr>
 </table>
 </div>
-<br/>
 
-<br/>
-Source de Risque &nbsp; <input type="text" id="at2a_text_sr"><br/>
-Objectifs Visés<br/>
-<div style="width:100%;height:120px;display: contents;">
-<textarea id="at2a_text_ov" style="width: 100%;    height: 120px;     box-sizing: border-box;"></textarea>
-</div>
-<br/>
-<br/>
-
-<center><button onclick="at2a_newsrovok_from_tab()" style="padding:8px 16px">Ajouter</button></center>
-
-<br/>
 </div>
 
 <div id="at2c_ch_ERelm" style="width:700px;padding:8px;">
