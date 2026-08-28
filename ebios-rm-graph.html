@@ -542,6 +542,7 @@ white-space: normal;
 display: flex;
 align-items: center;
 color: #001E3C;
+user-select: none;
 }
 
 .at4a_scenar_mod .bulle{
@@ -1184,10 +1185,23 @@ document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 	
 savedata.at4a={arrow:JSON.parse(at4a_scenar.dataset.arrow),tabbulles:tabbulles,col1w:col1.offsetWidth,col2w:col2.offsetWidth,col3w:col3.offsetWidth,col4w:col4.offsetWidth}
 
-//AT5A
+// AT4B
+savedata.at4b={}
+
+for(var i=1;i<at4b_TABLE.rows.length;i++)
+	{
+	var tr=at4b_TABLE.rows[i];
+	if(tr.dataset.idsrov!="0")
+		{
+		var dataIDsave = JSON.parse(tr.dataset.pathfound).nodes.join('_')
+		savedata.at4b[dataIDsave]=tr.dataset.idsrov
+		}
+	}
+
+// AT5A
 savedata.at5abcd=at5abcd.dataset.data
 
-//AT5C
+// AT5C
 savedata.at5c_timeoption=at5c_table.dataset.timeoption
 savedata.at5c_table=[]
 for(var i=1;i<at5c_table.rows.length;i++)
@@ -1258,9 +1272,11 @@ function demanderEtLireJSON() {
     };
 
     reader.readAsText(fichier, "utf-8");
+
   };
 
   input.click();
+
 }
 
 
@@ -1268,6 +1284,7 @@ function demanderEtLireJSON() {
 
 
 function loadJSON(infile,data){
+
 
 if(infile==1)
 	{
@@ -1282,10 +1299,10 @@ else
 	{
 	console.error('error function loadJSON')
 	return;
-	//if(!localStorage.getItem("saveJSON"))return;
-	//var dataLS=localStorage.getItem("saveJSON")
 	}
 	
+
+cacheClear();
 
 var savedata = JSON.parse(dataLS);
 
@@ -1411,9 +1428,12 @@ savedata.at2c.forEach(LineData => {
 	var ider = LineData[1]
 	var tr=at2c_srovlist.querySelector("[data-idsrov='"+idsrov+"']")
 	tr.dataset.ider=ider
-	var TRat1c = at1c_table.querySelector("[data-ider='"+ider+"']")
 
-	tr.cells[2].innerText= 	TRat1c.cells.length == 5     ? TRat1c.cells[2].innerText  : TRat1c.cells[1].innerText;
+	if(ider!="null")
+		{
+		var TRat1c = at1c_table.querySelector("[data-ider='"+ider+"']")
+		tr.cells[2].innerText= 	TRat1c.cells.length == 5     ? TRat1c.cells[2].innerText  : TRat1c.cells[1].innerText;
+		}
 	})
 
 
@@ -1449,12 +1469,13 @@ savedata.at3a.cat.forEach(LineData => {
 
 
 // AT3B
-at3b_list.querySelectorAll('.at3b_sc').forEach(e => e.remove());
+at3b_list.querySelectorAll('.at3b_sc').forEach(e => e.remove()); // SLOW TO LOAD HERE ?????
 savedata.at3b.forEach(e => at3b_add(e));
 at3b_redraw()
 
 // AT3C
 at3c_table.innerHTML = savedata.at3c // yes, i'm lazy, but it works
+
 
 
 
@@ -1477,13 +1498,37 @@ col2.style.width=savedata.at4a.col2w+"px"
 col3.style.width=savedata.at4a.col3w+"px"
 col4.style.width=savedata.at4a.col4w+"px"
 
-
-
-
 at4a_refresh_path_at4b()
 
 
+// AT4B
+for(var i=1;i<at4b_TABLE.rows.length;i++)
+	{
+	var tr=at4b_TABLE.rows[i];
+
+	var dataIDsave = JSON.parse(tr.dataset.pathfound).nodes.join("_")
+	log(dataIDsave)
+	if(savedata.at4b[dataIDsave])
+		{
+		log('FOUND')
+		log(tr)
+		tr.cells[2].innerText="OK"
+		var idsrov = savedata.at4b[dataIDsave]
+		tr.dataset.idsrov=idsrov;
+		cacheSave(dataIDsave,idsrov)
+		}
+	
+	}
+	/*
+savedata.at4b.forEach(LineData => {
+
+	var dataIDsave = LineData[0]
+	var idsrov = LineData[1]	
+	})
+*/
+
 //AT5A
+/*
 at5a_risktable.querySelectorAll('span').forEach(e => e.remove());
 while(at5a_tablerisk.rows[0])at5a_tablerisk.rows[0].remove()
 
@@ -1491,7 +1536,7 @@ if(savedata.at5abcd)
 	at5abcd.dataset.data=savedata.at5abcd
 if(savedata.at5abcd)
 	JSON.parse(savedata.at5abcd).risk.forEach(e=>{if(e)at5a_writerisk(e.id,e.txt,e.vra,e.gra)})
-
+*/
 
 //AT5C
 at5c_table.dataset.timeoption = savedata.at5c_timeoption
@@ -2116,7 +2161,7 @@ var cell3 = row2c.insertCell(2);
 cell1.innerHTML = srtxt;
 cell2.innerHTML = "<div class='td_reducetext'>"+ovtxt+"</div>"
 
-cell3.innerHTML = "<span style='color:rgba(227, 57, 74);'>Choisir un evenemnt redouté</span>";cell3.setAttribute('onclick','at2c_ch_ER(this)');
+cell3.innerHTML = "<span style='color:rgba(227, 57, 74);'>Choisir un événement redouté</span>";cell3.setAttribute('onclick','at2c_ch_ER(this)');
 
 document.querySelectorAll(".mra2do").forEach(e => createmradiv(e));
 
@@ -2156,7 +2201,7 @@ for(var i=1;i<at1c_table.rows.length;i++)
 
 if(at1c_table.rows.length<=1)
 	{
-	HTML="<tr><td style='background:var(--colorlight);'>Aucun evenement redouté dans l'atelier 1.C</td></tr>";
+	HTML="<tr><td style='background:var(--colorlight);'>Aucun événement redouté dans l'atelier 1.C</td></tr>";
 	}
 at2c_ch_ERelmTAble.innerHTML=HTML
 }
@@ -2395,6 +2440,7 @@ stop_at4amod()
 function at5abcd_load()
 {
 document.querySelectorAll('.at5abcd').forEach(e => e.classList.add('submenu_activ'));
+at5a_createTAB()
 }
 
 function at5ef_load()
@@ -3845,13 +3891,18 @@ tr.dataset.new_m=new_m
 tr.dataset.new_c=new_c
 
 
-var txtresult = ""
+var tabresult = []
 
-if(at3b_old_d.innerText!=new_d) txtresult +="("+at3b_old_d.innerText+"➜"+new_d+")"
-if(at3b_old_p.innerText!=new_p) txtresult +="("+at3b_old_p.innerText+"➜"+new_p+")"
-if(at3b_old_m.innerText!=new_m) txtresult +="("+at3b_old_m.innerText+"➜"+new_m+")"
-if(at3b_old_c.innerText!=new_c) txtresult +="("+at3b_old_c.innerText+"➜"+new_c+")"
+if(at3b_old_d.innerText!=new_d) tabresult.push("D:"+at3b_old_d.innerText+"➜"+new_d)
+if(at3b_old_p.innerText!=new_p) tabresult.push("P:"+at3b_old_p.innerText+"➜"+new_p)
+if(at3b_old_m.innerText!=new_m) tabresult.push("M:"+at3b_old_m.innerText+"➜"+new_m)
+if(at3b_old_c.innerText!=new_c) tabresult.push("C:"+at3b_old_c.innerText+"➜"+new_c)
 
+var txtresult=""
+if(tabresult)
+	{
+	txtresult="("+tabresult.join(", ")+")"
+	}
 
 tr.cells[1].innerText	=	at3b_new_pp.value
 tr.cells[2].innerText	=	at3b_new_path.value
@@ -5290,16 +5341,30 @@ const pathinfoMAX = [...pathinfo].sort((a, b) => b.vraisemblanceSTD - a.vraisemb
 
 at4b_div.innerHTML += "Scénario classé par vraisemblance<br/>"
 
-var HTML="<table style='border-collapse:collapse;margin: 20px;'>"
+var HTML="<table id='at4b_TABLE' style='border-collapse:collapse;margin: 20px;'>"
 
 HTML += "<tr><td>Vraisemblance</td><td></td><td>SR/OV lié</td></tr>"
 
 for(var i=0;i<pathinfoMAX.length;i++)
 	{
 	var path = pathinfoMAX[i]
-	var Vinfo = at4b_vraisemble_to_txtcol(path.vraisemblanceSTD)
-	HTML += "<tr style=background-color:#"+Vinfo.c+" onmouseover='overpath(this)' data-pathfound='"+JSON.stringify( path)+"'>"
-	HTML += "<td style='text-align: center;'><span style='font-weight:bold;'>V"+path.vraisemblanceSTD+"</span><br/>"+Vinfo.txt+"</td>"
+	var V= path.vraisemblanceSTD
+	var Vinfo = at4b_vraisemble_to_txtcol(V)
+	
+	//check cache
+	var TXTsrovlink ="Aucun"
+	var idsrov=0;
+	var dataIDsave = path.nodes.join('_')
+	var getcache = cacheGet(dataIDsave)
+	if(getcache!=null)
+		{
+		TXTsrovlink ="OK"
+		idsrov=getcache;
+		}
+		
+		
+	HTML += "<tr data-idsrov="+idsrov+" data-v="+V+" style=background-color:#"+Vinfo.c+" onmouseover='overpath(this)' data-pathfound='"+JSON.stringify(path)+"'>"
+	HTML += "<td style='text-align: center;'><span style='font-weight:bold;'>V"+V+"</span><br/>"+Vinfo.txt+"</td>"
 	HTML += "<td>"
 	HTML += Vinfo.d
 	/*
@@ -5308,9 +5373,14 @@ for(var i=0;i<pathinfoMAX.length;i++)
 		HTML += path.nodes[n]+"&gt;"
 		}
 	*/
+	
+	
+	
+
+	
 	HTML += "</td>"
 
-	HTML += "<td style='text-align: center;' onclick='at4b_ch_SROV(this)'>Non retenu</td>"
+	HTML += "<td style='text-align: center;' onclick='at4b_ch_SROV(this)'>"+TXTsrovlink+"</td>"
 	
 	HTML += "</tr>"
 	}
@@ -5322,40 +5392,105 @@ at4b_div.innerHTML = HTML
 function at4b_ch_SROV(elm)
 {
 
+
 PPL_clickTD=elm
 
 show_divcenter()
 at4b_ch_SROVelm.style.display="block"
-/*
-var ider = elm.closest('tr').dataset.ider
+
+var ididsrovSEL = elm.closest('tr').dataset.idsrov
 
 var HTML="<tr style='display:none'><td></td><td></td><td></td></tr>";
-for(var i=1;i<at1c_table.rows.length;i++)
+
+var at4b_srovlistOK=[]
+for(var i=1;i<at2c_srovlist.rows.length;i++)
 	{
-	var tr=at1c_table.rows[i];
-	var tabtr=[]
+	var tr=at2c_srovlist.rows[i];
+	if(tr.style.display!="none")
+		at4b_srovlistOK.push(tr)
+	}
+	
+for(var i=0;i<at4b_srovlistOK.length;i++)
+	{
+	var tr=at4b_srovlistOK[i];
 
-	if(tr.querySelector('.tdmetier p'))
-		var txt = tr.querySelector('.tdmetier p').innerText
-	var g = parseInt(tr.querySelector('.gravitespan').innerText)
-	
-	var txt2 = tr.cells.length == 5     ? tr.cells[2].innerText  : tr.cells[1].innerText;
-	
+
+	var idsrov = tr.dataset.idsrov
 	var v=""
-	if(ider==tr.dataset.ider) v="checked"
+	if(ididsrovSEL==idsrov) v="checked"
 
-	HTML +="<tr data-ider='"+tr.dataset.ider+"' onclick='clicktdinputradio(this)'><td><input type='radio' name='vmgra' value='' "+v+"/></td>"
-	HTML += "<td>"+txt+"</td><td>"+txt2+"</td><td style='background-color:"+getcolorfromgravite(g)+";text-align:center;width:50px;'>"+g+"</td>"
+	var trTD = tr.querySelectorAll('td')
+
+	HTML +="<tr data-idsrov='"+idsrov+"' onclick='clicktdinputradio(this)'><td><input type='radio' name='idsrov' value='' "+v+"/></td>"
+	HTML += "<td>"+trTD[0].innerText+"</td><td>"+trTD[1].innerText+"</td><td >"+trTD[2].innerText+"</td>"
 	HTML +="</tr>"
 	}
 
-if(at1c_table.rows.length<=1)
+if(!at4b_srovlistOK.length)
 	{
-	HTML="<tr><td>Aucun evenement redouté dans l'atelier 1.C</td></tr>";
+	HTML="<tr><td>Aucun SR/OV retenus l'atelier 2.C</td></tr>";
 	}
-at2c_ch_ERelmTAble.innerHTML=HTML
-*/
+at4b_ch_ERelmTAble.innerHTML=HTML
 }
+
+function at4b_ch_EROK()
+{
+if(!at4b_ch_SROVelm.querySelector('input:checked')) return; // nothing selected
+
+var tr=at4b_ch_SROVelm.querySelector('input:checked').closest('tr')
+var idsrov = tr.dataset.idsrov
+
+
+
+
+// save data into external tab (for automatic search)
+var dataIDsave = JSON.parse(PPL_clickTD.closest('tr').dataset.pathfound).nodes.join('_')
+cacheSave(dataIDsave,idsrov)
+
+hide_divgrey()
+
+PPL_clickTD.innerText="OK"
+PPL_clickTD.closest('tr').dataset.idsrov = idsrov
+}
+
+const CACHE = {};
+
+/**
+ * Sauvegarde dans le cache
+ */
+function cacheSave(id, data) {
+    CACHE[id] = data;
+}
+
+/**
+ * Récupère une valeur du cache
+ */
+function cacheGet(id) {
+    return (id in CACHE) ? CACHE[id] : null;
+}
+
+/**
+ * Supprime une entrée
+ */
+function cacheDelete(id) {
+    delete CACHE[id];
+}
+
+/**
+ * Vérifie si une clé existe
+ */
+function cacheHas(id) {
+    return id in CACHE;
+}
+/**
+ * Vide tout le cache
+ */
+function cacheClear() {
+    for (let key in CACHE) {
+        delete CACHE[key];
+    }
+}
+
 
 
 function at4b_vraisemble_to_txtcol(x)
@@ -5515,7 +5650,7 @@ at1a_drappltable()
 
 
 
-
+/*
 
 function at5a_addrisk()
 {
@@ -5558,23 +5693,65 @@ at5a_writerisk(firstFreeId,txt,vra,gra)
 }
 
 
-function at5a_writerisk(firstFreeId,txt,vra,gra)
+
+
+
+
+
+function at5a_deleterisk(id)
 {
-var row = at5a_tablerisk.insertRow();
-row.className="tr_deleteicon"
+at5c_table.querySelectorAll('.tagr'+id).forEach(e => e.remove());
+at5a_risktable.querySelectorAll("span").forEach(el => {
+  if (el.textContent.trim() === "R"+id) {
+    el.remove();
+  }
+});
 
-var cell0 = row.insertCell();
-var cell1 =	row.insertCell();
-var cell2 =	row.insertCell();
+var obj = JSON.parse(at5abcd.dataset.data)
+obj.risk = obj.risk.filter(e => e && e.id != id);
 
-cell0.innerHTML="<span onclick=\"at5a_deleterisk("+firstFreeId+");this.closest('tr').remove();\">×</span>"
-cell1.innerHTML="<span style='color:var(--color);font-weight:bold;'>R"+firstFreeId+"</span> :"
-cell2.innerText=txt;cell2.contentEditable=true;cell2.dataset.riskid=firstFreeId;cell2.addEventListener('input', function(){editRISKtext(this)});
-
-
-document.querySelector('#at5a_'+vra+gra).innerHTML+="<span>R"+firstFreeId+"</span>"
+at5abcd.dataset.data=JSON.stringify(obj)
 }
+*/
 
+function at5a_createTAB()
+{
+at5a_tablerisk.innerHTML="";
+at5a_risktable.querySelectorAll('span').forEach(e => e.remove());
+if(!at4b_TABLE) return; // table doesnt exist yet
+
+
+
+for(var i=1;i<at4b_TABLE.rows.length;i++)
+	{
+	var tr=at4b_TABLE.rows[i];
+
+	var vra = tr.dataset.v
+	var idsrov = tr.dataset.idsrov
+	if(idsrov!="0")
+		{
+		var ider = at2c_srovlist.querySelector("[data-idsrov='"+idsrov+"']").dataset.ider
+
+		
+		var gra = at1c_table.querySelector("[data-ider='"+ider+"']").querySelector('.gravitespan').innerText
+		gra=parseInt(gra)
+		
+		// TXT
+		var pathfound= JSON.parse(tr.dataset.pathfound)
+		
+		var bulleStartid = pathfound.nodes[0]
+
+		var bulleEndid = pathfound.nodes[pathfound.nodes.length-1]
+		
+
+		var bulleStartTXT = document.querySelector("#"+bulleStartid).querySelector('.bulletxt').innerText
+		var bulleEndTXT = document.querySelector("#"+bulleEndid).querySelector('.bulletxt').innerText
+		var txt = bulleStartTXT +"->"+ bulleEndTXT
+		firstFreeId=i;
+		at5a_writerisk(firstFreeId,txt,vra,gra)
+		}
+	}
+}
 
 function editRISKtext(elm)
 {
@@ -5593,21 +5770,23 @@ obj.risk.forEach(item => {
 at5abcd.dataset.data=JSON.stringify(obj)
 }
 
-function at5a_deleterisk(id)
+function at5a_writerisk(firstFreeId,txt,vra,gra)
 {
-at5c_table.querySelectorAll('.tagr'+id).forEach(e => e.remove());
-at5a_risktable.querySelectorAll("span").forEach(el => {
-  if (el.textContent.trim() === "R"+id) {
-    el.remove();
-  }
-});
 
-var obj = JSON.parse(at5abcd.dataset.data)
-obj.risk = obj.risk.filter(e => e && e.id != id);
+var row = at5a_tablerisk.insertRow();
+//row.className="tr_deleteicon"
 
-at5abcd.dataset.data=JSON.stringify(obj)
+//var cell0 = row.insertCell();
+var cell1 =	row.insertCell();
+var cell2 =	row.insertCell();
+
+//cell0.innerHTML="<span onclick=\"at5a_deleterisk("+firstFreeId+");this.closest('tr').remove();\">×</span>"
+cell1.innerHTML="<span class='riskid' data-riskid="+firstFreeId+" style='color:var(--color);font-weight:bold;'>R"+firstFreeId+"</span> :"
+cell2.innerText=txt;cell2.contentEditable=true;cell2.dataset.riskid=firstFreeId;cell2.addEventListener('input', function(){editRISKtext(this)});
+
+
+document.querySelector('#at5a_'+vra+gra).innerHTML+="<span>R"+firstFreeId+"</span>"
 }
-
 
 function at5c_add(){
 
@@ -5707,27 +5886,27 @@ function at5c_drawchooserisk(td)
 
 var HTML=""
 
-if(at5abcd.dataset.data == undefined)
+if(!at5a_tablerisk.querySelector('.riskid'))
 	{
 	HTML = "Aucun risque en 5.A";
 	}
 else
 	{
-	obj = JSON.parse(at5abcd.dataset.data)
 
 	const datasetIds = Array.from(td.querySelectorAll('span')).map(span => parseInt(span.dataset.id));
 	
-	log(datasetIds)
-	obj.risk.forEach(el => {
-
-			if(el && !datasetIds.includes(el.id))
+	at5a_tablerisk.querySelectorAll('.riskid').forEach(el => {
+			
+			var rid=parseInt(el.dataset.riskid)
+			if(!datasetIds.includes(rid))
 				{
-				log(el.id)
-					HTML += "<div onclick='at5c_clickaddrisk("+el.id+")'>R"+el.id+"</div>"
+				HTML += "<div onclick='at5c_clickaddrisk("+rid+")'>R"+rid+"</div>"
 				}
 				}
 			)
+	
 	}
+
 
 divchoice_open(PPL_clickTD,HTML)
 }
@@ -6584,7 +6763,7 @@ Probabilité de succès :
 <span class="big at5bg">5.A</span><span style="border-bottom:#FED6EB solid 3px;">Synthèse des scénarios de risque</span>
 <br/><br/><br/>
 
-<button onclick="at5a_addrisk()" style="padding:4px 8px;margin-left:50px;">Ajouter</button>
+<button onclick="at5a_addrisk()" style="padding:4px 8px;margin-left:50px;DISPLAY:NONE">Modifier</button>
 <br/>
 <br/>
 <br/>
@@ -6642,7 +6821,7 @@ Probabilité de succès :
 
 <br/>
 <br/>
-<span class="big at5bg">5.B</span><span style="border-bottom:#FED6EB solid 3px;">Stratégie de traitment du risque</span>
+<span class="big at5bg">5.B</span><span style="border-bottom:#FED6EB solid 3px;">Stratégie de traitement du risque</span>
 <br/>
 <br/>
 <table class="at5b_table" style="width:700px;margin-left:20px;;border:2px solid var(--colorlight);border-collapse:collapse;">
@@ -7006,9 +7185,9 @@ Description<br/>
 
 <div id="at4b_ch_SROVelm" style="width:700px;padding:8px;">
 
-<table id="at2c_ch_ERelmTAble" class="at1 tabletype" style="width:100%;margin:0">
+<table id="at4b_ch_ERelmTAble" class="at2 tabletype" style="width:100%;margin:0">
 </table>
-<center><button onclick="at2c_ch_EROK()" style="padding:8px 16px">Ok</button></center>
+<center><button onclick="at4b_ch_EROK()" style="padding:8px 16px">Ok</button></center>
 
 </div>
 
