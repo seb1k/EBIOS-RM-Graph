@@ -5270,11 +5270,18 @@ function at4a_refresh_path_at4b()
 var lst_target = document.querySelectorAll(".at4a_target")
 at4b_div.innerHTML = "";
 
+var HTML= "Scénario classé par vraisemblance<br/>"
+HTML +="<table id='at4b_TABLE' style='border-collapse:collapse;margin: 20px;'>"
+HTML += "<tr><td>Vraisemblance</td><td></td><td>SR/OV lié</td></tr>"
+
 
 for(var i=0;i<lst_target.length;i++)
 	{
-	at4b_pathbulleID(lst_target[i].id)
+	HTML +=at4b_pathbulleID(lst_target[i].id)
 	}
+	
+HTML += "</table>"
+at4b_div.innerHTML = HTML
 
 at4b_clean_overpath()
 }
@@ -5310,7 +5317,6 @@ log(pathinfo)
 function at4b_pathbulleID(bulleID)
 {
 
-log('BULLE ID'+bulleID)
 var pathinfo = allPaths(at4a_arrowlist,{end:bulleID})
 
 
@@ -5319,31 +5325,21 @@ for(var i=0;i<pathinfo.length;i++)
 	{
 	var Pnodes = pathinfo[i].nodes;
 	log(pathinfo)
-	//at4b_div.innerHTML += "<span onmouseover='overpath(this)' data-pathfound='"+JSON.stringify(pathinfo[i])+"'>Chemin"+(i+1)+" : "
+
 	var vmax = -1;
 	for(var n=0;n<Pnodes.length-1;n++)
 		{
-		//at4b_div.innerHTML += Pnodes[n]+ "("+document.querySelector('#'+Pnodes[n]).querySelector('.probaicon').dataset.value+")"+"&gt;"
 		var VelemPath = document.querySelector('#'+Pnodes[n]).querySelector('.probaicon').dataset.value
 		if(VelemPath>vmax) vmaxSTD = VelemPath;
 		}
 	pathinfo[i].vraisemblanceSTD = vmaxSTD
-	//pathinfo[i].Ipathinfo = i
-	//at4b_div.innerHTML += "Objectif, vraisemblance chemin : "+vmaxSTD+"</span><br/>"
 	}
 	
-	
 
-//const pathinfoMAX = pathinfo.filter(obj => obj.vraisemblanceSTD === vmaxSTD);
 const pathinfoMAX = [...pathinfo].sort((a, b) => b.vraisemblanceSTD - a.vraisemblanceSTD);
 
-//at4b_div.innerHTML += "Scénario le plus vraisemblable ("+at4a_proba_succes.options[vmaxSTD].innerText +")<br/>"
 
-at4b_div.innerHTML += "Scénario classé par vraisemblance<br/>"
-
-var HTML="<table id='at4b_TABLE' style='border-collapse:collapse;margin: 20px;'>"
-
-HTML += "<tr><td>Vraisemblance</td><td></td><td>SR/OV lié</td></tr>"
+var HTML=""
 
 for(var i=0;i<pathinfoMAX.length;i++)
 	{
@@ -5367,25 +5363,15 @@ for(var i=0;i<pathinfoMAX.length;i++)
 	HTML += "<td style='text-align: center;'><span style='font-weight:bold;'>V"+V+"</span><br/>"+Vinfo.txt+"</td>"
 	HTML += "<td>"
 	HTML += Vinfo.d
-	/*
-	for(var n=0;n<path.nodes.length-1;n++)
-		{
-		HTML += path.nodes[n]+"&gt;"
-		}
-	*/
-	
-	
 	
 
 	
 	HTML += "</td>"
-
 	HTML += "<td style='text-align: center;' onclick='at4b_ch_SROV(this)'>"+TXTsrovlink+"</td>"
-	
 	HTML += "</tr>"
 	}
 
-at4b_div.innerHTML = HTML
+return HTML
 
 }
 
