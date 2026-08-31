@@ -1174,8 +1174,8 @@ var tabbulles=[]
 document.querySelectorAll('.bulle:not(.newbulle)').forEach(el => {
 			tabbulles.push({id:el.id,
 							col:el.closest(".col").id,
-							x:el.offsetLeft,
-							y:el.offsetTop,
+							x:parseInt(el.style.left),
+							y:parseInt(el.style.top),
 							txt:el.querySelector('.bulletxt').innerText,
 							proba:parseInt(el.querySelector('.probaicon').dataset.value),
 							classname:el.className
@@ -2423,6 +2423,7 @@ function at4ab_load()
 {
 document.querySelectorAll('.atelier4open').forEach(e => e.classList.add('submenu_activ'));
 document.querySelectorAll("#at4a").forEach(e => e.style.display="block");
+at4a_bigger_line=""
 
 if(document.querySelector('#at4a_canvas'))
 	at4a_canvas.remove(); // prevent bug
@@ -4061,10 +4062,14 @@ const ctx = at4a_canvas.getContext('2d');
 ctx.clearRect(0, 0, at4a_canvas.width, at4a_canvas.height);
 
 var selected_line=0;
-// at4a_arrowlist
+var biggerline = 0
+
+
 for(var i=0;i<at4a_arrowlist.length;i++)
 	{
-	
+	biggerline = 0
+	var AnArrow = at4a_arrowlist[i]
+
 	if(selected_line)
 		{
 		selected_line=0;
@@ -4073,10 +4078,13 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 		{
 		selected_line=1;
 		}
-	
+	else if(at4a_bigger_line.includes(AnArrow.from+"_"+AnArrow.to))
+		{
+		biggerline = 1
+		}
 
 
-	var AnArrow = at4a_arrowlist[i]
+
 	
 
 	var elmStart=	getpos(document.querySelector('#'+AnArrow.from),AnArrow.frompos,AnArrow.fromposxy,0)
@@ -4094,6 +4102,10 @@ for(var i=0;i<at4a_arrowlist.length;i++)
 	if(selected_line)
 		{
 		ctx.strokeStyle = "#dd0000";
+		ctx.lineWidth = 6;
+		}
+	if(biggerline)
+		{
 		ctx.lineWidth = 6;
 		}
 		
@@ -4874,6 +4886,7 @@ function at4a_newbulle(id,parentelement,x,y,txt,proba,classname)
 
 
 var at4a_selectELM=false;
+var at4a_bigger_line=""
 
 function at4a_select(elm)
 {
@@ -5317,8 +5330,8 @@ pathinfo.nodes.forEach(e => document.querySelector('#'+e).classList.add('pathove
 
 
 
-log(pathinfo)
-
+at4a_bigger_line=elm.dataset.dataidsave
+at4a_showarrow()
 }
 
 
@@ -5639,71 +5652,6 @@ at1a_drappltable()
 
 
 
-
-
-/*
-
-function at5a_addrisk()
-{
-show_divcenter()
-at5a_divnewrisk.style.display="block"
-at5a_risk_txt.value=""
-at5a_risk_txt.focus()
-}
-
-
-function at5a_addriskok()
-{
-
-var vra	=	at5a_vra.value
-var gra	=	at5a_gra.value
-var txt =	at5a_risk_txt.value
-var obj={risk:[]}
-if(at5abcd.dataset.data && at5abcd.dataset.data != undefined)
-	obj = JSON.parse(at5abcd.dataset.data)
-
-
-const firstFreeId = [...Array(obj.risk.length + 2).keys()]
-  .slice(1)
-  .find(id => !obj.risk.some(x => x?.id === id));	
-	
-var newrisk = {id:firstFreeId,vra:vra,gra:gra,txt:txt}
-
-
-obj.risk[firstFreeId]=newrisk
-	
-	
-
-
-at5abcd.dataset.data=JSON.stringify(obj)
-
-
-hide_divcenter()
-
-at5a_writerisk(firstFreeId,txt,vra,gra)
-}
-
-
-
-
-
-
-
-function at5a_deleterisk(id)
-{
-at5c_table.querySelectorAll('.tagr'+id).forEach(e => e.remove());
-at5a_risktable.querySelectorAll("span").forEach(el => {
-  if (el.textContent.trim() === "R"+id) {
-    el.remove();
-  }
-});
-
-var obj = JSON.parse(at5abcd.dataset.data)
-obj.risk = obj.risk.filter(e => e && e.id != id);
-
-at5abcd.dataset.data=JSON.stringify(obj)
-}
-*/
 function at5a_createTAB()
 {
 at5a_tablerisk.innerHTML="";
@@ -5805,7 +5753,7 @@ cell2.innerText=txt;cell2.contentEditable=true;cell2.dataset.iduniq=iduniq;cell2
 
 cell3.innerHTML="🔍"
 cell3.setAttribute('onclick',"at5a_clickriskinfo(this)");
-
+cell3.style.cursor = "pointer";
 
 document.querySelector('#at5a_'+vra+gra).innerHTML+="<span data-iduniq='"+iduniq+"'>R"+riskid+"</span>"
 }
