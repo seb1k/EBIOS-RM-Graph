@@ -922,6 +922,7 @@ border-radius: 16px;
 font-size: 14px;
 width:40px;
 display:inline-block;
+text-wrap: nowrap;
 }
 
 .tag button {
@@ -1199,7 +1200,8 @@ for(var i=1;i<at4b_TABLE.rows.length;i++)
 	}
 
 // AT5A
-savedata.at5abcd=at5abcd.dataset.data
+//savedata.at5abcd=at5abcd.dataset.data
+savedata.at5a_risktable=at5a_risktable.dataset.riskinfo
 
 // AT5C
 savedata.at5c_timeoption=at5c_table.dataset.timeoption
@@ -1219,6 +1221,11 @@ for(var i=1;i<at5c_table.rows.length;i++)
 	}
 
 
+
+
+// SHARE https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js
+//const json = JSON.stringify(savedata);
+//log( LZString.compressToEncodedURIComponent(json))
 
 //DOWNLOAD FILE
 const contenu = JSON.stringify(savedata, null, 2);
@@ -1528,6 +1535,7 @@ savedata.at4b.forEach(LineData => {
 */
 
 //AT5A
+at5a_risktable.dataset.riskinfo=savedata.at5a_risktable
 /*
 at5a_risktable.querySelectorAll('span').forEach(e => e.remove());
 while(at5a_tablerisk.rows[0])at5a_tablerisk.rows[0].remove()
@@ -5324,7 +5332,6 @@ var pathinfo = allPaths(at4a_arrowlist,{end:bulleID})
 for(var i=0;i<pathinfo.length;i++)
 	{
 	var Pnodes = pathinfo[i].nodes;
-	log(pathinfo)
 
 	var vmax = -1;
 	for(var n=0;n<Pnodes.length-1;n++)
@@ -5359,12 +5366,10 @@ for(var i=0;i<pathinfoMAX.length;i++)
 		}
 		
 		
-	HTML += "<tr data-idsrov="+idsrov+" data-v="+V+" style=background-color:#"+Vinfo.c+" onmouseover='overpath(this)' data-pathfound='"+JSON.stringify(path)+"'>"
+	HTML += "<tr data-idsrov="+idsrov+" data-dataIDsave="+dataIDsave+" data-v="+V+" style=background-color:#"+Vinfo.c+" onmouseover='overpath(this)' data-pathfound='"+JSON.stringify(path)+"'>"
 	HTML += "<td style='text-align: center;'><span style='font-weight:bold;'>V"+V+"</span><br/>"+Vinfo.txt+"</td>"
 	HTML += "<td>"
 	HTML += Vinfo.d
-	
-
 	
 	HTML += "</td>"
 	HTML += "<td style='text-align: center;' onclick='at4b_ch_SROV(this)'>"+TXTsrovlink+"</td>"
@@ -5699,64 +5704,91 @@ obj.risk = obj.risk.filter(e => e && e.id != id);
 at5abcd.dataset.data=JSON.stringify(obj)
 }
 */
-
 function at5a_createTAB()
 {
 at5a_tablerisk.innerHTML="";
 at5a_risktable.querySelectorAll('span').forEach(e => e.remove());
 if(!at4b_TABLE) return; // table doesnt exist yet
 
+var riskinfo = []
+if(at5a_risktable.dataset.riskinfo)
+	riskinfo = JSON.parse(at5a_risktable.dataset.riskinfo);
 
 
-for(var i=1;i<at4b_TABLE.rows.length;i++)
+for(var i=1;i<at4b_TABLE.rows.length;i++) // add new risk from at4b if not exist
 	{
 	var tr=at4b_TABLE.rows[i];
 
-	var vra = tr.dataset.v
-	var idsrov = tr.dataset.idsrov
-	if(idsrov!="0")
-		{
-		var ider = at2c_srovlist.querySelector("[data-idsrov='"+idsrov+"']").dataset.ider
+	var idsrov = parseInt(tr.dataset.idsrov)
+	var dataidsave = tr.dataset.dataidsave
 
-		
-		var gra = at1c_table.querySelector("[data-ider='"+ider+"']").querySelector('.gravitespan').innerText
-		gra=parseInt(gra)
+	if(idsrov && !(riskinfo.some(i => i.dataidsave === dataidsave)))
+		{
+		const ids = riskinfo.map(i => i.riskid);
+		 let newid = 1;
+		 while (ids.includes(newid)) {newid++;}
+		 
+		var iduniq = Math.random().toString(36).slice(2)
 		
 		// TXT
 		var pathfound= JSON.parse(tr.dataset.pathfound)
-		
 		var bulleStartid = pathfound.nodes[0]
-
 		var bulleEndid = pathfound.nodes[pathfound.nodes.length-1]
-		
-
 		var bulleStartTXT = document.querySelector("#"+bulleStartid).querySelector('.bulletxt').innerText
 		var bulleEndTXT = document.querySelector("#"+bulleEndid).querySelector('.bulletxt').innerText
 		var txt = bulleStartTXT +"->"+ bulleEndTXT
-		firstFreeId=i;
-		at5a_writerisk(firstFreeId,txt,vra,gra)
+		
+		riskinfo.push({iduniq:iduniq,riskid:newid, dataidsave:dataidsave, txt:txt})
 		}
 	}
+
+
+
+/// DELETED RISK IF DOESNT EXIST ANYMORE in at4b
+var risk_to_delete=[]
+riskinfo.forEach(risk => {
+	if(!at4b_TABLE.querySelector("[data-dataidsave='"+risk.dataidsave+"']"))
+		risk_to_delete.push(risk.dataidsave)
+	});
+riskinfo = riskinfo.filter(risk => !risk_to_delete.includes(risk.dataidsave));
+
+
+
+//WRITE
+at5a_risktable.dataset.riskinfo=JSON.stringify(riskinfo)
+
+//SHOW
+riskinfo.forEach(risk => {
+	
+	var tr = at4b_TABLE.querySelector("[data-dataidsave='"+risk.dataidsave+"']")
+	var idsrov = tr.dataset.idsrov
+	var ider = at2c_srovlist.querySelector("[data-idsrov='"+idsrov+"']").dataset.ider
+	var GRA = at1c_table.querySelector("[data-ider='"+ider+"']").querySelector('.gravitespan').innerText
+	var VRA = parseInt(tr.dataset.v)
+	
+	at5a_writerisk(risk.iduniq,risk.riskid,risk.txt,VRA,GRA)
+	});
 }
+
+
+
 
 function editRISKtext(elm)
 {
+var riskinfo = JSON.parse(at5a_risktable.dataset.riskinfo);
 var txt = elm.innerText;
-var id = parseInt(elm.dataset.riskid);
+var iduniq = elm.dataset.iduniq;
 
-const obj = JSON.parse(at5abcd.dataset.data);
+const item = riskinfo.find(i => i.iduniq === iduniq);
+if (item) {
+	item.txt = txt;
+	at5a_risktable.dataset.riskinfo=JSON.stringify(riskinfo)
+	}
 
-// trouver et modifier
-obj.risk.forEach(item => {
-  if (item && item.id === id) {
-    item.txt = txt;
-  }
-});
-
-at5abcd.dataset.data=JSON.stringify(obj)
 }
 
-function at5a_writerisk(firstFreeId,txt,vra,gra)
+
+function at5a_writerisk(iduniq,riskid,txt,vra,gra)
 {
 
 var row = at5a_tablerisk.insertRow();
@@ -5765,13 +5797,116 @@ var row = at5a_tablerisk.insertRow();
 //var cell0 = row.insertCell();
 var cell1 =	row.insertCell();
 var cell2 =	row.insertCell();
+var cell3 =	row.insertCell();
 
 //cell0.innerHTML="<span onclick=\"at5a_deleterisk("+firstFreeId+");this.closest('tr').remove();\">×</span>"
-cell1.innerHTML="<span class='riskid' data-riskid="+firstFreeId+" style='color:var(--color);font-weight:bold;'>R"+firstFreeId+"</span> :"
-cell2.innerText=txt;cell2.contentEditable=true;cell2.dataset.riskid=firstFreeId;cell2.addEventListener('input', function(){editRISKtext(this)});
+cell1.innerHTML="<span class='riskid' data-iduniq="+iduniq+" style='color:var(--color);font-weight:bold;'>R"+riskid+"</span> :"
+cell2.innerText=txt;cell2.contentEditable=true;cell2.dataset.iduniq=iduniq;cell2.addEventListener('input', function(){editRISKtext(this)});
+
+cell3.innerHTML="🔍"
+cell3.setAttribute('onclick',"at5a_clickriskinfo(this)");
 
 
-document.querySelector('#at5a_'+vra+gra).innerHTML+="<span>R"+firstFreeId+"</span>"
+document.querySelector('#at5a_'+vra+gra).innerHTML+="<span data-iduniq='"+iduniq+"'>R"+riskid+"</span>"
+}
+
+function at5a_clickriskinfo(elm)
+{
+var tr = elm.closest('tr');
+
+if(tr.classList.contains('open'))
+	{
+	tr.classList.remove('open')
+	tr.nextSibling.remove()
+	return
+	}
+tr.classList.add('open')
+
+var spaninfo = tr.querySelector('span')
+var riskTXT = spaninfo.innerText
+var iduniq = spaninfo.dataset.iduniq
+
+
+var tdinfo = at5a_tablerisk.insertRow();
+var cell1 =	tdinfo.insertCell();
+var cell2 =	tdinfo.insertCell();
+var cell3 =	tdinfo.insertCell();
+
+cell1.innerHTML="<select onmousedown='at5a_openrisk(this)' onchange='at5a_chriskid(this)' data-iduniq="+iduniq+"><option>"+riskTXT+"</option></select>"
+cell2.innerHTML="Vraisemblance : 4.B<br/>Gravité : 1.C"
+
+
+
+
+tr.insertAdjacentElement('afterend',tdinfo);
+}
+
+
+function at5a_openrisk(elm)
+{
+ setTimeout(() => {
+    at5a_openrisk10ms(elm)
+  }, 10);
+}
+
+function at5a_openrisk10ms(elm)
+{
+var iduniq= elm.dataset.iduniq;
+var riskinfo = JSON.parse(at5a_risktable.dataset.riskinfo);
+
+
+
+const item = riskinfo.find(i => i.iduniq === iduniq);
+if (item) {
+	var riskid=item.riskid;
+	elm.dataset.actualriskid=riskid
+	}
+
+//const riskIds = riskinfo.map(item => item.riskid);
+//log(riskIds)
+
+var HTML=""
+for(var i=1;i<40;i++)
+	{
+	var isdisabled =""
+	var isselected =""
+	
+
+	
+	if(riskid==i)
+		isselected="selected='true'"
+		
+	if(isselected=="" && riskinfo.find(ri => ri.riskid === i))
+		isdisabled = "disabled='disabled'"
+	
+	
+	HTML+="<option value="+i+" "+isdisabled+" "+isselected+">R"+i+"</option>"
+	}
+	
+elm.innerHTML=HTML
+}
+
+function at5a_chriskid(elm)
+{
+if(elm.value==elm.dataset.actualriskid) return; // no change
+
+var iduniq= elm.dataset.iduniq;
+var riskinfo = JSON.parse(at5a_risktable.dataset.riskinfo);
+
+const item = riskinfo.find(i => i.iduniq === iduniq);
+if (!item) error("risk not found")
+
+var newriskid=parseInt(elm.value)
+item.riskid=newriskid;
+
+at5a_risktable.querySelector("[data-iduniq='"+iduniq+"']").innerText="R"+newriskid;
+at5a_tablerisk.querySelector("[data-iduniq='"+iduniq+"']").innerText="R"+newriskid;
+at5c_table.querySelectorAll("[data-iduniq='"+iduniq+"']").forEach(e => {e.parentElement.innerHTML=at5c_tagriskHTML(iduniq,newriskid)});
+
+
+
+
+at5a_risktable.dataset.riskinfo=JSON.stringify(riskinfo)
 }
 
 function at5c_add(){
@@ -5879,14 +6014,14 @@ if(!at5a_tablerisk.querySelector('.riskid'))
 else
 	{
 
-	const datasetIds = Array.from(td.querySelectorAll('span')).map(span => parseInt(span.dataset.id));
-	
+	const datasetIds = Array.from(td.querySelectorAll('span')).map(span => span.dataset.iduniq);
+
 	at5a_tablerisk.querySelectorAll('.riskid').forEach(el => {
 			
-			var rid=parseInt(el.dataset.riskid)
-			if(!datasetIds.includes(rid))
+			var iduniq=el.dataset.iduniq
+			if(!datasetIds.includes(iduniq))
 				{
-				HTML += "<div onclick='at5c_clickaddrisk("+rid+")'>R"+rid+"</div>"
+				HTML += "<div onclick='at5c_clickaddrisk(\""+iduniq+"\")'>"+el.innerText+"</div>"
 				}
 				}
 			)
@@ -5921,12 +6056,8 @@ setTimeout(function () {
 
 function divchoice_autoclose(event)
 {
-log(event.target)
-
 if(event.target.closest('#divover_risk')||event.target.id=='divover_risk')return;
-
 divchoice_close()
-
 }
 
 
@@ -5944,19 +6075,29 @@ at5c_drawchooserisk(PPL_clickTD)
 }
 
 
-function at5c_addrisk(id)
+function at5c_addrisk(iduniq)
 {
-if(!id)return;
+if(!iduniq)return;
 const tag = document.createElement("div");
-tag.className = "tag tagr"+id;
+tag.className = "tag";
+
+
+var riskinfo = JSON.parse(at5a_risktable.dataset.riskinfo);
+
+const item = riskinfo.find(i => i.iduniq === iduniq);
 	  
-      tag.innerHTML = `
-        <span data-id='${id}'>R${id}</span>
-        <button type="button" onclick='this.parentElement.remove()'>×</button>
-      `;
+  tag.innerHTML = at5c_tagriskHTML(iduniq,item.riskid)
+	
+
 PPL_clickTD.appendChild(tag);
 }
 
+function at5c_tagriskHTML(iduniq,riskid)
+{
+return `
+	<span data-iduniq='${iduniq}'>R${riskid}</span>
+	<button type="button" onclick='this.parentElement.remove()'>×</button>`
+}
 
 function at5c_chtime_add()
 {
@@ -6146,6 +6287,7 @@ document.querySelectorAll('.at1c_select_socle1').forEach(select => {
 
 at1d_socle_ch("showdiv")
 }
+
 
 
 </script>
