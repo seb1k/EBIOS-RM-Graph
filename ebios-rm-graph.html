@@ -13,6 +13,19 @@ body{
 margin:0;
 }
 
+.iconshare{
+width:20px;
+height:20px;
+display:inline-block;
+background-color:#ddd;
+border-radius:40px;
+cursor:pointer;
+line-height: 24px;
+}
+.iconshare:hover{
+;background-color:#bbb;
+}
+
 .bodyhidescroll{
 overflow:hidden;
 }
@@ -1009,6 +1022,12 @@ margin:6px 0 2px 8px;
 
 #at1b_table .visiblehover{visibility:hidden;opacity:.7;margin:8px;}
 #at1b_table tr:hover .visiblehover{visibility:visible;}
+
+
+@keyframes flash {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 </style>
 
 
@@ -1030,7 +1049,7 @@ document.addEventListener('keydown', function(event) {
 })
 
 
-function saveJSON(){
+function saveJSON(saveformat){
 
 
 
@@ -1188,16 +1207,16 @@ savedata.at4a={arrow:JSON.parse(at4a_scenar.dataset.arrow),tabbulles:tabbulles,c
 
 // AT4B
 savedata.at4b={}
-
-for(var i=1;i<at4b_TABLE.rows.length;i++)
-	{
-	var tr=at4b_TABLE.rows[i];
-	if(tr.dataset.idsrov!="0")
+if(typeof at4b_TABLE !== "undefined")
+	for(var i=1;i<at4b_TABLE.rows.length;i++)
 		{
-		var dataIDsave = JSON.parse(tr.dataset.pathfound).nodes.join('_')
-		savedata.at4b[dataIDsave]=tr.dataset.idsrov
+		var tr=at4b_TABLE.rows[i];
+		if(tr.dataset.idsrov!="0")
+			{
+			var dataIDsave = JSON.parse(tr.dataset.pathfound).nodes.join('_')
+			savedata.at4b[dataIDsave]=tr.dataset.idsrov
+			}
 		}
-	}
 
 // AT5A
 //savedata.at5abcd=at5abcd.dataset.data
@@ -1222,10 +1241,13 @@ for(var i=1;i<at5c_table.rows.length;i++)
 
 
 
+if(saveformat==2)
+	{
+	const json = JSON.stringify(savedata);
+	return LZString.compressToEncodedURIComponent(json)
+	}
 
-// SHARE https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js
-//const json = JSON.stringify(savedata);
-//log( LZString.compressToEncodedURIComponent(json))
+
 
 //DOWNLOAD FILE
 const contenu = JSON.stringify(savedata, null, 2);
@@ -1630,11 +1652,8 @@ function show_divcenter()
 {
 show_divgrey()
 divcenter.style.display='block'
-
 divcenter.querySelectorAll(":scope > div").forEach(e => e.style.display="none");
 }
-
-
 
 
 function show_divgrey()
@@ -2000,8 +2019,23 @@ at3a_newcat()
 at3a_newcat()
 
 showatt('at1a',document.querySelector('.startscript'))
+
+// HASH
+addEventListener("hashchange", even_hashchange())
+even_hashchange();
 }
 
+
+function even_hashchange()
+{
+log("even_hashchange")
+var hash = window.location.hash
+if (!hash.startsWith("#autoload=")) return;
+
+const valueencoded = hash.split("=")[1];
+const json = LZString.decompressFromEncodedURIComponent(valueencoded);
+loadJSON(2,json)
+}
 
 function seuil()
 {
@@ -2217,9 +2251,10 @@ at2c_ch_ERelmTAble.innerHTML=HTML
 
 function at2c_ch_EROK()
 {
+hide_divgrey()
 var tr=at2c_ch_ERelmTAble.querySelector('input:checked').closest('tr')
 
-hide_divgrey()
+
 
 PPL_clickTD.innerText=tr.cells[2].innerText
 PPL_clickTD.closest('tr').dataset.ider = tr.dataset.ider
@@ -3131,8 +3166,15 @@ function at3b_new()
 show_divcenter()
 at3b_newsscnear.style.display="block"
 
+var SROVchecked=[]
+at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => SROVchecked.push(e.closest('tr').dataset.idsrov));
+
 var toshow=[]
-at2b_srovlist.querySelectorAll('input[type="checkbox"]:checked').forEach(e => toshow.push(e.closest('tr').dataset.idsrov));
+for(var i=0;i<SROVchecked.length;i++)
+	{
+	if(at2c_srovlist.querySelector("[data-idsrov='"+SROVchecked[i]+"']").dataset.ider)
+		toshow.push(SROVchecked[i])
+	}
 
 var HTML="<table id='at3b_1table' class='tabletype at2' style='min-width:680px'>"
 HTML+="<tr style='background-color:#FFB9F6'><td></td><td style='min-width: 140px;'>Source de Risque</td><td>Objectif Visés</td><td>Gravité</td></tr>"
@@ -6238,6 +6280,44 @@ at1d_socle_ch("showdiv")
 
 
 
+// https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js
+var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",e={};function t(r,o){if(!e[r]){e[r]={};for(var n=0;n<r.length;n++)e[r][r.charAt(n)]=n}return e[r][o]}var i={compressToBase64:function(r){if(null==r)return"";var n=i._compress(r,6,function(r){return o.charAt(r)});switch(n.length%4){default:case 0:return n;case 1:return n+"===";case 2:return n+"==";case 3:return n+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(n){return t(o,r.charAt(n))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(r){return null==r?"":""==r?null:i._decompress(r.length,16384,function(o){return r.charCodeAt(o)-32})},compressToUint8Array:function(r){for(var o=i.compress(r),n=new Uint8Array(2*o.length),e=0,t=o.length;e<t;e++){var s=o.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null==o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;e<t;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return n.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(o){return t(n,r.charAt(o))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(r,o,n){if(null==r)return"";var e,t,i,s={},u={},a="",p="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1)if(a=r.charAt(i),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=f++,u[a]=!0),p=c+a,Object.prototype.hasOwnProperty.call(s,p))c=p;else{if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++),s[p]=f++,c=String(a)}if(""!==c){if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==o-1){d.push(n(m));break}v++}return d.join("")},decompress:function(r){return null==r?"":""==r?null:i._decompress(r.length,32768,function(o){return r.charCodeAt(o)})},_decompress:function(o,n,e){var t,i,s,u,a,p,c,l=[],f=4,h=4,d=3,m="",v=[],g={val:e(0),position:n,index:1};for(t=0;t<3;t+=1)l[t]=t;for(s=0,a=Math.pow(2,2),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 2:return""}for(l[3]=c,i=c,v.push(c);;){if(g.index>o)return"";for(s=0,a=Math.pow(2,d),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(c=s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 2:return v.join("")}if(0==f&&(f=Math.pow(2,d),d++),l[c])m=l[c];else{if(c!==h)return null;m=i+i.charAt(0)}v.push(m),l[h++]=i+m.charAt(0),i=m,0==--f&&(f=Math.pow(2,d),d++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module?module.exports=LZString:"undefined"!=typeof angular&&null!=angular&&angular.module("LZString",[]).factory("LZString",function(){return LZString});
+
+
+function clickiconshare()
+{
+show_divcenter()
+at00_iconshare.style.display="block"
+
+
+var data=saveJSON(2)
+
+
+var url=window.location.href
+
+if(url.startsWith("file://")) // local file, use github
+	{
+	url="https://seb1k.github.io/EBIOS-RM-Graph/ebios-rm-graph.html"
+	}
+
+at00_iconshare_link.value=url+"#autoload="+data
+}
+
+function at00_iconshare_click()
+{
+var elm = at00_iconshare_link
+navigator.clipboard.writeText(elm.value)
+
+elm.style.animation = "flash 300ms ease forwards";
+setTimeout(() => {
+  elm.style.animation = "";
+}, 300);
+
+setTimeout(() => {
+  elm.style.animation = "";
+}, 300);
+}
+
 </script>
 </head>
 <body onload="go()">
@@ -6254,7 +6334,19 @@ at1d_socle_ch("showdiv")
 <br/>
 
 
-&nbsp; <button onclick="saveJSON()" type="button"> &#128427; Save </button><br/>
+&nbsp; <button onclick="saveJSON(1)" type="button"> &#128427; Save </button>
+
+<i class="iconshare" onclick="clickiconshare()">
+<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round">
+  <line x1="6" y1="12" x2="18" y2="5"/>
+  <line x1="6" y1="12" x2="18" y2="19"/>
+  <circle cx="18" cy="5" r="3" fill="#000" stroke="none"/>
+  <circle cx="6" cy="12" r="3" fill="#000" stroke="none"/>
+  <circle cx="18" cy="19" r="3" fill="#000" stroke="none"/>
+</svg>
+</i>
+
+<br/>
 &nbsp; <button onclick="loadJSON(1)" type="button"> &#128427; Load </button><br/>
 
 <br/>
@@ -6960,32 +7052,28 @@ impérativement être prises à court terme. Dans le cas contraire, tout ou part
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </div>
 </div>
 <div id="divcenter">
 
 
-<div id="at1a_addppl" style="width:700px;padding: 8px;">
+<div id="at00_iconshare">
+<br/>
+<br/>
+<br/>
+<input style="margin-left:16px;width: 90%;"id="at00_iconshare_link" type="text"/>
+<br/><br/>
+<center>
+<button onclick="at00_iconshare_click()" style="padding:8px 16px;cursor:pointer;">Copier</button>
+</center>
+<br/>
 <br/>
 
 
+</div>
 
-
+<div id="at1a_addppl" style="width:700px;padding: 8px;">
+<br/>
 
 <table>
 <tr><td>Nom</td><td><input id="at1a_name" type="text"/></td></tr>
@@ -7098,16 +7186,16 @@ Exemple de SR/OV:
 <div class="exemple">
 <table id="at2a_tablesrovexemple" >
 <tr  style="color:#6D2163"><td>Src. de Risque</td><td style="text-indent:10px">Objectif Visés</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition des vaccins à des fins d’extorsion d’une rançon.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Saboter la campagne nationale de vaccination.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Amateur</td><td>Amusement</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Concurrent</td><td>Voler des informations en espionnant les travaux de R&D en vue d’obtenir un avantage concurrentiel.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Cybercriminel</td><td>Divulguer des informations sur les tests animaliers.</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Espionnage</td><td>Vol de données</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Etatique</td><td>Compromission du réseau de télécommunication</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Ex-salarié</td><td>Suppression de données</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Officine spécialisée</td><td>Divulgation de fausses informations</td></tr>
-<tr onclick="at2a_choosesrov(this)" style="cursor:pointer"><td>Terroriste</td><td>Arrêts d’un site de production</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Menace d’altération de la composition des vaccins à des fins d’extorsion d’une rançon.</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Activiste</td><td>Saboter la campagne nationale de vaccination.</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Amateur</td><td>Amusement</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Concurrent</td><td>Voler des informations en espionnant les travaux de R&D en vue d’obtenir un avantage concurrentiel.</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Cybercriminel</td><td>Divulguer des informations sur les tests animaliers.</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Espionnage</td><td>Vol de données</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Etatique</td><td>Compromission du réseau de télécommunication</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Ex-salarié</td><td>Suppression de données</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Officine spécialisée</td><td>Divulgation de fausses informations</td></tr>
+<tr onmousedown="at2a_choosesrov(this)" style="cursor:pointer"><td>Terroriste</td><td>Arrêts d’un site de production</td></tr>
 </table>
 </div>
 
