@@ -449,7 +449,7 @@ position: relative;
 background-color:#CCEDEC;
 height:100%;
 display:inline-block;
-width:400px;
+width:500px;
 left:200px;
 position: absolute;
 }
@@ -460,7 +460,7 @@ height:100%;
 display:inline-block;
 width:300px;
 position: absolute;
-left:630px;
+left:730px;
 }
 
 .at3b_sc .autohide{
@@ -735,6 +735,7 @@ position:absolute;
 right:0px;
 opacity:.7;
 transform: scaleX(-1);
+margin-top: -2px;
 }
 
 .at3b_sc .editicon:hover{
@@ -3256,7 +3257,7 @@ tr.querySelector('input').checked=true;
 function at3b_add(from_save)
 {
 var txt1 ="Attaquant"
-var txt2 ="Production des vaccins"
+var txt2 ="Chiffrement des données contre rançon"
 var txtOV = "SOCIÉTÉ"
 var icon1 = "testSR"
 var icon2 = "OVOV"
@@ -3286,7 +3287,7 @@ else
 		gravite = row.cells[3].innerText
 		
 		var ider = row.dataset.ider
-		log(ider)
+
 		var TRat1c = at1c_table.querySelector("[data-ider='"+ider+"']")
 
 		for(var i=TRat1c.rowIndex;i>0;i--) //SEARCH VM name
@@ -3332,7 +3333,7 @@ if(scenarobj.attackpath.length>4) return; // max : 5
 
 var text = "Chemin d’attaque"
 
-var path = {type:"XXX",	text:text,risk:1,pp1:"",at3c_sec:"",at3c_sec:""}
+var path = {type:"XXX",	text:text,risk:1,pp1:""}
 
 if(x==1)path.type="direct"
 if(x==2){path.type="eco";path.pp1="Partie prenante";}
@@ -3392,7 +3393,7 @@ for(var i=0;i < scenars.length; i++)
 		
 		var text = sc.text
 		if(sc.text3) text = sc.text3
-		cell3.innerHTML+="<p style='white-space: pre-wrap'>"+(iatt+1)+". "+text+"</p>"
+		cell3.innerHTML+="<p style='white-space: pre-wrap'>- "+text+"</p>"
 
 
 		}
@@ -3426,29 +3427,29 @@ var scenarobj = JSON.parse(divsc.dataset.attackinfo)
 
 
 //text center
-divsc.querySelector('.at3b_sc_center').innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>ÉCOSYSTÈME</div>"
+divsc.querySelector('.at3b_sc_center').innerHTML +="<div class='scadded typeeco' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>ÉCOSYSTÈME</div>"
 
 //text right
-divsc.querySelector('.at3b_sc_right').innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>"+scenarobj.ov+"</div>"
+divsc.querySelector('.at3b_sc_right').innerHTML +="<div class='scadded editicon typeov' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;top:10px;position: absolute;z-index:50;width:100%;text-align:center;'>"+scenarobj.ov+"</div>"
 
 //SOURCE
 divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;border-radius:100px;width:76px;height:76px;left:59px;top:161px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 80px;'>SR</div>"
 divsc.innerHTML +="<div class='scadded' style='width:105px;height:140px;left:57px;top:140px;position: absolute;z-index:40;background-color:#fff'></div>"
 //SOURCE txt
-divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;left:20px;top:250px;width:160px;position: absolute;z-index:60;text-align:center;'>"+scenarobj.txt1+"</div>"
+divsc.innerHTML +="<div class='scadded editicon typetxt1' contenteditable='plaintext-only' style='font-weight:bold;color:#002742;left:20px;top:250px;width:160px;position: absolute;z-index:60;text-align:center;'>"+scenarobj.txt1+"</div>"
 
 
 //Objectif
-divsc.innerHTML +="<div class='scadded' style='border:4px solid #E3394A;border-radius:100px;width:100px;height:100px;left:725px;top:148px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 100px;'>OV</div>"
-divsc.innerHTML +="<div class='scadded' style='width:120px;height:170px;left:695px;top:118px;position: absolute;z-index:40;background-color:#99DCDA'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:4px solid #E3394A;border-radius:100px;width:100px;height:100px;left:825px;top:148px;position: absolute;z-index:50;background-color:#fff;text-align: center;  line-height: 100px;'>OV</div>"
+divsc.innerHTML +="<div class='scadded' style='width:120px;height:170px;left:795px;top:118px;position: absolute;z-index:40;background-color:#99DCDA'></div>"
 //Objectif txt
-divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-weight:bold;color:#E3394A;left:792px;bottom:260px;width:134px;position: absolute;z-index:60;text-align:center;font-size:12px'>"+scenarobj.txt2+"</div>"
+divsc.innerHTML +="<div class='scadded editicon typetxt2' contenteditable='plaintext-only' style='font-weight:bold;color:#E3394A;left:892px;bottom:260px;width:134px;position: absolute;z-index:60;text-align:center;font-size:12px'>"+scenarobj.txt2+"</div>"
 
 // 4 blocs cible
-divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:0;height:25px;left:777px;top:136px;position: absolute;z-index:60;'></div>"
-divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:0;height:25px;left:777px;top:240px;position: absolute;z-index:60;'></div>"
-divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:25px;left:711px;top:200px;position: absolute;z-index:60;'></div>"
-divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:25px;left:817px;top:200px;position: absolute;z-index:60;'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:0;height:25px;left:877px;top:136px;position: absolute;z-index:60;'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:0;height:25px;left:877px;top:240px;position: absolute;z-index:60;'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:25px;left:811px;top:200px;position: absolute;z-index:60;'></div>"
+divsc.innerHTML +="<div class='scadded' style='border:2px solid #E3394A;width:25px;left:917px;top:200px;position: absolute;z-index:60;'></div>"
 
 // pathpos
 var nbattackpath = scenarobj.attackpath.length
@@ -3509,12 +3510,12 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 
 	if(top==200&&h==0)fleche="centre"
 
-	if(sc.type=="direct" && fleche=="haut") divsc.innerHTML +="<div class='scadded' style='left:768px;top:110px;display : inline-block; height : 0; width : 0; border-top : 19px solid #E3394A; border-right : 11px solid transparent; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
-	if(sc.type=="direct" && fleche=="centre") divsc.innerHTML +="<div class='scadded' style='left:686px;top:191px;display : inline-block; height : 0; width : 0;border-top : 11px solid transparent; border-bottom : 11px solid transparent; border-left : 19px solid #E3394A;position: absolute;z-index:80'></div>"
-	if(sc.type=="direct" && fleche=="bas") divsc.innerHTML +="<div class='scadded' style='left:768px;top:274px;display : inline-block; height : 0; width : 0; border-right : 11px solid transparent; border-bottom : 19px solid #E3394A; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
+	if(sc.type=="direct" && fleche=="haut") divsc.innerHTML +="<div class='scadded' style='left:868px;top:110px;display : inline-block; height : 0; width : 0; border-top : 19px solid #E3394A; border-right : 11px solid transparent; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
+	if(sc.type=="direct" && fleche=="centre") divsc.innerHTML +="<div class='scadded' style='left:786px;top:191px;display : inline-block; height : 0; width : 0;border-top : 11px solid transparent; border-bottom : 11px solid transparent; border-left : 19px solid #E3394A;position: absolute;z-index:80'></div>"
+	if(sc.type=="direct" && fleche=="bas") divsc.innerHTML +="<div class='scadded' style='left:868px;top:274px;display : inline-block; height : 0; width : 0; border-right : 11px solid transparent; border-bottom : 19px solid #E3394A; border-left : 11px solid transparent;position: absolute;z-index:80'></div>"
 	
 	if(sc.type=="direct")
-		divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;"+b+";height:"+h+"px;border-radius:10px;width:673px;left:100px;top:"+top+"px;position: absolute;z-index:"+(20-iatt)+"'></div>"// Fleche SR centre
+		divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;"+b+";height:"+h+"px;border-radius:10px;width:773px;left:100px;top:"+top+"px;position: absolute;z-index:"+(20-iatt)+"'></div>"// Fleche SR centre
 
 	if(sc.type=="eco")
 		divsc.innerHTML +="<div class='scadded' style='border:4px solid #00A7A2;"+b+";height:"+h+"px;border-radius:10px;border-right:0;width:320px;left:100px;top:"+top+"px;position: absolute;z-index:"+(20-iatt)+"'></div>"
@@ -3522,7 +3523,7 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 
 	if(sc.pp1!="")
 		{
-		var HTMLpp = "<div class='scadded' data-ppuid='SCPPUID' style='left:"+145+"px;top:"+(toptext-20)+"px;width:120px;height:40px;z-index:60;position:absolute;background-color:#CCEDEC;line-height: 100px;text-align: center;white-space: nowrap;'>"
+		var HTMLpp = "<div class='scadded' data-ppuid='SCPPUID' style='left:"+195+"px;top:"+(toptext-20)+"px;width:120px;height:40px;z-index:60;position:absolute;background-color:#CCEDEC;line-height: 100px;text-align: center;white-space: nowrap;'>"
 		HTMLpp +="<div class='scadded' style='left:25px;top:0px;width:70px;height:40px;position:absolute;background-color:#fff'>"
 
 		
@@ -3536,30 +3537,63 @@ for(var iatt=0;iatt<nbattackpath;iatt++)
 	divsc.querySelector('.at3b_sc_left').innerHTML+="<div class='optioncolumn scadded autohide' style='position:absolute;transform:rotate(270deg) translateY(-5px);cursor:pointer;font-size:20px;right:0;top:"+(toptext-25)+"px;z-index:200' onmousedown='at3b_chpath(this,"+iatt+")'><b>...</b></div>"
 	
 	if(!sc.pp1)
-		divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-size:14px;left:250px;top:"+(toptext-18)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:300px;text-align:center;'>"+sc.text+"</div>"
+		divsc.innerHTML +="<div class='scadded editicon typetext' data-iatt="+iatt+" contenteditable='plaintext-only' style='font-size:14px;left:300px;top:"+(toptext-18)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:300px;text-align:center;'>"+sc.text+"</div>"
 	else
 		{
-		divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-size:14px;left:205px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text+"</div>"
+		divsc.innerHTML +="<div class='scadded editicon typetext' data-iatt="+iatt+" contenteditable='plaintext-only' style='font-size:14px;left:205px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:180px;text-align: center;'>"+sc.text+"</div>"
 		if(sc.text2)
-			divsc.innerHTML +="<div class='scadded editicon' contenteditable='plaintext-only' style='font-size:14px;left:475px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text2+"</div>"
+			divsc.innerHTML +="<div class='scadded editicon typetext2' data-iatt="+iatt+" contenteditable='plaintext-only' style='font-size:14px;left:475px;bottom:"+(400-toptext)+"px;position: absolute;z-index:"+(50-iatt)+";color:#001784;width:130px;text-align: center;'>"+sc.text2+"</div>"
 		}
 	}
+	// add event on every "editicon"
+	divsc.querySelectorAll('.editicon').forEach(e => e.addEventListener('input', function(){change_text(e)}));
 }
 }
 
-function at3b_chpath(elem,idpath)
+
+function change_text(elm)
 {
-show_divmenuover(elem)
+var divsc = elm.closest('.at3b_sc')
+var scenarobj = JSON.parse(divsc.dataset.attackinfo)
+var newtxt = elm.innerText
+//icon1:icon1,txt1:txt1,txt2:txt2,ov:txtOV,gravite:gravite, icon2:icon2, attackpath:attackpath
+var iatt=-1;
+if(elm.dataset.iatt)
+	iatt=elm.dataset.iatt
+	
+log(elm)
+var t =""
+if(elm.classList.contains('typeeco'))t ="typeeco"
+if(elm.classList.contains('typeov'))
+	scenarobj.ov=newtxt
+if(elm.classList.contains('typetxt1'))
+	scenarobj.txt1=newtxt
+if(elm.classList.contains('typetxt2'))
+	scenarobj.txt2=newtxt
+if(elm.classList.contains('typetext'))
+	scenarobj.attackpath[iatt].text=newtxt
+if(elm.classList.contains('typetext2'))
+	scenarobj.attackpath[iatt].text2=newtxt
+
+
+log(scenarobj.attackpath[iatt])
+
+divsc.dataset.attackinfo = JSON.stringify(scenarobj)
+at3b_redraw_synthese()
+}
+
+function at3b_chpath(elm,idpath)
+{
+show_divmenuover(elm)
 
 document.querySelectorAll('.scenarselected').forEach(e => e.classList.remove('scenarselected'));
-elem.closest('.at3b_sc').classList.add('scenarselected')
+elm.closest('.at3b_sc').classList.add('scenarselected')
 
-divmenuover.innerHTML ="<div onclick='at3b_chpath2(1,"+idpath+")'><span style='padding:0 10px'>&#x270E;</span>Editer</div>"
-divmenuover.innerHTML +="<div onclick='at3b_chpath2(5,"+idpath+")'><span style='padding:0 10px'> </span>Partie prenante</div>"
+divmenuover.innerHTML ="<div onclick='at3b_chpath2(5,"+idpath+")'><span style='padding:0 10px'>&#9998;</span>Partie prenante</div>"
 
-divmenuover.innerHTML +="<div onclick='at3b_chpath2(2,"+idpath+")'><span style='padding:0 10px'>+</span>Monter</div>"
-divmenuover.innerHTML +="<div onclick='at3b_chpath2(3,"+idpath+")'><span style='padding:0 10px'>-</span>Descendre</div>"
-divmenuover.innerHTML +="<div onclick='at3b_chpath2(4,"+idpath+")'><span style='padding:0 10px'>X</span>Supprimer</div>"
+divmenuover.innerHTML +="<div onclick='at3b_chpath2(2,"+idpath+")'><span style='padding:0 10px'>&#11165;</span>Monter</div>"
+divmenuover.innerHTML +="<div onclick='at3b_chpath2(3,"+idpath+")'><span style='padding:0 10px'>&#11167;</span>Descendre</div>"
+divmenuover.innerHTML +="<div onclick='at3b_chpath2(4,"+idpath+")'><span style='padding:0 10px;font-size:20px;font-weight: bold;'>×</span>Supprimer</div>"
 }
 
 function at3b_chpath2(x,idpath)
@@ -3576,7 +3610,6 @@ if(x==2&&idpath==0)return;
 if(x==3&&idpath>=scenarobj.attackpath.length-1)return;
 
 
-if(x==1){at3b_chpath2edit(idpath);return}
 if(x==2)scenarobj.attackpath = move_elem_in_array(scenarobj.attackpath,idpath,idpath-1)
 if(x==3)scenarobj.attackpath = move_elem_in_array(scenarobj.attackpath,idpath,idpath+1)
 if(x==4){delete(scenarobj.attackpath[idpath]);scenarobj.attackpath=scenarobj.attackpath.filter(val => val)}
@@ -3588,41 +3621,8 @@ divsc.dataset.attackinfo = JSON.stringify(scenarobj)
 at3b_redraw()
 }
 
-function at3b_chpath2edit(idpath)
-{
-show_divcenter()
-at3b_chpathdiv.style.display="block"
 
-at3b_chpathdiv.dataset.idpath=idpath
 
-var divsc = document.querySelector('.scenarselected')
-var scenarobj = JSON.parse(divsc.dataset.attackinfo)
-
-//at3b_synthese.style.display = 
-
-var p = scenarobj.attackpath[idpath]
-
-at3b_chpath1input.value=(p.text) ? p.text : "";
-at3b_chpath2input.value=(p.text2) ? p.text2 : "";
-at3b_chpath3input.value=(p.text3) ? p.text3 : "";
-
-}
-
-function at3b_chpath2edit_ok()
-{
-var divsc = document.querySelector('.scenarselected')
-var scenarobj = JSON.parse(divsc.dataset.attackinfo)
-var idpath = parseInt(at3b_chpathdiv.dataset.idpath)
-
-scenarobj.attackpath[idpath].text=at3b_chpath1input.value
-scenarobj.attackpath[idpath].text2=at3b_chpath2input.value
-scenarobj.attackpath[idpath].text3=at3b_chpath3input.value
-
-divsc.dataset.attackinfo = JSON.stringify(scenarobj)
-
-hide_divgrey()
-at3b_redraw()
-}
 
 function at3b_add_pp(idpath)
 {
@@ -3933,7 +3933,6 @@ tr.classList.add('trselected');
 
 
 
-at3b_new_path.value		=	tr.cells[2].innerText
 
 at3b_new_descr.value	= tr.querySelector('.at3c_desc')		? tr.querySelector('.at3c_desc').innerText : "";
 at3b_new_detail.value	= tr.querySelector('.at3b_new_detail')	? tr.querySelector('.at3b_new_detail').innerText : "";
@@ -4006,7 +4005,7 @@ if(tabresult)
 	}
 
 tr.cells[1].innerText	=	at3b_new_pp.value
-tr.cells[2].innerText	=	at3b_new_path.value
+
 
 tr.cells[3].innerHTML	=	"<span style='font-weight:bold;' class='at3c_desc'>"+at3b_new_descr.value+"</span><span style='font-weight:bold;'> "+txtresult+"</span><br/><span class='at3c_detail'>"+at3b_new_detail.innerHTML+"</span>"
 
@@ -7283,22 +7282,6 @@ Exemple de SR/OV:
 <br/>
 </div>
 
-<div id="at3b_chpathdiv" style="width:700px">
-<br/>
-<br/>
-<table>
-<tr><td>Attaquant &lt;-&gt;  Ecosystème</td><td><input id="at3b_chpath1input" /></td></tr>
-<tr><td>Ecosystème &lt;-&gt; Société</td><td><input id="at3b_chpath2input" /></td></tr>
-</table>
-<br/>
-Description<br/>
-<textarea id="at3b_chpath3input" style="width:500px;height:80px"></textarea>
-<br/><br/>
-<center><button onclick="at3b_chpath2edit_ok()" style="padding:8px 16px;">Ok</button></center>
-
-<br/>
-</div>
-
 
 
 <div id="at3c_newsmesurediv" style="width:700px">
@@ -7321,7 +7304,6 @@ Description<br/>
 <br/>
 <table>
 <tr style="display:none"><td>Partie prenante</td><td><input id="at3b_new_pp" /></td></tr>
-<tr><td>Chemins d’attaque stratégiques</td><td><input id="at3b_new_path" /></td></tr>
 <tr><td></td><td></td></tr>
 
 <tr><td><b>Mesures de sécurité :</b></td><td></td></tr>
